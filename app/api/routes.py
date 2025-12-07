@@ -3,16 +3,29 @@ API routes for the Predictive Maintenance Platform.
 """
 from datetime import datetime, timedelta
 from flask import jsonify, request, current_app
+from flask_login import login_required
 from sqlalchemy import func
 from app.packages import api_bp
 from app.models.sensor_data import SensorData, EventLog, MachineState
 from app.models.company import Company, Machine
 from app.services.predictor import PredictiveService
 from app.services.simulator import DataSimulator
+from app.api.auth import auth_bp
+from app.api.ingest import ingest_bp
+from app.api.machine_management import machine_mgmt_bp
+from app.api.admin import admin_bp
+
+def register_routes(app):
+    app.register_blueprint(api_bp) # Register the existing api_bp
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(ingest_bp)
+    app.register_blueprint(machine_mgmt_bp)
+    app.register_blueprint(admin_bp)
 
 # Services will be initialized per request to avoid context issues
 
 @api_bp.route('/latest-states', methods=['GET'])
+@login_required
 def get_latest_machine_states():
     """Get current state of all machines with predictions."""
     try:
@@ -66,6 +79,7 @@ def get_latest_machine_states():
         return jsonify({"error": "Internal server error"}), 500
 
 @api_bp.route('/history')
+@login_required
 def get_history():
     """Get historical sensor data for a specific machine."""
     machine_id = request.args.get('machine_id')
@@ -89,6 +103,7 @@ def get_history():
 
 
 @api_bp.route('/perform-maintenance', methods=['POST'])
+@login_required
 def perform_maintenance():
     """Request maintenance for a specific machine."""
     try:

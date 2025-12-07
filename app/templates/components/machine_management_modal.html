@@ -1,0 +1,331 @@
+<!-- Enhanced Machine Management Modal -->
+<div id="machine-management-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div
+            class="bg-gray-900 rounded-xl max-w-7xl w-full max-h-[95vh] overflow-hidden border-2 border-electric-blue/30">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-electric-blue/20 to-neon-cyan/20 p-6 border-b border-electric-blue/30">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-3xl font-space font-bold text-white mb-2">🔧 Machine Management System</h2>
+                        <p class="text-silver text-lg">Add, configure, and monitor your industrial equipment</p>
+                    </div>
+                    <button onclick="hideMachineManagement()"
+                        class="text-white hover:text-electric-blue text-3xl font-bold bg-gray-800 hover:bg-gray-700 rounded-full w-12 h-12 flex items-center justify-center transition-all duration-300">&times;</button>
+                </div>
+            </div>
+
+            <!-- Enhanced Tabs -->
+            <div class="bg-gray-800 border-b border-gray-700">
+                <div class="flex space-x-1 p-2">
+                    <button id="tab-machines"
+                        class="tab-button active px-6 py-3 rounded-lg font-bold text-white bg-electric-blue"
+                        onclick="switchMachineTab('machines')">
+                        🏭 Machines
+                    </button>
+                    <button id="tab-data-upload"
+                        class="tab-button px-6 py-3 rounded-lg font-bold text-gray-300 hover:text-white hover:bg-gray-700"
+                        onclick="switchMachineTab('data-upload')">
+                        📊 Training Data
+                    </button>
+                    <button id="tab-data-streaming"
+                        class="tab-button px-6 py-3 rounded-lg font-bold text-gray-300 hover:text-white hover:bg-gray-700"
+                        onclick="switchMachineTab('data-streaming')">
+                        📡 Data Streaming
+                    </button>
+                    <button id="tab-analytics"
+                        class="tab-button px-6 py-3 rounded-lg font-bold text-gray-300 hover:text-white hover:bg-gray-700"
+                        onclick="switchMachineTab('analytics')">
+                        📈 Analytics
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="p-6 overflow-y-auto max-h-[calc(95vh-200px)] bg-gray-900">
+                <!-- Machines Tab -->
+                <div id="machines-panel" class="tab-panel">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Register New Machine -->
+                        <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                            <h3 class="text-2xl font-space font-bold text-white mb-6 flex items-center">
+                                <span class="mr-3">🚀</span> Register New Machine
+                            </h3>
+                            <form id="machine-form" class="space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-white font-bold text-lg mb-2">Machine ID</label>
+                                        <input type="text" name="machine_id_at_company"
+                                            class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
+                                            placeholder="e.g., FILLING_002" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-white font-bold text-lg mb-2">Machine Name</label>
+                                        <input type="text" name="name"
+                                            class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
+                                            placeholder="e.g., Filling Line 2" required>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-white font-bold text-lg mb-2">Machine Type</label>
+                                        <div class="flex space-x-2 w-full max-w-full">
+                                            <div class="flex-1 min-w-0">
+                                                <select id="machine-type-select" name="machine_type"
+                                                    class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
+                                                    required>
+                                                    <option value="">-- Select Machine Type --</option>
+                                                    <!-- Options will be populated dynamically -->
+                                                </select>
+                                                <input type="text" id="custom-machine-type"
+                                                    placeholder="Or enter custom type"
+                                                    class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
+                                                    style="display: none;">
+                                            </div>
+                                            <button type="button" id="add-custom-type"
+                                                class="w-12 h-12 bg-electric-blue text-white rounded-lg hover:bg-blue-600 text-xl font-bold flex items-center justify-center flex-shrink-0">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-white font-bold text-lg mb-2">Manufacturer</label>
+                                            <input type="text" name="manufacturer"
+                                                class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
+                                                placeholder="e.g., Siemens">
+                                        </div>
+                                        <div>
+                                            <label class="block text-white font-bold text-lg mb-2">Model</label>
+                                            <input type="text" name="model"
+                                                class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
+                                                placeholder="e.g., SIMATIC S7-1500">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-white font-bold text-lg mb-2">Serial Number</label>
+                                        <input type="text" name="serial_number"
+                                            class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
+                                            placeholder="e.g., SN123456789">
+                                    </div>
+                                    <div>
+                                        <label class="block text-white font-bold text-lg mb-2">Location</label>
+                                        <input type="text" name="location"
+                                            class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
+                                            placeholder="e.g., Production Line A">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-white font-bold text-lg mb-2">Installation Date</label>
+                                        <input type="date" name="installation_date"
+                                            class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg">
+                                    </div>
+                                </div>
+
+                                <!-- Dynamic Sensor Configuration -->
+                                <div class="bg-gray-700 rounded-lg p-4">
+                                    <h4
+                                        class="text-xl font-bold text-electric-blue mb-4 flex items-center justify-between">
+                                        🔧 Sensor Configuration
+                                        <button type="button" id="add-sensor-btn"
+                                            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-bold">+
+                                            Add Sensor</button>
+                                    </h4>
+                                    <div id="sensor-config-fields">
+                                        <p class="text-gray-400 mb-4">Add sensors for this machine. Each sensor can have
+                                            custom configuration.</p>
+                                        <div id="sensors-container">
+                                            <!-- Dynamic sensors will be added here -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="submit"
+                                    class="w-full bg-gradient-to-r from-electric-blue to-neon-cyan text-white font-bold py-4 px-6 rounded-lg text-xl hover:from-electric-blue/80 hover:to-neon-cyan/80 transition-all duration-300 transform hover:scale-105">
+                                    🚀 Register Machine
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Existing Machines -->
+                        <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                            <h3 class="text-2xl font-space font-bold text-white mb-6 flex items-center">
+                                <span class="mr-3">📋</span> Registered Machines
+                            </h3>
+                            <div id="machines-list" class="space-y-4">
+                                <div class="text-center text-gray-400 py-8">
+                                    <div class="text-4xl mb-2">🔄</div>
+                                    <p>Loading machines...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Training Data Upload Tab -->
+                <div id="data-upload-panel" class="tab-panel hidden">
+                    <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                        <h3 class="text-2xl font-space font-bold text-white mb-6 flex items-center">
+                            <span class="mr-3">📊</span> Upload Historical Maintenance Data
+                        </h3>
+
+                        <!-- Machine Selection -->
+                        <div class="mb-6">
+                            <label class="block text-white font-bold text-lg mb-2">Select Machine for Training
+                                Data</label>
+                            <select id="training-machine-select"
+                                class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
+                                required>
+                                <option value="">-- Select Machine --</option>
+                            </select>
+                            <p class="text-sm text-gray-400 mt-2">Choose which machine this training data belongs to</p>
+                        </div>
+
+                        <!-- CSV Upload Area -->
+                        <div class="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-electric-blue transition-colors duration-300"
+                            id="csv-upload-area">
+                            <div class="text-6xl mb-4">📁</div>
+                            <h4 class="text-xl font-bold text-white mb-2">Upload CSV Training Data</h4>
+                            <p class="text-gray-400 mb-4">Drag and drop your CSV file here or click to browse</p>
+                            <input type="file" id="csv-file-input" accept=".csv" class="hidden">
+                            <button type="button" id="browse-csv-btn"
+                                class="bg-electric-blue text-white font-bold py-3 px-6 rounded-lg hover:bg-electric-blue/80 transition-colors duration-300">
+                                Browse Files
+                            </button>
+                            <div class="mt-4 text-sm text-gray-500">
+                                <p>Supported formats: CSV files with sensor data and maintenance records</p>
+                            </div>
+                        </div>
+
+                        <!-- Upload Progress -->
+                        <div class="hidden mt-4" id="csv-progress">
+                            <div class="bg-gray-700 rounded-full h-3 overflow-hidden">
+                                <div class="bg-gradient-to-r from-electric-blue to-neon-cyan h-full transition-all duration-300"
+                                    id="csv-progress-bar" style="width: 0%"></div>
+                            </div>
+                            <p class="text-white text-center mt-2">Uploading...</p>
+                        </div>
+
+                        <!-- Uploaded Files List -->
+                        <div class="mt-6">
+                            <h4 class="text-lg font-bold text-white mb-4">📋 Uploaded Training Files</h4>
+                            <div id="uploaded-files-list" class="space-y-2">
+                                <p class="text-gray-400 text-center py-4">No files uploaded yet</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Streaming Tab -->
+                <div id="data-streaming-panel" class="tab-panel hidden">
+                    <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                        <h3 class="text-2xl font-space font-bold text-white mb-6 flex items-center">
+                            <span class="mr-3">📡</span> Real-Time Data Streaming Configuration
+                        </h3>
+
+                        <!-- Streaming Status -->
+                        <div class="mb-6 p-4 bg-gray-700 rounded-lg">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-3 h-3 bg-red-500 rounded-full" id="streaming-indicator"></div>
+                                    <span class="text-white font-bold" id="streaming-text">Streaming Inactive</span>
+                                </div>
+                                <button id="start-streaming-btn"
+                                    class="bg-electric-blue text-white font-bold py-2 px-4 rounded-lg hover:bg-electric-blue/80 transition-colors duration-300">
+                                    Start Streaming
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Machine Selection -->
+                        <div class="mb-6">
+                            <label class="block text-white font-bold text-lg mb-2">Select Machine for Data
+                                Streaming</label>
+                            <select id="streaming-machine-select"
+                                class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg">
+                                <option value="">-- Select Machine --</option>
+                            </select>
+                        </div>
+
+                        <!-- Connection Settings -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-white font-bold text-lg mb-2">Data Source Type</label>
+                                <select id="data-source-type"
+                                    class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg">
+                                    <option value="api">REST API</option>
+                                    <option value="mqtt">MQTT Broker</option>
+                                    <option value="opcua">OPC UA</option>
+                                    <option value="modbus">Modbus TCP</option>
+                                    <option value="websocket">WebSocket</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-white font-bold text-lg mb-2">Update Frequency
+                                    (seconds)</label>
+                                <input type="number" id="update-frequency"
+                                    class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
+                                    value="5" min="1" max="60">
+                            </div>
+                            <div>
+                                <label class="block text-white font-bold text-lg mb-2">Host/IP Address</label>
+                                <input type="text" id="streaming-host"
+                                    class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
+                                    placeholder="192.168.1.100">
+                            </div>
+                            <div>
+                                <label class="block text-white font-bold text-lg mb-2">Port</label>
+                                <input type="number" id="streaming-port"
+                                    class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
+                                    placeholder="8080">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Model Training Tab -->
+
+                <!-- Analytics Tab -->
+                <div id="analytics-panel" class="tab-panel hidden">
+                    <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+                        <h3 class="text-2xl font-space font-bold text-white mb-6 flex items-center">
+                            <span class="mr-3">📈</span> Machine Analytics & Insights
+                        </h3>
+
+                        <!-- Analytics Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <div class="bg-gray-700 rounded-lg p-4 text-center">
+                                <h4 class="text-3xl font-bold text-electric-blue">95.2%</h4>
+                                <p class="text-white font-bold">Model Accuracy</p>
+                            </div>
+                            <div class="bg-gray-700 rounded-lg p-4 text-center">
+                                <h4 class="text-3xl font-bold text-success-green">1,247</h4>
+                                <p class="text-white font-bold">Data Points Processed</p>
+                            </div>
+                            <div class="bg-gray-700 rounded-lg p-4 text-center">
+                                <h4 class="text-3xl font-bold text-warning-amber">3</h4>
+                                <p class="text-white font-bold">Predictions Made</p>
+                            </div>
+                        </div>
+
+                        <!-- Performance Charts -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="bg-gray-700 rounded-lg p-4">
+                                <h4 class="text-lg font-bold text-electric-blue mb-4">Model Performance Over Time</h4>
+                                <canvas id="performance-chart" width="400" height="200"></canvas>
+                            </div>
+                            <div class="bg-gray-700 rounded-lg p-4">
+                                <h4 class="text-lg font-bold text-electric-blue mb-4">Data Quality Metrics</h4>
+                                <canvas id="quality-chart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

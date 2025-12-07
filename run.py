@@ -16,6 +16,7 @@ def run_simulator(app):
     
     with app.app_context():
         simulator = DataSimulator()
+        simulator.ensure_initialized()
         while True:
             try:
                 simulator.generate_sensor_data()
@@ -29,9 +30,13 @@ if __name__ == '__main__':
     
     app = create_app()
     
-    # Start simulator in background thread
-    simulator_thread = threading.Thread(target=run_simulator, args=(app,), daemon=True)
-    simulator_thread.start()
+    # Start simulator in background thread if enabled
+    if app.config.get('ENABLE_SIMULATOR', True):
+        simulator_thread = threading.Thread(target=run_simulator, args=(app,), daemon=True)
+        simulator_thread.start()
+        app.logger.info("Simulator started")
+    else:
+        app.logger.info("Simulator disabled - waiting for real data")
     
     # Run Flask app with SocketIO
     socketio.run(app, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=False)

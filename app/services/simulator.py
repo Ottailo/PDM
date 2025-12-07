@@ -22,6 +22,10 @@ class DataSimulator:
     
     def __init__(self):
         """Initialize the simulator."""
+        pass
+        
+    def ensure_initialized(self):
+        """Ensure machine states are initialized."""
         self.initialize_states()
         
     def initialize_states(self):

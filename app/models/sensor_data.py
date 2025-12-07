@@ -3,7 +3,7 @@ Database models for the Predictive Maintenance Platform.
 """
 from datetime import datetime
 from app import db
-from sqlalchemy.dialects.sqlite import JSON as SqliteJSON
+from app import db
 
 class SensorData(db.Model):
     """Sensor readings from machines."""
@@ -61,7 +61,7 @@ class MachineState(db.Model):
     machine_id = db.Column(db.String(100), unique=True, nullable=False)
     status = db.Column(db.String(50), nullable=False, default='Normal')
     health_factor = db.Column(db.Float, nullable=False, default=1.0)
-    active_failure = db.Column(SqliteJSON, nullable=True)
+    active_failure = db.Column(db.JSON, nullable=True)
     event_steps_left = db.Column(db.Integer, nullable=False, default=0)
     last_updated = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     

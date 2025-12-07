@@ -1,0 +1,45 @@
+<!-- Technical Header -->
+<header class="mb-6 border-b border-gray-800 pb-4">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <!-- Title & Status -->
+        <div>
+            <h1 class="text-2xl font-space font-bold text-white tracking-tight">
+                <span class="text-accent">PDM</span> DASHBOARD
+            </h1>
+            <div class="flex items-center gap-3 mt-1">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                <p id="last-updated" class="text-xs text-gray-500 font-mono">
+                    SYSTEM ONLINE | CONNECTING...
+                </p>
+            </div>
+        </div>
+
+        <!-- KPI Summary Bar -->
+        <div class="flex items-center gap-6 bg-gray-900/50 px-4 py-2 rounded border border-gray-800">
+            <div class="text-center">
+                <div class="text-xs text-gray-500 uppercase tracking-wider">Online</div>
+                <div class="font-mono text-lg font-bold text-accent" id="kpi-online">-</div>
+            </div>
+            <div class="w-px h-8 bg-gray-800"></div>
+            <div class="text-center">
+                <div class="text-xs text-gray-500 uppercase tracking-wider">Alerts</div>
+                <div class="font-mono text-lg font-bold text-critical" id="kpi-alerts">-</div>
+            </div>
+            <div class="w-px h-8 bg-gray-800"></div>
+            <div>
+                {% if current_user.role == 'admin' %}
+                <button onclick="showMachineManagement()"
+                    class="px-3 py-1 text-xs font-bold text-gray-900 bg-accent hover:bg-cyan-400 transition-colors rounded-sm uppercase tracking-wide">
+                    Manage
+                </button>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- User Controls -->
+        <div class="absolute top-4 right-4 md:static">
+            <a href="/auth/logout"
+                class="text-xs text-gray-500 hover:text-white transition-colors font-mono">[LOGOUT]</a>
+        </div>
+    </div>
+</header>

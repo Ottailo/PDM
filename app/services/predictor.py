@@ -18,6 +18,14 @@ from app.config.machine_config import (
 
 logger = logging.getLogger(__name__)
 
+# Global cache for models
+_MODEL_CACHE = {
+    'models': {},
+    'scalers': {},
+    'rul_scalers': {},
+    'loaded': False
+}
+
 class PredictiveService:
     """Flexible service for making predictions about machine health and failures.
     
@@ -29,12 +37,14 @@ class PredictiveService:
     """
 
     def __init__(self) -> None:
-        self.models = {}
-        self.scalers = {}
-        self.rul_scalers = {}
-        self.models_loaded = False
+        self.models = _MODEL_CACHE['models']
+        self.scalers = _MODEL_CACHE['scalers']
+        self.rul_scalers = _MODEL_CACHE['rul_scalers']
+        self.models_loaded = _MODEL_CACHE['loaded']
         self.z_score_threshold = 3.0
-        self._load_models()
+        
+        if not self.models_loaded:
+            self._load_models()
 
     def _try_import_tf(self):
         """Try to import TensorFlow, return None if unavailable."""
@@ -47,14 +57,14 @@ class PredictiveService:
 
     def _load_models(self) -> None:
         """Load models for all configured machine types."""
-        if self.models_loaded:
+        if _MODEL_CACHE['loaded']:
             return
             
         model_base_dir = current_app.config.get('MODEL_BASE_DIR')
         load_model = self._try_import_tf()
         
         if load_model is None:
-            self.models_loaded = False
+            _MODEL_CACHE['loaded'] = False
             logger.info("Running in heuristic mode - no ML models available")
             return
             
@@ -69,16 +79,18 @@ class PredictiveService:
                     logger.warning("Missing model assets for %s; skipping", machine_type)
                     continue
                     
-                self.models[machine_type] = load_model(model_path)
-                self.scalers[machine_type] = joblib.load(scaler_path)
-                self.rul_scalers[machine_type] = joblib.load(rul_scaler_path)
+                _MODEL_CACHE['models'][machine_type] = load_model(model_path)
+                _MODEL_CACHE['scalers'][machine_type] = joblib.load(scaler_path)
+                _MODEL_CACHE['rul_scalers'][machine_type] = joblib.load(rul_scaler_path)
                 any_loaded = True
                 logger.info("Loaded model and scalers for %s", machine_type)
                 
             except Exception as e:
                 logger.error("Failed to load model for %s: %s", machine_type, e)
                 
+        _MODEL_CACHE['loaded'] = any_loaded
         self.models_loaded = any_loaded
+        
         if self.models_loaded:
             logger.info("ML models loaded successfully")
         else:

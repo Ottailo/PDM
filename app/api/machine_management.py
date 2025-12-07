@@ -1,18 +1,33 @@
 """
 Machine Management API Routes
 """
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, abort
+from flask_login import login_required, current_user
 from datetime import datetime
 from app import db
 from app.models.company import Company, Machine, MaintenanceRecord
 from app.models.sensor_data import MachineState
 from app.services.simulator import DataSimulator
 import logging
+from functools import wraps
 
 logger = logging.getLogger(__name__)
 
 # Create blueprint for machine management
 machine_mgmt_bp = Blueprint('machine_mgmt', __name__)
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or current_user.role != 'admin':
+            return jsonify({"error": "Admin access required"}), 403
+        return f(*args, **kwargs)
+    return decorated_function
+
+@machine_mgmt_bp.before_request
+@login_required
+def before_request():
+    pass
 
 @machine_mgmt_bp.route('/companies', methods=['GET'])
 def get_companies():
@@ -179,6 +194,7 @@ def get_company_dashboard(company_id):
         return jsonify({"error": "Failed to fetch dashboard data"}), 500
 
 @machine_mgmt_bp.route('/machines', methods=['POST'])
+@admin_required
 def create_machine():
     """Create a new machine with dynamic sensor configuration."""
     try:
@@ -273,6 +289,7 @@ def add_sensor_config():
         return jsonify({"error": "Failed to update sensor configuration"}), 500
 
 @machine_mgmt_bp.route('/machines/<machine_id>', methods=['DELETE'])
+@admin_required
 def delete_machine(machine_id):
     """Delete a machine."""
     try:
