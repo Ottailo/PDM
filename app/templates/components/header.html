@@ -1,45 +1,65 @@
-<!-- Technical Header -->
-<header class="mb-6 border-b border-gray-800 pb-4">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <!-- Title & Status -->
-        <div>
-            <h1 class="text-2xl font-space font-bold text-white tracking-tight">
-                <span class="text-accent">PDM</span> DASHBOARD
-            </h1>
-            <div class="flex items-center gap-3 mt-1">
-                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                <p id="last-updated" class="text-xs text-gray-500 font-mono">
-                    SYSTEM ONLINE | CONNECTING...
-                </p>
-            </div>
+<!-- High-Density Industrial Control Header Strip -->
+<header class="h-12 border-b border-[var(--pdm-border-hairline)] bg-[var(--pdm-surface-base)] px-4 flex items-center justify-between flex-shrink-0 z-20">
+    <!-- Brand & System Telemetry Status -->
+    <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2">
+            <span class="font-display font-bold text-sm tracking-wide text-[var(--pdm-accent-base)] uppercase">PDM</span>
+            <span class="text-xs text-[var(--pdm-border-strong)]">|</span>
+            <span class="font-display font-medium text-xs tracking-wider text-[var(--pdm-text-secondary)] uppercase hidden sm:inline">CONTROL CONSOLE</span>
         </div>
 
-        <!-- KPI Summary Bar -->
-        <div class="flex items-center gap-6 bg-gray-900/50 px-4 py-2 rounded border border-gray-800">
-            <div class="text-center">
-                <div class="text-xs text-gray-500 uppercase tracking-wider">Online</div>
-                <div class="font-mono text-lg font-bold text-accent" id="kpi-online">-</div>
-            </div>
-            <div class="w-px h-8 bg-gray-800"></div>
-            <div class="text-center">
-                <div class="text-xs text-gray-500 uppercase tracking-wider">Alerts</div>
-                <div class="font-mono text-lg font-bold text-critical" id="kpi-alerts">-</div>
-            </div>
-            <div class="w-px h-8 bg-gray-800"></div>
-            <div>
-                {% if current_user.role == 'admin' %}
-                <button onclick="showMachineManagement()"
-                    class="px-3 py-1 text-xs font-bold text-gray-900 bg-accent hover:bg-cyan-400 transition-colors rounded-sm uppercase tracking-wide">
-                    Manage
-                </button>
-                {% endif %}
-            </div>
+        <div class="h-4 w-px bg-[var(--pdm-border-hairline)]"></div>
+
+        <!-- Telemetry Heartbeat Ticker -->
+        <div class="flex items-center gap-2">
+            <span id="heartbeat-dot" class="pdm-ticker-dot" title="Telemetry Heartbeat"></span>
+            <span id="last-updated" class="font-mono text-[11px] text-[var(--pdm-text-muted)] uppercase tracking-wider">
+                STREAM CONNECTING...
+            </span>
+        </div>
+    </div>
+
+    <!-- Central Fleet KPI Readouts -->
+    <div class="flex items-center gap-3">
+        <!-- Online Fleet Counter -->
+        <div class="flex items-center gap-1.5 px-2.5 py-1 bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] rounded-[var(--pdm-radius-sm)]">
+            <span class="pdm-label text-[10px] text-[var(--pdm-text-muted)]">ONLINE</span>
+            <span id="kpi-online" class="font-mono text-xs font-bold text-[var(--pdm-status-normal)]">-</span>
         </div>
 
-        <!-- User Controls -->
-        <div class="absolute top-4 right-4 md:static">
-            <a href="/auth/logout"
-                class="text-xs text-gray-500 hover:text-white transition-colors font-mono">[LOGOUT]</a>
+        <!-- Active Alerts Counter -->
+        <div class="flex items-center gap-1.5 px-2.5 py-1 bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] rounded-[var(--pdm-radius-sm)]">
+            <span class="pdm-label text-[10px] text-[var(--pdm-text-muted)]">ALERTS</span>
+            <span id="kpi-alerts" class="font-mono text-xs font-bold text-[var(--pdm-status-critical)]">-</span>
         </div>
+    </div>
+
+    <!-- Actions & User Session Strip -->
+    <div class="flex items-center gap-2">
+        {% if current_user.role == 'admin' %}
+        <button onclick="showMachineManagement()"
+            class="pdm-btn text-xs py-1 px-2.5 h-7 bg-[var(--pdm-surface-raised)] border-[var(--pdm-border-subtle)] hover:border-[var(--pdm-accent-base)] text-[var(--pdm-text-primary)]"
+            title="Machinery & Data Management">
+            <svg class="w-3.5 h-3.5 text-[var(--pdm-accent-base)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <span class="hidden sm:inline">ENGINEERING</span>
+        </button>
+        {% endif %}
+
+        <!-- User Role Badge -->
+        <span class="font-mono text-[10px] uppercase px-2 py-0.5 rounded-[var(--pdm-radius-sm)] bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] text-[var(--pdm-text-secondary)] hidden md:inline">
+            {{ current_user.username }} [{{ current_user.role }}]
+        </span>
+
+        <!-- Logout Trigger -->
+        <a href="{{ url_for('auth.logout') }}"
+            class="pdm-btn text-xs py-1 px-2 h-7 bg-transparent border-transparent hover:border-[var(--pdm-border-subtle)] text-[var(--pdm-text-muted)] hover:text-[var(--pdm-status-critical)]"
+            title="Terminate Session">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+        </a>
     </div>
 </header>

@@ -10,23 +10,28 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initTabs() {
-    const tabs = ['users', 'system', 'settings'];
+    const tabs = ['users', 'config', 'system', 'settings'];
 
     tabs.forEach(tab => {
         const btn = document.getElementById(`tab-${tab}`);
         const panel = document.getElementById(`panel-${tab}`);
+        if (!btn || !panel) return;
 
         btn.addEventListener('click', () => {
             // Deactivate all
             tabs.forEach(t => {
-                document.getElementById(`tab-${t}`).classList.remove('text-electric-blue', 'border-b-2', 'border-electric-blue', 'font-semibold');
-                document.getElementById(`tab-${t}`).classList.add('text-gray-400');
-                document.getElementById(`panel-${t}`).classList.add('hidden');
+                const b = document.getElementById(`tab-${t}`);
+                const p = document.getElementById(`panel-${t}`);
+                if (b) {
+                    b.classList.remove('text-[var(--pdm-accent-base)]', 'border-b-2', 'border-[var(--pdm-accent-base)]', 'font-semibold');
+                    b.classList.add('text-[var(--pdm-text-muted)]');
+                }
+                if (p) p.classList.add('hidden');
             });
 
             // Activate clicked
-            btn.classList.add('text-electric-blue', 'border-b-2', 'border-electric-blue', 'font-semibold');
-            btn.classList.remove('text-gray-400');
+            btn.classList.add('text-[var(--pdm-accent-base)]', 'border-b-2', 'border-[var(--pdm-accent-base)]', 'font-semibold');
+            btn.classList.remove('text-[var(--pdm-text-muted)]');
             panel.classList.remove('hidden');
         });
     });
@@ -48,23 +53,26 @@ async function loadUsers() {
 
 function renderUsersTable(users) {
     const tbody = document.getElementById('users-table-body');
+    if (!tbody) return;
     tbody.innerHTML = '';
 
     users.forEach(user => {
         const tr = document.createElement('tr');
-        tr.className = 'hover:bg-gray-700/50 transition-colors';
+        tr.className = 'hover:bg-[var(--pdm-surface-raised)] border-b border-[var(--pdm-border-hairline)] transition-colors';
         tr.innerHTML = `
-            <td class="px-6 py-4 font-medium text-white">${user.username}</td>
-            <td class="px-6 py-4 text-gray-300">${user.email}</td>
-            <td class="px-6 py-4">
-                <span class="px-2 py-1 text-xs rounded-full ${getRoleBadgeClass(user.role)}">
+            <td class="px-5 py-3 font-mono font-medium text-xs text-[var(--pdm-text-primary)]">${user.username}</td>
+            <td class="px-5 py-3 font-mono text-xs text-[var(--pdm-text-secondary)]">${user.email}</td>
+            <td class="px-5 py-3">
+                <span class="${getRoleBadgeClass(user.role)}">
                     ${user.role.toUpperCase()}
                 </span>
             </td>
-            <td class="px-6 py-4 text-gray-400 text-sm">${new Date(user.created_at).toLocaleDateString()}</td>
-            <td class="px-6 py-4 text-right">
-                <button onclick="deleteUser(${user.id})" class="text-gray-400 hover:text-critical-red transition-colors" title="Delete User">
-                    🗑️
+            <td class="px-5 py-3 text-[var(--pdm-text-muted)] font-mono text-xs">${new Date(user.created_at).toLocaleDateString()}</td>
+            <td class="px-5 py-3 text-right">
+                <button onclick="deleteUser(${user.id})" class="pdm-btn text-xs py-1 px-2 h-7 bg-transparent border-transparent hover:border-[var(--pdm-status-critical)] text-[var(--pdm-text-muted)] hover:text-[var(--pdm-status-critical)]" title="Delete User">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
                 </button>
             </td>
         `;
@@ -74,9 +82,9 @@ function renderUsersTable(users) {
 
 function getRoleBadgeClass(role) {
     switch (role) {
-        case 'admin': return 'bg-warning-amber/20 text-warning-amber border border-warning-amber/30';
-        case 'viewer': return 'bg-gray-600 text-gray-200';
-        default: return 'bg-electric-blue/20 text-electric-blue border border-electric-blue/30';
+        case 'admin': return 'pdm-tag pdm-tag-warning';
+        case 'viewer': return 'pdm-tag bg-[var(--pdm-surface-sunken)] text-[var(--pdm-text-muted)] border-[var(--pdm-border-hairline)]';
+        default: return 'pdm-tag pdm-tag-normal';
     }
 }
 
@@ -160,24 +168,24 @@ async function loadSystemStats() {
 }
 
 function showNotification(message, type = 'info') {
-    // Reusing the notification system from dashboard.js if available, 
-    // or creating a simple one here
     const notification = document.createElement('div');
-    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${type === 'success' ? 'bg-success-green text-deep-navy' :
-            type === 'error' ? 'bg-critical-red text-white' :
-                'bg-electric-blue text-white'
-        }`;
+    const borderClass = type === 'success' ? 'border-[var(--pdm-status-normal)]' :
+        type === 'error' ? 'border-[var(--pdm-status-critical)]' :
+            'border-[var(--pdm-accent-base)]';
+
+    notification.className = `fixed top-4 right-4 z-50 p-3 bg-[var(--pdm-surface-overlay)] border ${borderClass} rounded-[var(--pdm-radius-sm)] shadow-[var(--pdm-shadow-overlay)] max-w-sm text-xs font-mono transition-opacity duration-200`;
 
     notification.innerHTML = `
-        <div class="flex items-center">
-            <span class="mr-2 font-bold">${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
-            <span>${message}</span>
+        <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full ${type === 'success' ? 'bg-[var(--pdm-status-normal)]' : type === 'error' ? 'bg-[var(--pdm-status-critical)]' : 'bg-[var(--pdm-accent-base)]'}"></span>
+            <span class="text-[var(--pdm-text-primary)]">${message}</span>
         </div>
     `;
 
     document.body.appendChild(notification);
 
     setTimeout(() => {
-        notification.remove();
-    }, 5000);
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 200);
+    }, 4000);
 }

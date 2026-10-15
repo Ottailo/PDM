@@ -7,7 +7,8 @@ from flask_login import login_required
 from sqlalchemy import func
 from app.packages import api_bp
 from app.models.sensor_data import SensorData, EventLog, MachineState
-from app.models.company import Company, Machine
+from app.models.company import Company # Keep Company for now if needed, but Machine is replaced
+from app.models.configuration import Asset
 from app.services.predictor import PredictiveService
 from app.services.simulator import DataSimulator
 from app.api.auth import auth_bp
@@ -25,13 +26,14 @@ def register_routes(app):
 # Services will be initialized per request to avoid context issues
 
 @api_bp.route('/latest-states', methods=['GET'])
-@login_required
+# @login_required - Public dashboard access
 def get_latest_machine_states():
     """Get current state of all machines with predictions."""
     try:
         # For now, get all machines (we'll add company filtering later)
-        company_machines = Machine.query.filter_by(company_id=1).all()  # GDK Perfume
-        machine_ids = [machine.machine_id for machine in company_machines]
+        # Using Asset model instead of legacy Machine model
+        company_machines = Asset.query.filter_by(company_id=1).all()  # GDK Perfume
+        machine_ids = [asset.name for asset in company_machines]
         
         predictor = PredictiveService()
         simulator = DataSimulator()
@@ -79,7 +81,7 @@ def get_latest_machine_states():
         return jsonify({"error": "Internal server error"}), 500
 
 @api_bp.route('/history')
-@login_required
+# @login_required - Public dashboard access
 def get_history():
     """Get historical sensor data for a specific machine."""
     machine_id = request.args.get('machine_id')
@@ -103,7 +105,7 @@ def get_history():
 
 
 @api_bp.route('/perform-maintenance', methods=['POST'])
-@login_required
+# @login_required - Public dashboard access
 def perform_maintenance():
     """Request maintenance for a specific machine."""
     try:

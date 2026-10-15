@@ -1,0 +1,78 @@
+{
+  "title": "Master Connection Map \u2014 PDM Platform",
+  "diagramType": "connection-map",
+  "generator": "graphify-antigravity-builder",
+  "nodes": [
+    {
+      "id": "client_ui",
+      "label": "Operator Dashboard (Web)",
+      "sub": "Chart.js & Live Cards",
+      "x": 15,
+      "y": 50,
+      "color": "#1E3A8A",
+      "border": "#3B82F6"
+    },
+    {
+      "id": "flask_core",
+      "label": "Flask Core Runtime",
+      "sub": "Blueprints: admin, auth, config",
+      "x": 45,
+      "y": 70,
+      "color": "#065F46",
+      "border": "#10B981"
+    },
+    {
+      "id": "ws_broker",
+      "label": "SocketIO Telemetry Broker",
+      "sub": "Event emitter & room manager",
+      "x": 45,
+      "y": 30,
+      "color": "#78350F",
+      "border": "#F59E0B"
+    },
+    {
+      "id": "db_store",
+      "label": "SQL Database (pdm.db)",
+      "sub": "Machines, sensors, tickets",
+      "x": 80,
+      "y": 70,
+      "color": "#581C87",
+      "border": "#A855F7"
+    },
+    {
+      "id": "gru_engine",
+      "label": "Keras GRU Model Bank",
+      "sub": "Loaded into memory",
+      "x": 80,
+      "y": 30,
+      "color": "#7F1D1D",
+      "border": "#EF4444"
+    }
+  ],
+  "edges": [
+    {
+      "from": "client_ui",
+      "to": "flask_core",
+      "label": "HTTP / REST",
+      "color": "#38BDF8"
+    },
+    {
+      "from": "client_ui",
+      "to": "ws_broker",
+      "label": "WebSocket duplex",
+      "color": "#F59E0B"
+    },
+    {
+      "from": "flask_core",
+      "to": "db_store",
+      "label": "SQLAlchemy",
+      "color": "#A855F7"
+    },
+    {
+      "from": "ws_broker",
+      "to": "gru_engine",
+      "label": "Inference pipe",
+      "color": "#EF4444"
+    }
+  ]
+}

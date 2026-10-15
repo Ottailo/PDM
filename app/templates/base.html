@@ -3,48 +3,68 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Predictive Maintenance Dashboard{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>{% block title %}PDM — Industrial Predictive Maintenance{% endblock %}</title>
 
-    <!-- Google Fonts -->
+    <!-- DIN-Caliber Instrumentation Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
         rel="stylesheet">
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS with OKLCH Theme Architecture -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            future: {
+                hoverOnlyWhenSupported: true,
+            },
             theme: {
                 extend: {
                     colors: {
-                        'electric-blue': 'var(--electric-blue)',
-                        'silver': 'var(--silver)',
-                        'warning-amber': 'var(--warning-amber)',
-                        'slate-800': '#1e293b',
-                        'slate-900': '#0f172a',
+                        'pdm-canvas': 'var(--pdm-canvas)',
+                        'pdm-surface-base': 'var(--pdm-surface-base)',
+                        'pdm-surface-raised': 'var(--pdm-surface-raised)',
+                        'pdm-surface-overlay': 'var(--pdm-surface-overlay)',
+                        'pdm-surface-sunken': 'var(--pdm-surface-sunken)',
+                        'pdm-border-hairline': 'var(--pdm-border-hairline)',
+                        'pdm-border-subtle': 'var(--pdm-border-subtle)',
+                        'pdm-border-strong': 'var(--pdm-border-strong)',
+                        'pdm-accent': 'var(--pdm-accent-base)',
+                        'pdm-accent-muted': 'var(--pdm-accent-muted)',
+                        'pdm-normal': 'var(--pdm-status-normal)',
+                        'pdm-warning': 'var(--pdm-status-warning)',
+                        'pdm-critical': 'var(--pdm-status-critical)',
+                        'pdm-offline': 'var(--pdm-status-offline)',
+                        'pdm-text-primary': 'var(--pdm-text-primary)',
+                        'pdm-text-secondary': 'var(--pdm-text-secondary)',
+                        'pdm-text-muted': 'var(--pdm-text-muted)',
+                        /* Backward compatibility aliases */
+                        'electric-blue': 'var(--pdm-accent-base)',
+                        'silver': 'var(--pdm-text-secondary)',
+                        'warning-amber': 'var(--pdm-status-warning)',
+                        'success-green': 'var(--pdm-status-normal)',
+                        'critical-red': 'var(--pdm-status-critical)',
                     },
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        space: ['Space Grotesk', 'sans-serif'],
-                        jetbrains: ['JetBrains Mono', 'monospace'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        display: ['"Chakra Petch"', 'sans-serif'],
+                        space: ['"Chakra Petch"', 'sans-serif'],
+                        jetbrains: ['"JetBrains Mono"', 'monospace'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
                     }
                 }
             }
         }
     </script>
 
-    <!-- Custom CSS -->
+    <!-- Industrial Design System CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body
-    class="bg-slate-900 text-white font-sans antialiased selection:bg-electric-blue selection:text-white overflow-hidden">
+    class="bg-[var(--pdm-canvas)] text-[var(--pdm-text-primary)] font-sans antialiased selection:bg-[var(--pdm-accent-base)] selection:text-black overflow-hidden h-screen h-[100dvh]">
 
     {% block content %}{% endblock %}
 
@@ -54,8 +74,8 @@
         src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script
         src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
-    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/machine_management.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}?v=3.0"></script>
+    <script src="{{ url_for('static', filename='js/machine_management.js') }}?v=3.0"></script>
 </body>
 
 </html>

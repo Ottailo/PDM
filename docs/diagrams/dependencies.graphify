@@ -1,0 +1,74 @@
+{
+  "title": "Dependency Graph \u2014 PDM Platform",
+  "diagramType": "dependencies",
+  "generator": "graphify-antigravity-builder",
+  "nodes": [
+    {
+      "id": "flask",
+      "label": "Flask & Blueprints",
+      "sub": "WSGI Web Framework",
+      "x": 20,
+      "y": 70,
+      "color": "#1E3A8A",
+      "border": "#3B82F6"
+    },
+    {
+      "id": "tf",
+      "label": "TensorFlow 2.15 (Keras)",
+      "sub": "GRU Recurrent Networks",
+      "x": 20,
+      "y": 30,
+      "color": "#7F1D1D",
+      "border": "#EF4444"
+    },
+    {
+      "id": "socketio_pkg",
+      "label": "Flask-SocketIO & Eventlet",
+      "sub": "Real-Time WebSockets",
+      "x": 50,
+      "y": 50,
+      "color": "#78350F",
+      "border": "#F59E0B"
+    },
+    {
+      "id": "sa",
+      "label": "SQLAlchemy & Alembic",
+      "sub": "ORM & Schema Migrations",
+      "x": 80,
+      "y": 70,
+      "color": "#581C87",
+      "border": "#A855F7"
+    },
+    {
+      "id": "skl",
+      "label": "Scikit-learn & Joblib",
+      "sub": "MinMax Feature Scalers",
+      "x": 80,
+      "y": 30,
+      "color": "#065F46",
+      "border": "#10B981"
+    }
+  ],
+  "edges": [
+    {
+      "from": "flask",
+      "to": "socketio_pkg",
+      "color": "#3B82F6"
+    },
+    {
+      "from": "tf",
+      "to": "skl",
+      "color": "#EF4444"
+    },
+    {
+      "from": "socketio_pkg",
+      "to": "sa",
+      "color": "#F59E0B"
+    },
+    {
+      "from": "socketio_pkg",
+      "to": "skl",
+      "color": "#10B981"
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "title": "Data Flow \u2014 Sensor Telemetry to Failure Prediction",
+  "diagramType": "data-flow",
+  "generator": "graphify-antigravity-builder",
+  "nodes": [
+    {
+      "id": "sensors",
+      "label": "1. Sensor Ingestion",
+      "sub": "Vibration, temp, pressure (Hz)",
+      "x": 15,
+      "y": 50,
+      "color": "#1E3A8A",
+      "border": "#3B82F6"
+    },
+    {
+      "id": "scale",
+      "label": "2. MinMax Scaling",
+      "sub": "Normalized via scaler.joblib",
+      "x": 38,
+      "y": 50,
+      "color": "#065F46",
+      "border": "#10B981"
+    },
+    {
+      "id": "infer",
+      "label": "3. GRU Inference (<50ms)",
+      "sub": "Dual output: RUL + Fault type",
+      "x": 62,
+      "y": 50,
+      "color": "#7F1D1D",
+      "border": "#EF4444"
+    },
+    {
+      "id": "alert",
+      "label": "4. Broadcast & Log",
+      "sub": "Emit WS + persist maintenance_log",
+      "x": 85,
+      "y": 50,
+      "color": "#581C87",
+      "border": "#A855F7"
+    }
+  ],
+  "edges": [
+    {
+      "from": "sensors",
+      "to": "scale",
+      "color": "#38BDF8"
+    },
+    {
+      "from": "scale",
+      "to": "infer",
+      "color": "#10B981"
+    },
+    {
+      "from": "infer",
+      "to": "alert",
+      "color": "#EF4444"
+    }
+  ]
+}

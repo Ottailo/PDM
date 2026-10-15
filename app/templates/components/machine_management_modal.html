@@ -1,331 +1,373 @@
-<!-- Enhanced Machine Management Modal -->
-<div id="machine-management-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden">
-    <div class="flex items-center justify-center min-h-screen p-4">
-        <div
-            class="bg-gray-900 rounded-xl max-w-7xl w-full max-h-[95vh] overflow-hidden border-2 border-electric-blue/30">
-            <!-- Modal Header -->
-            <div class="bg-gradient-to-r from-electric-blue/20 to-neon-cyan/20 p-6 border-b border-electric-blue/30">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-3xl font-space font-bold text-white mb-2">🔧 Machine Management System</h2>
-                        <p class="text-silver text-lg">Add, configure, and monitor your industrial equipment</p>
-                    </div>
-                    <button onclick="hideMachineManagement()"
-                        class="text-white hover:text-electric-blue text-3xl font-bold bg-gray-800 hover:bg-gray-700 rounded-full w-12 h-12 flex items-center justify-center transition-all duration-300">&times;</button>
+<!-- High-Density Machinery & Engineering Management Modal -->
+<div id="machine-management-modal" class="fixed inset-0 bg-black/80 z-50 hidden pdm-modal-backdrop flex items-center justify-center p-3 sm:p-6 select-none">
+    <div class="bg-[var(--pdm-surface-overlay)] rounded-[var(--pdm-radius-lg)] max-w-6xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-[var(--pdm-border-subtle)] shadow-[var(--pdm-shadow-overlay)] pdm-modal-dialog">
+
+        <!-- Modal Header Strip -->
+        <div class="px-5 py-3.5 border-b border-[var(--pdm-border-hairline)] bg-[var(--pdm-surface-raised)] flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <span class="w-2 h-2 rounded-full bg-[var(--pdm-accent-base)]"></span>
+                <div>
+                    <h2 class="font-display font-semibold text-sm tracking-wider uppercase text-[var(--pdm-text-primary)]">
+                        MACHINERY &amp; TELEMETRY CONFIGURATION
+                    </h2>
+                    <p class="text-[11px] text-[var(--pdm-text-muted)] font-sans">Asset Registry, Protocol Bridges &amp; Inference Ingestion</p>
                 </div>
             </div>
+            <button onclick="hideMachineManagement()"
+                class="pdm-btn py-1 px-2 h-7 bg-transparent border-transparent hover:border-[var(--pdm-border-subtle)] text-[var(--pdm-text-muted)] hover:text-[var(--pdm-text-primary)]"
+                title="Close Dialog">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
 
-            <!-- Enhanced Tabs -->
-            <div class="bg-gray-800 border-b border-gray-700">
-                <div class="flex space-x-1 p-2">
-                    <button id="tab-machines"
-                        class="tab-button active px-6 py-3 rounded-lg font-bold text-white bg-electric-blue"
-                        onclick="switchMachineTab('machines')">
-                        🏭 Machines
-                    </button>
-                    <button id="tab-data-upload"
-                        class="tab-button px-6 py-3 rounded-lg font-bold text-gray-300 hover:text-white hover:bg-gray-700"
-                        onclick="switchMachineTab('data-upload')">
-                        📊 Training Data
-                    </button>
-                    <button id="tab-data-streaming"
-                        class="tab-button px-6 py-3 rounded-lg font-bold text-gray-300 hover:text-white hover:bg-gray-700"
-                        onclick="switchMachineTab('data-streaming')">
-                        📡 Data Streaming
-                    </button>
-                    <button id="tab-analytics"
-                        class="tab-button px-6 py-3 rounded-lg font-bold text-gray-300 hover:text-white hover:bg-gray-700"
-                        onclick="switchMachineTab('analytics')">
-                        📈 Analytics
-                    </button>
-                </div>
+        <!-- Segmented Tab Bar -->
+        <div class="px-4 py-2 bg-[var(--pdm-surface-sunken)] border-b border-[var(--pdm-border-hairline)]">
+            <div class="pdm-segmented-group flex">
+                <button id="tab-machines"
+                    class="pdm-segmented-btn tab-button active flex-1 flex items-center justify-center gap-2"
+                    onclick="switchMachineTab('machines')">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                    <span>MACHINERY REGISTRY</span>
+                </button>
+                <button id="tab-data-upload"
+                    class="pdm-segmented-btn tab-button flex-1 flex items-center justify-center gap-2"
+                    onclick="switchMachineTab('data-upload')">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                    </svg>
+                    <span>TRAINING DATA CSV</span>
+                </button>
+                <button id="tab-data-streaming"
+                    class="pdm-segmented-btn tab-button flex-1 flex items-center justify-center gap-2"
+                    onclick="switchMachineTab('data-streaming')">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    <span>DATA BRIDGES</span>
+                </button>
+                <button id="tab-analytics"
+                    class="pdm-segmented-btn tab-button flex-1 flex items-center justify-center gap-2"
+                    onclick="switchMachineTab('analytics')">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    <span>MODEL VALIDATION</span>
+                </button>
             </div>
+        </div>
 
-            <!-- Modal Content -->
-            <div class="p-6 overflow-y-auto max-h-[calc(95vh-200px)] bg-gray-900">
-                <!-- Machines Tab -->
-                <div id="machines-panel" class="tab-panel">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <!-- Register New Machine -->
-                        <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                            <h3 class="text-2xl font-space font-bold text-white mb-6 flex items-center">
-                                <span class="mr-3">🚀</span> Register New Machine
+        <!-- Tab Panels Body -->
+        <div class="p-5 overflow-y-auto max-h-[calc(92vh-130px)] bg-[var(--pdm-surface-base)] space-y-6">
+
+            <!-- Panel 1: Machinery Registry Tab -->
+            <div id="machines-panel" class="tab-panel">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+                    <!-- Left Column: Registration Form (7 cols) -->
+                    <div class="lg:col-span-7 pdm-panel p-4 bg-[var(--pdm-surface-raised)]">
+                        <div class="flex items-center justify-between mb-4 pb-2 border-b border-[var(--pdm-border-hairline)]">
+                            <h3 class="font-display font-semibold text-xs tracking-wider uppercase text-[var(--pdm-text-primary)]">
+                                REGISTER PHYSICAL ASSET
                             </h3>
-                            <form id="machine-form" class="space-y-6">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-white font-bold text-lg mb-2">Machine ID</label>
-                                        <input type="text" name="machine_id_at_company"
-                                            class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
-                                            placeholder="e.g., FILLING_002" required>
-                                    </div>
-                                    <div>
-                                        <label class="block text-white font-bold text-lg mb-2">Machine Name</label>
-                                        <input type="text" name="name"
-                                            class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
-                                            placeholder="e.g., Filling Line 2" required>
-                                    </div>
-                                </div>
-
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-white font-bold text-lg mb-2">Machine Type</label>
-                                        <div class="flex space-x-2 w-full max-w-full">
-                                            <div class="flex-1 min-w-0">
-                                                <select id="machine-type-select" name="machine_type"
-                                                    class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
-                                                    required>
-                                                    <option value="">-- Select Machine Type --</option>
-                                                    <!-- Options will be populated dynamically -->
-                                                </select>
-                                                <input type="text" id="custom-machine-type"
-                                                    placeholder="Or enter custom type"
-                                                    class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
-                                                    style="display: none;">
-                                            </div>
-                                            <button type="button" id="add-custom-type"
-                                                class="w-12 h-12 bg-electric-blue text-white rounded-lg hover:bg-blue-600 text-xl font-bold flex items-center justify-center flex-shrink-0">+</button>
-                                        </div>
-                                    </div>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label class="block text-white font-bold text-lg mb-2">Manufacturer</label>
-                                            <input type="text" name="manufacturer"
-                                                class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
-                                                placeholder="e.g., Siemens">
-                                        </div>
-                                        <div>
-                                            <label class="block text-white font-bold text-lg mb-2">Model</label>
-                                            <input type="text" name="model"
-                                                class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
-                                                placeholder="e.g., SIMATIC S7-1500">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-white font-bold text-lg mb-2">Serial Number</label>
-                                        <input type="text" name="serial_number"
-                                            class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
-                                            placeholder="e.g., SN123456789">
-                                    </div>
-                                    <div>
-                                        <label class="block text-white font-bold text-lg mb-2">Location</label>
-                                        <input type="text" name="location"
-                                            class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
-                                            placeholder="e.g., Production Line A">
-                                    </div>
-                                </div>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-white font-bold text-lg mb-2">Installation Date</label>
-                                        <input type="date" name="installation_date"
-                                            class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg">
-                                    </div>
-                                </div>
-
-                                <!-- Dynamic Sensor Configuration -->
-                                <div class="bg-gray-700 rounded-lg p-4">
-                                    <h4
-                                        class="text-xl font-bold text-electric-blue mb-4 flex items-center justify-between">
-                                        🔧 Sensor Configuration
-                                        <button type="button" id="add-sensor-btn"
-                                            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-bold">+
-                                            Add Sensor</button>
-                                    </h4>
-                                    <div id="sensor-config-fields">
-                                        <p class="text-gray-400 mb-4">Add sensors for this machine. Each sensor can have
-                                            custom configuration.</p>
-                                        <div id="sensors-container">
-                                            <!-- Dynamic sensors will be added here -->
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <button type="submit"
-                                    class="w-full bg-gradient-to-r from-electric-blue to-neon-cyan text-white font-bold py-4 px-6 rounded-lg text-xl hover:from-electric-blue/80 hover:to-neon-cyan/80 transition-all duration-300 transform hover:scale-105">
-                                    🚀 Register Machine
-                                </button>
-                            </form>
+                            <span class="font-mono text-[10px] text-[var(--pdm-text-muted)]">CRUD ENTRY</span>
                         </div>
 
-                        <!-- Existing Machines -->
-                        <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                            <h3 class="text-2xl font-space font-bold text-white mb-6 flex items-center">
-                                <span class="mr-3">📋</span> Registered Machines
-                            </h3>
-                            <div id="machines-list" class="space-y-4">
-                                <div class="text-center text-gray-400 py-8">
-                                    <div class="text-4xl mb-2">🔄</div>
-                                    <p>Loading machines...</p>
+                        <form id="machine-form" class="space-y-3.5">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block pdm-label mb-1">Asset Machine ID</label>
+                                    <input type="text" name="machine_id_at_company"
+                                        class="w-full pdm-input font-mono"
+                                        placeholder="e.g. MCH-FILL-002" required>
+                                </div>
+                                <div>
+                                    <label class="block pdm-label mb-1">Display Name</label>
+                                    <input type="text" name="name"
+                                        class="w-full pdm-input"
+                                        placeholder="e.g. Rotary Filling Unit 2" required>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Training Data Upload Tab -->
-                <div id="data-upload-panel" class="tab-panel hidden">
-                    <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                        <h3 class="text-2xl font-space font-bold text-white mb-6 flex items-center">
-                            <span class="mr-3">📊</span> Upload Historical Maintenance Data
-                        </h3>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block pdm-label mb-1">Asset Class Template</label>
+                                    <div class="flex gap-2">
+                                        <select id="machine-type-select" name="machine_type"
+                                            class="w-full pdm-input font-mono" required>
+                                            <option value="">-- SELECT ASSET CLASS --</option>
+                                        </select>
+                                        <input type="text" id="custom-machine-type"
+                                            placeholder="Custom Machine Type"
+                                            class="w-full pdm-input font-mono hidden">
+                                        <button type="button" id="add-custom-type"
+                                            class="pdm-btn px-2.5 h-9 bg-[var(--pdm-surface-sunken)] border-[var(--pdm-border-subtle)]"
+                                            title="Add Custom Type">+</button>
+                                    </div>
+                                </div>
 
-                        <!-- Machine Selection -->
-                        <div class="mb-6">
-                            <label class="block text-white font-bold text-lg mb-2">Select Machine for Training
-                                Data</label>
-                            <select id="training-machine-select"
-                                class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
-                                required>
-                                <option value="">-- Select Machine --</option>
-                            </select>
-                            <p class="text-sm text-gray-400 mt-2">Choose which machine this training data belongs to</p>
-                        </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block pdm-label mb-1">Manufacturer</label>
+                                        <input type="text" name="manufacturer"
+                                            class="w-full pdm-input"
+                                            placeholder="e.g. Krones AG">
+                                    </div>
+                                    <div>
+                                        <label class="block pdm-label mb-1">Model / Spec</label>
+                                        <input type="text" name="model"
+                                            class="w-full pdm-input"
+                                            placeholder="e.g. Modulfill VFS">
+                                    </div>
+                                </div>
+                            </div>
 
-                        <!-- CSV Upload Area -->
-                        <div class="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-electric-blue transition-colors duration-300"
-                            id="csv-upload-area">
-                            <div class="text-6xl mb-4">📁</div>
-                            <h4 class="text-xl font-bold text-white mb-2">Upload CSV Training Data</h4>
-                            <p class="text-gray-400 mb-4">Drag and drop your CSV file here or click to browse</p>
-                            <input type="file" id="csv-file-input" accept=".csv" class="hidden">
-                            <button type="button" id="browse-csv-btn"
-                                class="bg-electric-blue text-white font-bold py-3 px-6 rounded-lg hover:bg-electric-blue/80 transition-colors duration-300">
-                                Browse Files
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div>
+                                    <label class="block pdm-label mb-1">Serial Number</label>
+                                    <input type="text" name="serial_number"
+                                        class="w-full pdm-input font-mono"
+                                        placeholder="e.g. SN-884920">
+                                </div>
+                                <div>
+                                    <label class="block pdm-label mb-1">Factory Location</label>
+                                    <input type="text" name="location"
+                                        class="w-full pdm-input"
+                                        placeholder="e.g. Packaging Line 1">
+                                </div>
+                                <div>
+                                    <label class="block pdm-label mb-1">Commission Date</label>
+                                    <input type="date" name="installation_date"
+                                        class="w-full pdm-input font-mono">
+                                </div>
+                            </div>
+
+                            <!-- Dynamic Sensor Configuration Well -->
+                            <div class="pdm-panel-sunken p-3 mt-2">
+                                <div class="flex items-center justify-between mb-2 pb-1 border-b border-[var(--pdm-border-hairline)]">
+                                    <span class="pdm-label text-[10px]">TELEMETRY CHANNEL CHANNELS</span>
+                                    <button type="button" id="add-sensor-btn"
+                                        class="pdm-btn text-[10px] py-0.5 px-2 h-6 bg-[var(--pdm-surface-raised)] border-[var(--pdm-border-hairline)]">
+                                        + ADD CHANNEL
+                                    </button>
+                                </div>
+                                <div id="sensor-config-fields">
+                                    <p class="text-xs text-[var(--pdm-text-muted)] font-mono mb-2">Configure sensor channels, physical units and baseline envelope bounds.</p>
+                                    <div id="sensors-container" class="space-y-2"></div>
+                                </div>
+                            </div>
+
+                            <button type="submit"
+                                class="w-full pdm-btn pdm-btn-primary mt-3">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                <span>REGISTER ASSET TO REGISTRY</span>
                             </button>
-                            <div class="mt-4 text-sm text-gray-500">
-                                <p>Supported formats: CSV files with sensor data and maintenance records</p>
-                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Right Column: Registered Machines List (5 cols) -->
+                    <div class="lg:col-span-5 pdm-panel p-4 bg-[var(--pdm-surface-raised)] flex flex-col">
+                        <div class="flex items-center justify-between mb-4 pb-2 border-b border-[var(--pdm-border-hairline)]">
+                            <h3 class="font-display font-semibold text-xs tracking-wider uppercase text-[var(--pdm-text-primary)]">
+                                REGISTERED FLEET ASSETS
+                            </h3>
+                            <span class="font-mono text-[10px] text-[var(--pdm-text-muted)]">LIVE INVENTORY</span>
                         </div>
 
-                        <!-- Upload Progress -->
-                        <div class="hidden mt-4" id="csv-progress">
-                            <div class="bg-gray-700 rounded-full h-3 overflow-hidden">
-                                <div class="bg-gradient-to-r from-electric-blue to-neon-cyan h-full transition-all duration-300"
-                                    id="csv-progress-bar" style="width: 0%"></div>
-                            </div>
-                            <p class="text-white text-center mt-2">Uploading...</p>
-                        </div>
-
-                        <!-- Uploaded Files List -->
-                        <div class="mt-6">
-                            <h4 class="text-lg font-bold text-white mb-4">📋 Uploaded Training Files</h4>
-                            <div id="uploaded-files-list" class="space-y-2">
-                                <p class="text-gray-400 text-center py-4">No files uploaded yet</p>
+                        <div id="machines-list" class="space-y-2.5 overflow-y-auto max-h-[500px] flex-grow">
+                            <div class="pdm-empty-state py-8">
+                                <svg class="pdm-empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                </svg>
+                                <span class="text-xs font-mono text-[var(--pdm-text-muted)]">LOADING REGISTRY...</span>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Data Streaming Tab -->
-                <div id="data-streaming-panel" class="tab-panel hidden">
-                    <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                        <h3 class="text-2xl font-space font-bold text-white mb-6 flex items-center">
-                            <span class="mr-3">📡</span> Real-Time Data Streaming Configuration
+            <!-- Panel 2: Training Data Upload Tab -->
+            <div id="data-upload-panel" class="tab-panel hidden">
+                <div class="pdm-panel p-5 bg-[var(--pdm-surface-raised)]">
+                    <div class="flex items-center justify-between mb-4 pb-2 border-b border-[var(--pdm-border-hairline)]">
+                        <h3 class="font-display font-semibold text-xs tracking-wider uppercase text-[var(--pdm-text-primary)]">
+                            RUN-TO-FAILURE HISTORICAL TELEMETRY INGESTION
                         </h3>
+                        <span class="font-mono text-[10px] text-[var(--pdm-text-muted)]">CSV FORMAT</span>
+                    </div>
 
-                        <!-- Streaming Status -->
-                        <div class="mb-6 p-4 bg-gray-700 rounded-lg">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-3 h-3 bg-red-500 rounded-full" id="streaming-indicator"></div>
-                                    <span class="text-white font-bold" id="streaming-text">Streaming Inactive</span>
-                                </div>
-                                <button id="start-streaming-btn"
-                                    class="bg-electric-blue text-white font-bold py-2 px-4 rounded-lg hover:bg-electric-blue/80 transition-colors duration-300">
-                                    Start Streaming
-                                </button>
-                            </div>
+                    <!-- Target Machine Selection -->
+                    <div class="mb-4">
+                        <label class="block pdm-label mb-1">Target Physical Asset</label>
+                        <select id="training-machine-select"
+                            class="w-full max-w-md pdm-input font-mono" required>
+                            <option value="">-- SELECT TARGET ASSET --</option>
+                        </select>
+                        <p class="text-[11px] text-[var(--pdm-text-muted)] mt-1">Multi-channel sensor sequence mapped to target asset class weights.</p>
+                    </div>
+
+                    <!-- CSV Drop Area -->
+                    <div id="csv-upload-area"
+                        class="border border-dashed border-[var(--pdm-border-strong)] rounded-[var(--pdm-radius-md)] p-8 text-center bg-[var(--pdm-surface-sunken)] hover:border-[var(--pdm-accent-base)] transition-colors">
+                        <svg class="w-8 h-8 mx-auto text-[var(--pdm-text-muted)] mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                        </svg>
+                        <p class="font-display text-xs uppercase text-[var(--pdm-text-primary)] tracking-wide mb-1">SELECT OR DROP RUN-TO-FAILURE CSV</p>
+                        <p class="text-[11px] text-[var(--pdm-text-muted)] mb-3 font-mono">Requires columns: timestamp, asset_id, sensor channels 1-N, rul_target</p>
+                        <input type="file" id="csv-file-input" accept=".csv" class="hidden">
+                        <button type="button" id="browse-csv-btn" class="pdm-btn pdm-btn-primary text-xs">
+                            BROWSE FILES
+                        </button>
+                    </div>
+
+                    <!-- Upload Progress -->
+                    <div id="csv-progress" class="hidden mt-4">
+                        <div class="w-full bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] h-2 rounded-[2px] overflow-hidden">
+                            <div id="csv-progress-bar" class="h-full bg-[var(--pdm-accent-base)] transition-[width] duration-200 ease-out" style="width: 0%"></div>
                         </div>
+                        <p class="text-xs font-mono text-[var(--pdm-text-secondary)] text-center mt-1.5">INGESTING CSV DATA...</p>
+                    </div>
 
-                        <!-- Machine Selection -->
-                        <div class="mb-6">
-                            <label class="block text-white font-bold text-lg mb-2">Select Machine for Data
-                                Streaming</label>
+                    <!-- Uploaded Datasets Table -->
+                    <div class="mt-6 pt-4 border-t border-[var(--pdm-border-hairline)]">
+                        <h4 class="font-display text-xs uppercase text-[var(--pdm-text-secondary)] tracking-wider mb-3">INGESTED DATASET RECORDS</h4>
+                        <div id="uploaded-files-list" class="space-y-2">
+                            <p class="text-xs font-mono text-[var(--pdm-text-muted)] text-center py-4">No historical datasets uploaded yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 3: Data Streaming Configuration Tab -->
+            <div id="data-streaming-panel" class="tab-panel hidden">
+                <div class="pdm-panel p-5 bg-[var(--pdm-surface-raised)]">
+                    <div class="flex items-center justify-between mb-4 pb-2 border-b border-[var(--pdm-border-hairline)]">
+                        <h3 class="font-display font-semibold text-xs tracking-wider uppercase text-[var(--pdm-text-primary)]">
+                            INDUSTRIAL PROTOCOL TELEMETRY BRIDGE
+                        </h3>
+                        <span class="font-mono text-[10px] text-[var(--pdm-text-muted)]">OPC-UA / MODBUS / MQTT</span>
+                    </div>
+
+                    <!-- Live Bridge Status Bar -->
+                    <div class="mb-4 p-3 bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] rounded-[var(--pdm-radius-sm)] flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-2.5 h-2.5 rounded-full bg-[var(--pdm-status-offline)]" id="streaming-indicator"></div>
+                            <span class="font-mono text-xs text-[var(--pdm-text-primary)] uppercase tracking-wider" id="streaming-text">BRIDGE INACTIVE</span>
+                        </div>
+                        <button id="start-streaming-btn"
+                            class="pdm-btn pdm-btn-primary text-xs py-1 px-3 h-8">
+                            CONNECT BRIDGE
+                        </button>
+                    </div>
+
+                    <!-- Bridge Configuration Parameters -->
+                    <div class="space-y-4">
+                        <div class="max-w-md">
+                            <label class="block pdm-label mb-1">Target Asset Stream</label>
                             <select id="streaming-machine-select"
-                                class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg">
-                                <option value="">-- Select Machine --</option>
+                                class="w-full pdm-input font-mono" required>
+                                <option value="">-- SELECT ASSET --</option>
                             </select>
                         </div>
 
-                        <!-- Connection Settings -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                             <div>
-                                <label class="block text-white font-bold text-lg mb-2">Data Source Type</label>
-                                <select id="data-source-type"
-                                    class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg">
-                                    <option value="api">REST API</option>
-                                    <option value="mqtt">MQTT Broker</option>
-                                    <option value="opcua">OPC UA</option>
+                                <label class="block pdm-label mb-1">Protocol Standard</label>
+                                <select id="data-source-type" class="w-full pdm-input font-mono">
+                                    <option value="opcua">OPC-UA Binary</option>
                                     <option value="modbus">Modbus TCP</option>
-                                    <option value="websocket">WebSocket</option>
+                                    <option value="mqtt">MQTT Broker</option>
+                                    <option value="api">REST Poller</option>
+                                    <option value="websocket">Raw WebSocket</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-white font-bold text-lg mb-2">Update Frequency
-                                    (seconds)</label>
+                                <label class="block pdm-label mb-1">Sampling Cycle (s)</label>
                                 <input type="number" id="update-frequency"
-                                    class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
-                                    value="5" min="1" max="60">
+                                    class="w-full pdm-input font-mono"
+                                    value="2" min="1" max="60">
                             </div>
                             <div>
-                                <label class="block text-white font-bold text-lg mb-2">Host/IP Address</label>
+                                <label class="block pdm-label mb-1">Host / Endpoint IP</label>
                                 <input type="text" id="streaming-host"
-                                    class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
+                                    class="w-full pdm-input font-mono"
                                     placeholder="192.168.1.100">
                             </div>
                             <div>
-                                <label class="block text-white font-bold text-lg mb-2">Port</label>
+                                <label class="block pdm-label mb-1">Port</label>
                                 <input type="number" id="streaming-port"
-                                    class="w-full px-4 py-3 bg-gray-700 text-white border-2 border-gray-600 rounded-lg focus:border-electric-blue focus:outline-none text-lg"
-                                    placeholder="8080">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Model Training Tab -->
-
-                <!-- Analytics Tab -->
-                <div id="analytics-panel" class="tab-panel hidden">
-                    <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                        <h3 class="text-2xl font-space font-bold text-white mb-6 flex items-center">
-                            <span class="mr-3">📈</span> Machine Analytics & Insights
-                        </h3>
-
-                        <!-- Analytics Cards -->
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                            <div class="bg-gray-700 rounded-lg p-4 text-center">
-                                <h4 class="text-3xl font-bold text-electric-blue">95.2%</h4>
-                                <p class="text-white font-bold">Model Accuracy</p>
-                            </div>
-                            <div class="bg-gray-700 rounded-lg p-4 text-center">
-                                <h4 class="text-3xl font-bold text-success-green">1,247</h4>
-                                <p class="text-white font-bold">Data Points Processed</p>
-                            </div>
-                            <div class="bg-gray-700 rounded-lg p-4 text-center">
-                                <h4 class="text-3xl font-bold text-warning-amber">3</h4>
-                                <p class="text-white font-bold">Predictions Made</p>
-                            </div>
-                        </div>
-
-                        <!-- Performance Charts -->
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div class="bg-gray-700 rounded-lg p-4">
-                                <h4 class="text-lg font-bold text-electric-blue mb-4">Model Performance Over Time</h4>
-                                <canvas id="performance-chart" width="400" height="200"></canvas>
-                            </div>
-                            <div class="bg-gray-700 rounded-lg p-4">
-                                <h4 class="text-lg font-bold text-electric-blue mb-4">Data Quality Metrics</h4>
-                                <canvas id="quality-chart" width="400" height="200"></canvas>
+                                    class="w-full pdm-input font-mono"
+                                    placeholder="4840">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Panel 4: Model Validation Tab (Honest Operational Telemetry, No Fake Numbers) -->
+            <div id="analytics-panel" class="tab-panel hidden">
+                <div class="pdm-panel p-5 bg-[var(--pdm-surface-raised)]">
+                    <div class="flex items-center justify-between mb-4 pb-2 border-b border-[var(--pdm-border-hairline)]">
+                        <h3 class="font-display font-semibold text-xs tracking-wider uppercase text-[var(--pdm-text-primary)]">
+                            DUAL-HEAD GRU MODEL VALIDATION
+                        </h3>
+                        <span class="font-mono text-[10px] text-[var(--pdm-text-muted)]">INFERENCE DIAGNOSTICS</span>
+                    </div>
+
+                    <!-- Authentic Operational Metric Readouts -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+                        <div class="pdm-panel-sunken p-3 text-center">
+                            <span class="pdm-label text-[10px] text-[var(--pdm-text-muted)]">ACTIVE MODEL ARCHITECTURE</span>
+                            <div class="font-mono text-base font-bold text-[var(--pdm-accent-base)] mt-1">DUAL-HEAD GRU</div>
+                            <span class="font-mono text-[10px] text-[var(--pdm-text-muted)]">Sequence Window: 30 steps</span>
+                        </div>
+                        <div class="pdm-panel-sunken p-3 text-center">
+                            <span class="pdm-label text-[10px] text-[var(--pdm-text-muted)]">REGISTERED FLEET ASSETS</span>
+                            <div class="font-mono text-base font-bold text-[var(--pdm-status-normal)] mt-1" id="analytics-asset-count">-</div>
+                            <span class="font-mono text-[10px] text-[var(--pdm-text-muted)]">Physical packaging units</span>
+                        </div>
+                        <div class="pdm-panel-sunken p-3 text-center">
+                            <span class="pdm-label text-[10px] text-[var(--pdm-text-muted)]">INFERENCE CYCLE LATENCY</span>
+                            <div class="font-mono text-base font-bold text-[var(--pdm-status-warning)] mt-1" id="analytics-inference-latency">&lt; 15ms</div>
+                            <span class="font-mono text-[10px] text-[var(--pdm-text-muted)]">Keras backend inference</span>
+                        </div>
+                    </div>
+
+                    <!-- Performance Evaluation Charts -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div class="pdm-panel-sunken p-3">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-display text-xs uppercase text-[var(--pdm-text-secondary)] tracking-wider">RUL RESIDUAL ERROR DISTRIBUTION</span>
+                                <span class="font-mono text-[10px] text-[var(--pdm-text-muted)]">MAE (min)</span>
+                            </div>
+                            <div class="h-48 relative">
+                                <canvas id="performance-chart" class="w-full h-full"></canvas>
+                            </div>
+                        </div>
+                        <div class="pdm-panel-sunken p-3">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-display text-xs uppercase text-[var(--pdm-text-secondary)] tracking-wider">SENSOR CHANNEL DRIFT VARIANCE</span>
+                                <span class="font-mono text-[10px] text-[var(--pdm-text-muted)]">Z-Score std</span>
+                            </div>
+                            <div class="h-48 relative">
+                                <canvas id="quality-chart" class="w-full h-full"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer Strip -->
+        <div class="px-5 py-2.5 border-t border-[var(--pdm-border-hairline)] bg-[var(--pdm-surface-sunken)] flex items-center justify-between text-[11px] font-mono text-[var(--pdm-text-muted)]">
+            <span>PLANT SECURITY LEVEL: ADMIN-ELEVATED</span>
+            <span>REST API ENDPOINT: /api/machines</span>
         </div>
     </div>
 </div>

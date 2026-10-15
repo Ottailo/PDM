@@ -54,6 +54,9 @@ Thumbs.db
 *.db
 *.sqlite
 *.sqlite3
+instance/
+*.db-wal
+*.db-shm
 
 # ML Models
 models/*.h5

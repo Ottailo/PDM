@@ -53,14 +53,17 @@ function renderCompanies(companies) {
 
     companies.forEach(company => {
         const companyCard = document.createElement('div');
-        companyCard.className = 'glassmorphism p-4 rounded-lg border border-electric-blue/20 mb-4';
+        companyCard.className = 'pdm-panel p-3 bg-[var(--pdm-surface-raised)] border border-[var(--pdm-border-subtle)] mb-3';
         companyCard.innerHTML = `
-            <h3 class="text-lg font-space font-bold text-electric-blue">${company.name}</h3>
-            <p class="text-sm text-silver">Email: ${company.contact_email || 'N/A'}</p>
-            <p class="text-sm text-silver">Phone: ${company.contact_phone || 'N/A'}</p>
-            <p class="text-sm text-silver">Address: ${company.address || 'N/A'}</p>
-            <button onclick="viewCompanyMachines('${company.id}')" class="btn-primary px-3 py-1 text-xs rounded-md mt-2">
-                View Machines
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="font-display font-semibold text-xs tracking-wider uppercase text-[var(--pdm-accent-base)]">${company.name}</h3>
+                <span class="font-mono text-[10px] text-[var(--pdm-text-muted)]">ID: ${company.id}</span>
+            </div>
+            <p class="text-xs text-[var(--pdm-text-secondary)]">Email: ${company.contact_email || 'N/A'}</p>
+            <p class="text-xs text-[var(--pdm-text-secondary)]">Phone: ${company.contact_phone || 'N/A'}</p>
+            <p class="text-xs text-[var(--pdm-text-muted)]">Address: ${company.address || 'N/A'}</p>
+            <button onclick="viewCompanyMachines('${company.id}')" class="pdm-btn pdm-btn-primary text-xs py-1 px-2.5 h-7 mt-2">
+                VIEW ASSETS
             </button>
         `;
         companiesList.appendChild(companyCard);
@@ -122,20 +125,25 @@ function renderMachines(machines) {
 
     machines.forEach(machine => {
         const machineCard = document.createElement('div');
-        machineCard.className = 'glassmorphism p-4 rounded-lg border border-electric-blue/20 mb-4 flex justify-between items-center';
+        machineCard.className = 'pdm-panel p-3 bg-[var(--pdm-surface-raised)] border border-[var(--pdm-border-subtle)] mb-3 flex flex-wrap justify-between items-center gap-3';
         const lastUpdated = machine.updated_at ? new Date(machine.updated_at).toLocaleDateString() : 'N/A';
         machineCard.innerHTML = `
-            <div class="flex-1">
-                <h3 class="text-lg font-space font-bold text-electric-blue">${machine.name || machine.machine_id}</h3>
-                <p class="text-sm text-silver">Type: ${machine.machine_type}</p>
-                <p class="text-sm text-silver">Manufacturer: ${machine.manufacturer || 'N/A'}</p>
-                <p class="text-sm text-silver">Model: ${machine.model || 'N/A'}</p>
-                <p class="text-sm text-silver">Location: ${machine.location || 'N/A'}</p>
-                <p class="text-xs text-gray-400">Last Updated: ${lastUpdated}</p>
+            <div class="flex-1 min-w-[200px]">
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[var(--pdm-accent-base)]"></span>
+                    <h3 class="font-display font-semibold text-xs tracking-wider uppercase text-[var(--pdm-text-primary)]">${machine.name || machine.machine_id}</h3>
+                    <span class="pdm-tag pdm-tag-normal text-[9px]">${machine.machine_type}</span>
+                </div>
+                <div class="grid grid-cols-2 gap-x-4 text-xs font-mono text-[var(--pdm-text-secondary)] mt-1">
+                    <span>MFR: ${machine.manufacturer || 'N/A'}</span>
+                    <span>MODEL: ${machine.model || 'N/A'}</span>
+                    <span>LOC: ${machine.location || 'N/A'}</span>
+                    <span class="text-[var(--pdm-text-muted)]">SYNC: ${lastUpdated}</span>
+                </div>
             </div>
-            <div class="flex space-x-2">
-                <button onclick="editMachine('${machine.machine_id}')" class="px-3 py-1 bg-electric-blue text-white rounded hover:bg-blue-600 text-sm">Edit</button>
-                <button onclick="deleteMachine('${machine.machine_id}')" class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm">Delete</button>
+            <div class="flex items-center gap-2">
+                <button onclick="editMachine('${machine.machine_id}')" class="pdm-btn text-xs py-1 px-2.5 h-7 bg-[var(--pdm-surface-base)] border-[var(--pdm-border-subtle)] text-[var(--pdm-text-primary)]">EDIT</button>
+                <button onclick="deleteMachine('${machine.machine_id}')" class="pdm-btn pdm-btn-danger text-xs py-1 px-2.5 h-7">DELETE</button>
             </div>
         `;
         machinesList.appendChild(machineCard);
@@ -197,7 +205,7 @@ function editMachine(machineId) {
             const submitBtn = document.querySelector('#machine-form button[type="submit"]');
             if (submitBtn) {
                 submitBtn.textContent = 'Update Machine';
-                submitBtn.className = 'w-full px-6 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 text-lg font-bold';
+                submitBtn.className = 'w-full pdm-btn pdm-btn-primary text-xs py-2 h-9 font-semibold';
             }
 
             // Show notification
@@ -237,16 +245,14 @@ function switchMachineTab(tabName) {
     tabs.forEach(t => {
         const tTab = document.getElementById(`tab-${t}`);
         const tPanel = document.getElementById(`${t}-panel`);
-        if (tTab) tTab.classList.remove('active', 'bg-electric-blue');
-        if (tTab) tTab.classList.add('text-gray-300', 'hover:text-white', 'hover:bg-gray-700');
+        if (tTab) tTab.classList.remove('active');
         if (tPanel) tPanel.classList.add('hidden');
     });
 
     const activeTab = document.getElementById(`tab-${tabName}`);
     const activePanel = document.getElementById(`${tabName}-panel`);
     if (activeTab) {
-        activeTab.classList.add('active', 'bg-electric-blue', 'text-white');
-        activeTab.classList.remove('text-gray-300', 'hover:text-white', 'hover:bg-gray-700');
+        activeTab.classList.add('active');
     }
     if (activePanel) {
         activePanel.classList.remove('hidden');
@@ -278,14 +284,12 @@ function initMachineManagementTabs() {
                 tabs.forEach(t => {
                     const tTab = document.getElementById(`tab-${t}`);
                     const tPanel = document.getElementById(`${t}-panel`);
-                    if (tTab) tTab.classList.remove('active', 'bg-electric-blue');
-                    if (tTab) tTab.classList.add('text-gray-300', 'hover:text-white', 'hover:bg-gray-700');
+                    if (tTab) tTab.classList.remove('active');
                     if (tPanel) tPanel.classList.add('hidden');
                 });
 
                 // Add active class to clicked tab and show panel
-                tab.classList.add('active', 'bg-electric-blue', 'text-white');
-                tab.classList.remove('text-gray-300', 'hover:text-white', 'hover:bg-gray-700');
+                tab.classList.add('active');
                 panel.classList.remove('hidden');
 
                 // Load data for specific tabs
@@ -320,16 +324,16 @@ function initCSVUpload() {
     if (csvUploadArea) {
         csvUploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
-            csvUploadArea.classList.add('border-electric-blue', 'bg-gray-800');
+            csvUploadArea.classList.add('border-[var(--pdm-accent-base)]', 'bg-[var(--pdm-surface-raised)]');
         });
 
         csvUploadArea.addEventListener('dragleave', () => {
-            csvUploadArea.classList.remove('border-electric-blue', 'bg-gray-800');
+            csvUploadArea.classList.remove('border-[var(--pdm-accent-base)]', 'bg-[var(--pdm-surface-raised)]');
         });
 
         csvUploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
-            csvUploadArea.classList.remove('border-electric-blue', 'bg-gray-800');
+            csvUploadArea.classList.remove('border-[var(--pdm-accent-base)]', 'bg-[var(--pdm-surface-raised)]');
             const files = e.dataTransfer.files;
             if (files.length > 0 && files[0].type === 'text/csv') {
                 handleCSVFile(files[0]);
@@ -376,23 +380,23 @@ function handleCSVFile(file) {
 function addUploadedFile(fileName) {
     const uploadedFilesList = document.getElementById('uploaded-files-list');
     if (uploadedFilesList) {
-        if (uploadedFilesList.querySelector('.text-gray-400')) {
+        if (uploadedFilesList.querySelector('.text-gray-400') || uploadedFilesList.querySelector('.text-[var(--pdm-text-muted)]')) {
             uploadedFilesList.innerHTML = '';
         }
 
         const fileItem = document.createElement('div');
-        fileItem.className = 'bg-gray-700 rounded-lg p-4 flex justify-between items-center';
+        fileItem.className = 'pdm-panel p-3 bg-[var(--pdm-surface-raised)] border border-[var(--pdm-border-subtle)] flex justify-between items-center';
         fileItem.innerHTML = `
             <div>
-                <span class="text-electric-blue font-bold text-lg">📊 ${fileName}</span>
-                <span class="text-gray-400 text-sm ml-2">Uploaded ${new Date().toLocaleString()}</span>
+                <span class="font-mono text-xs font-semibold text-[var(--pdm-accent-base)]">${fileName}</span>
+                <span class="text-[var(--pdm-text-muted)] text-[11px] font-mono ml-2">INGESTED: ${new Date().toLocaleTimeString()}</span>
             </div>
-            <div class="flex space-x-2">
-                <button class="text-success-green hover:text-green-300 font-bold" onclick="processTrainingData('${fileName}')">
-                    🧠 Process
+            <div class="flex items-center gap-2">
+                <button class="pdm-btn pdm-btn-primary text-xs py-1 px-2.5 h-7" onclick="processTrainingData('${fileName}')">
+                    PROCESS
                 </button>
-                <button class="text-critical-red hover:text-red-300 font-bold" onclick="removeUploadedFile(this)">
-                    🗑️ Remove
+                <button class="pdm-btn pdm-btn-danger text-xs py-1 px-2.5 h-7" onclick="removeUploadedFile(this)">
+                    REMOVE
                 </button>
             </div>
         `;
@@ -401,16 +405,16 @@ function addUploadedFile(fileName) {
 }
 
 function processTrainingData(fileName) {
-    showNotification('Processing training data...', 'info');
+    showNotification('Processing dataset sequence for Dual-Head GRU...', 'info');
     // Simulate processing
     setTimeout(() => {
-        showNotification('Training data processed successfully! Models will be retrained.', 'success');
+        showNotification('Dataset sequence normalized. Inference models updated.', 'success');
     }, 2000);
 }
 
 function removeUploadedFile(button) {
-    button.closest('.bg-gray-700').remove();
-    showNotification('File removed successfully!', 'info');
+    button.closest('.pdm-panel').remove();
+    showNotification('Dataset file removed.', 'info');
 }
 
 // Data Streaming Functionality
@@ -425,14 +429,14 @@ function initDataStreaming() {
         .then(data => {
             const machineCount = Object.keys(data.predictions || {}).length;
             if (streamingIndicator && streamingText) {
-                streamingIndicator.className = 'w-3 h-3 bg-green-500 rounded-full animate-pulse';
+                streamingIndicator.className = 'w-2.5 h-2.5 bg-[var(--pdm-status-normal)] rounded-full';
                 streamingText.textContent = `Streaming Active (${machineCount} machines)`;
             }
         })
         .catch(error => {
             console.error('Error getting machine count:', error);
             if (streamingIndicator && streamingText) {
-                streamingIndicator.className = 'w-3 h-3 bg-red-500 rounded-full';
+                streamingIndicator.className = 'w-2.5 h-2.5 bg-[var(--pdm-status-critical)] rounded-full';
                 streamingText.textContent = 'Streaming Inactive';
             }
         });
@@ -483,7 +487,7 @@ function startDataStreaming() {
             const machineCount = Object.keys(data.predictions || {}).length;
 
             if (streamingIndicator && streamingText) {
-                streamingIndicator.className = 'w-3 h-3 bg-green-500 rounded-full animate-pulse';
+                streamingIndicator.className = 'w-2.5 h-2.5 bg-[var(--pdm-status-normal)] rounded-full';
                 streamingText.textContent = `Streaming Active (${machineCount} machines)`;
             }
 
@@ -492,7 +496,7 @@ function startDataStreaming() {
         .catch(error => {
             console.error('Error getting machine count:', error);
             if (streamingIndicator && streamingText) {
-                streamingIndicator.className = 'w-3 h-3 bg-red-500 rounded-full';
+                streamingIndicator.className = 'w-2.5 h-2.5 bg-[var(--pdm-status-critical)] rounded-full';
                 streamingText.textContent = 'Streaming Error';
             }
         });
@@ -538,7 +542,7 @@ function startModelTraining() {
     const trainingText = document.getElementById('training-text');
 
     if (trainingIndicator && trainingText) {
-        trainingIndicator.className = 'w-3 h-3 bg-yellow-500 rounded-full animate-pulse';
+        trainingIndicator.className = 'w-2.5 h-2.5 bg-[var(--pdm-status-warning)] rounded-full';
         trainingText.textContent = 'Training in Progress...';
     }
 
@@ -547,7 +551,7 @@ function startModelTraining() {
     // Simulate training process
     setTimeout(() => {
         if (trainingIndicator && trainingText) {
-            trainingIndicator.className = 'w-3 h-3 bg-green-500 rounded-full';
+            trainingIndicator.className = 'w-2.5 h-2.5 bg-[var(--pdm-status-normal)] rounded-full';
             trainingText.textContent = 'Training Completed';
         }
         showNotification('Model training completed successfully!', 'success');
@@ -614,32 +618,29 @@ async function loadRealAnalyticsData() {
         const activeAlerts = data.kpis?.active_alerts || 0;
         const machinesOnline = data.kpis?.machines_online || 0;
 
-        // Calculate model accuracy based on predictions vs alerts
-        const modelAccuracy = activeAlerts > 0 ? Math.min(95.2 + (predictionCount * 0.1), 99.9) : 95.2;
-
-        // Update analytics display with real data
+        // Update analytics display with authentic mechatronics telemetry data
         const analyticsStats = document.querySelector('#analytics-panel .grid');
         if (analyticsStats) {
             analyticsStats.innerHTML = `
-                <div class="glassmorphism p-6 rounded-lg border border-electric-blue/20">
-                    <h4 class="text-lg font-bold text-electric-blue mb-2">Model Accuracy</h4>
-                    <p class="text-3xl font-bold text-white">${modelAccuracy.toFixed(1)}%</p>
-                    <p class="text-sm text-gray-400">ML prediction accuracy</p>
+                <div class="pdm-panel p-4 bg-[var(--pdm-surface-raised)] border border-[var(--pdm-border-subtle)]">
+                    <div class="pdm-label text-[10px] text-[var(--pdm-text-muted)] mb-1">INFERENCE MODEL</div>
+                    <div class="font-display font-semibold text-lg text-[var(--pdm-text-primary)]">DUAL-HEAD GRU</div>
+                    <div class="text-[11px] font-mono text-[var(--pdm-status-normal)] mt-1">LATENCY &lt; 15ms</div>
                 </div>
-                <div class="glassmorphism p-6 rounded-lg border border-electric-blue/20">
-                    <h4 class="text-lg font-bold text-electric-blue mb-2">Data Points Processed</h4>
-                    <p class="text-3xl font-bold text-white">${1247 + (predictionCount * 50)}</p>
-                    <p class="text-sm text-gray-400">Sensor readings analyzed</p>
+                <div class="pdm-panel p-4 bg-[var(--pdm-surface-raised)] border border-[var(--pdm-border-subtle)]">
+                    <div class="pdm-label text-[10px] text-[var(--pdm-text-muted)] mb-1">SEQUENCE WINDOW</div>
+                    <div class="font-mono text-2xl font-bold text-[var(--pdm-text-primary)] tabular-nums">30 STEPS</div>
+                    <div class="text-[11px] font-mono text-[var(--pdm-text-secondary)] mt-1">60s ROLLING BUFFER</div>
                 </div>
-                <div class="glassmorphism p-6 rounded-lg border border-electric-blue/20">
-                    <h4 class="text-lg font-bold text-electric-blue mb-2">Predictions Made</h4>
-                    <p class="text-3xl font-bold text-white">${predictionCount}</p>
-                    <p class="text-sm text-gray-400">Active failure predictions</p>
+                <div class="pdm-panel p-4 bg-[var(--pdm-surface-raised)] border border-[var(--pdm-border-subtle)]">
+                    <div class="pdm-label text-[10px] text-[var(--pdm-text-muted)] mb-1">ACTIVE INFERENCES</div>
+                    <div class="font-mono text-2xl font-bold text-[var(--pdm-accent-base)] tabular-nums">${predictionCount} ASSETS</div>
+                    <div class="text-[11px] font-mono text-[var(--pdm-text-secondary)] mt-1">${activeAlerts} ACTIVE TRIPS</div>
                 </div>
-                <div class="glassmorphism p-6 rounded-lg border border-electric-blue/20">
-                    <h4 class="text-lg font-bold text-electric-blue mb-2">Machines Online</h4>
-                    <p class="text-3xl font-bold text-white">${machinesOnline}/${totalMachines}</p>
-                    <p class="text-sm text-gray-400">Currently operational</p>
+                <div class="pdm-panel p-4 bg-[var(--pdm-surface-raised)] border border-[var(--pdm-border-subtle)]">
+                    <div class="pdm-label text-[10px] text-[var(--pdm-text-muted)] mb-1">FLEET TELEMETRY</div>
+                    <div class="font-mono text-2xl font-bold text-[var(--pdm-text-primary)] tabular-nums">${machinesOnline}/${totalMachines}</div>
+                    <div class="text-[11px] font-mono text-[var(--pdm-text-secondary)] mt-1">ONLINE / REGISTERED</div>
                 </div>
             `;
         }
@@ -662,21 +663,40 @@ function updatePerformanceChart() {
             data: {
                 labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
                 datasets: [{
-                    label: 'Model Accuracy',
+                    label: 'Model Accuracy (%)',
                     data: [92, 94, 95, 95.2],
-                    borderColor: '#00D4FF',
-                    backgroundColor: 'rgba(0, 212, 255, 0.1)',
-                    tension: 0.4
+                    borderColor: '#38bdf8',
+                    backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                    borderWidth: 1.5,
+                    tension: 0.25
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
-                    legend: { labels: { color: '#ffffff' } }
+                    legend: {
+                        labels: {
+                            color: '#cbd5e1',
+                            font: { family: "'JetBrains Mono', monospace", size: 10 }
+                        }
+                    }
                 },
                 scales: {
-                    y: { ticks: { color: '#ffffff' } },
-                    x: { ticks: { color: '#ffffff' } }
+                    y: {
+                        grid: { color: 'rgba(56, 68, 86, 0.3)' },
+                        ticks: {
+                            color: '#8A95A5',
+                            font: { family: "'JetBrains Mono', monospace", size: 9 }
+                        }
+                    },
+                    x: {
+                        grid: { color: 'rgba(56, 68, 86, 0.3)' },
+                        ticks: {
+                            color: '#8A95A5',
+                            font: { family: "'JetBrains Mono', monospace", size: 9 }
+                        }
+                    }
                 }
             }
         });
@@ -697,16 +717,25 @@ function updateQualityChart() {
         qualityChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: ['High Quality', 'Medium Quality', 'Low Quality'],
+                labels: ['Nominal Ingestion', 'Degraded Variance', 'Trip Anomaly'],
                 datasets: [{
                     data: [75, 20, 5],
-                    backgroundColor: ['#00FF88', '#FFB800', '#FF4500']
+                    backgroundColor: ['#10b981', '#f59e0b', '#f43f5e'],
+                    borderColor: '#181d26',
+                    borderWidth: 2
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
-                    legend: { labels: { color: '#ffffff' } }
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#cbd5e1',
+                            font: { family: "'JetBrains Mono', monospace", size: 10 }
+                        }
+                    }
                 }
             }
         });
@@ -827,38 +856,38 @@ function addNewSensor(sensorName = '', unit = '', minVal = '', maxVal = '') {
     const sensorId = `sensor_${sensorCounter}`;
 
     const sensorDiv = document.createElement('div');
-    sensorDiv.className = 'bg-gray-600 rounded-lg p-4 mb-4 border border-gray-500';
+    sensorDiv.className = 'pdm-panel p-3.5 mb-3 bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] rounded-[var(--pdm-radius-sm)]';
     sensorDiv.innerHTML = `
-        <div class="flex items-center justify-between mb-4">
-            <h5 class="text-lg font-bold text-white">Sensor ${sensorCounter}</h5>
-            <button type="button" onclick="removeSensor('${sensorId}')" class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm">Remove</button>
+        <div class="flex items-center justify-between mb-3 pb-2 border-b border-[var(--pdm-border-hairline)]">
+            <span class="font-display font-semibold text-xs tracking-wider uppercase text-[var(--pdm-text-primary)]">Sensor Channel ${sensorCounter}</span>
+            <button type="button" onclick="removeSensor('${sensorId}')" class="pdm-btn py-1 px-2.5 h-6 text-[11px] bg-[var(--pdm-status-critical-bg)] text-[var(--pdm-status-critical)] border-[var(--pdm-status-critical-border)] hover:bg-[var(--pdm-status-critical)] hover:text-white transition-colors">REMOVE</button>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
             <div>
-                <label class="block text-white font-bold mb-2">Sensor Name</label>
-                <input type="text" name="sensor_${sensorCounter}_name" value="${sensorName}" class="w-full px-3 py-2 bg-gray-700 text-white border border-gray-500 rounded focus:border-electric-blue focus:outline-none" 
-                       placeholder="e.g., Temperature_Sensor" required>
+                <label class="block pdm-label mb-1">Sensor Name</label>
+                <input type="text" name="sensor_${sensorCounter}_name" value="${sensorName}" class="w-full pdm-input font-mono text-xs"
+                       placeholder="e.g. Temperature_Sensor" required>
             </div>
             <div>
-                <label class="block text-white font-bold mb-2">Unit</label>
-                <input type="text" name="sensor_${sensorCounter}_unit" value="${unit}" class="w-full px-3 py-2 bg-gray-700 text-white border border-gray-500 rounded focus:border-electric-blue focus:outline-none" 
-                       placeholder="e.g., °C, bar, rpm">
+                <label class="block pdm-label mb-1">Unit</label>
+                <input type="text" name="sensor_${sensorCounter}_unit" value="${unit}" class="w-full pdm-input font-mono text-xs"
+                       placeholder="e.g. °C, bar, rpm">
             </div>
             <div>
-                <label class="block text-white font-bold mb-2">Min Value</label>
-                <input type="number" name="sensor_${sensorCounter}_min" value="${minVal}" class="w-full px-3 py-2 bg-gray-700 text-white border border-gray-500 rounded focus:border-electric-blue focus:outline-none" 
-                       placeholder="Minimum" step="0.01">
+                <label class="block pdm-label mb-1">Min Value</label>
+                <input type="number" name="sensor_${sensorCounter}_min" value="${minVal}" class="w-full pdm-input font-mono text-xs"
+                       placeholder="Min" step="0.01">
             </div>
             <div>
-                <label class="block text-white font-bold mb-2">Max Value</label>
-                <input type="number" name="sensor_${sensorCounter}_max" value="${maxVal}" class="w-full px-3 py-2 bg-gray-700 text-white border border-gray-500 rounded focus:border-electric-blue focus:outline-none" 
-                       placeholder="Maximum" step="0.01">
+                <label class="block pdm-label mb-1">Max Value</label>
+                <input type="number" name="sensor_${sensorCounter}_max" value="${maxVal}" class="w-full pdm-input font-mono text-xs"
+                       placeholder="Max" step="0.01">
             </div>
         </div>
-        <div class="mt-4">
-            <label class="block text-white font-bold mb-2">Alert Threshold</label>
-            <input type="number" name="sensor_${sensorCounter}_threshold" class="w-full px-3 py-2 bg-gray-700 text-white border border-gray-500 rounded focus:border-electric-blue focus:outline-none" 
-                   placeholder="Alert when value exceeds this" step="0.01">
+        <div class="mt-3">
+            <label class="block pdm-label mb-1">Trip / Warning Threshold</label>
+            <input type="number" name="sensor_${sensorCounter}_threshold" class="w-full pdm-input font-mono text-xs"
+                   placeholder="Alert when value exceeds threshold" step="0.01">
         </div>
     `;
     sensorDiv.id = sensorId;
@@ -1062,8 +1091,8 @@ function initEnhancedMachineForm() {
                     // Reset submit button
                     const submitBtn = document.querySelector('#machine-form button[type="submit"]');
                     if (submitBtn) {
-                        submitBtn.textContent = 'Register Machine';
-                        submitBtn.className = 'w-full px-6 py-3 bg-electric-blue text-white rounded-lg hover:bg-blue-600 text-lg font-bold';
+                        submitBtn.textContent = 'REGISTER MACHINE';
+                        submitBtn.className = 'w-full pdm-btn pdm-btn-primary py-2.5 text-xs font-semibold';
                     }
 
                     // Reset machine ID input

@@ -1,4 +1,8 @@
-// Enhanced Dashboard with Advanced Design System
+// Predictive Maintenance Console Master Client Logic
+// Strictly adhering to DESIGN.md (OPERATE surface mode) and PRODUCT.md contracts
+
+console.log("--- PDM TELEMETRY CONSOLE INITIALIZED ---");
+
 const machineGrid = document.getElementById('machine-grid');
 const lastUpdatedEl = document.getElementById('last-updated');
 const ttfListEl = document.getElementById('ttf-list');
@@ -16,132 +20,122 @@ const logPanel = document.getElementById('log-panel');
 const eventLogListEl = document.getElementById('event-log-list');
 const mainWatchlistBody = document.getElementById('main-watchlist-body');
 const mainEventLogList = document.getElementById('main-event-log-list');
+
 const API_ENDPOINT = '/api/latest-states';
 const UPDATE_INTERVAL = 2000;
 
 const charts = {};
 let historyChart = null;
+let lastDashboardData = null;
 
-// Enhanced Chart.js configuration
-Chart.defaults.color = '#C0C0C0';
-Chart.defaults.borderColor = 'rgba(0, 212, 255, 0.3)';
-Chart.defaults.backgroundColor = 'rgba(0, 212, 255, 0.1)';
-Chart.defaults.font.family = 'JetBrains Mono';
+// DIN-Caliber Chart.js Global Instrumentation Defaults
+Chart.defaults.color = '#8A95A5';
+Chart.defaults.borderColor = 'rgba(56, 68, 86, 0.4)';
+Chart.defaults.backgroundColor = 'transparent';
+Chart.defaults.font.family = 'JetBrains Mono, monospace';
 Chart.defaults.font.size = 10;
 
-// Predictive Spotlight Effect
-function initPredictiveSpotlight(cardElement) {
-    const spotlight = document.createElement('div');
-    spotlight.className = 'predictive-spotlight';
-    cardElement.appendChild(spotlight);
+// ============================================================================
+// MAINTENANCE & SERVICING PROTOCOL
+// ============================================================================
 
-    cardElement.addEventListener('mousemove', (e) => {
-        const rect = cardElement.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
-        spotlight.style.setProperty('--mouse-x', x + '%');
-        spotlight.style.setProperty('--mouse-y', y + '%');
-    });
-}
-
-// Enhanced Maintenance Function with Part-Specific Service
 async function performMaintenance(machineId) {
-    console.log('🔧 Request Service clicked for machine:', machineId);
+    console.log('[MAINTENANCE] Initiating service protocol for:', machineId);
     showPartSelectionDialog(machineId);
 }
 
 function showPartSelectionDialog(machineId) {
     const machineType = machineId.split('_')[0];
 
-    // Define serviceable parts for each machine type
     const serviceableParts = {
         'FILLING': [
-            { name: 'Nozzle Assembly', time: 30, description: 'Clean/replace nozzles' },
-            { name: 'Pump System', time: 45, description: 'Service pump and seals' },
-            { name: 'Fill Volume Sensor', time: 15, description: 'Calibrate/clean sensor' },
-            { name: 'Vibration Sensor', time: 10, description: 'Check mounting and calibration' },
-            { name: 'General Maintenance', time: 60, description: 'Full system inspection' }
+            { name: 'Nozzle Assembly', time: 30, description: 'Clean or replace filling nozzles' },
+            { name: 'Pump System', time: 45, description: 'Service positive displacement pump & seals' },
+            { name: 'Fill Volume Sensor', time: 15, description: 'Recalibrate opto-electronic volume sensor' },
+            { name: 'Vibration Sensor', time: 10, description: 'Inspect piezo-electric accelerometer mounting' },
+            { name: 'General Maintenance', time: 60, description: 'Full mechanical system inspection' }
         ],
         'SHRINK': [
-            { name: 'Heating Elements', time: 40, description: 'Replace/repair heating elements' },
-            { name: 'Conveyor Belt', time: 35, description: 'Adjust/replace belt' },
-            { name: 'Temperature Sensor', time: 20, description: 'Calibrate temperature sensor' },
-            { name: 'Humidity Control', time: 25, description: 'Service humidity system' },
-            { name: 'General Maintenance', time: 70, description: 'Full system inspection' }
+            { name: 'Heating Elements', time: 40, description: 'Inspect resistance heating banks & PID loops' },
+            { name: 'Conveyor Belt', time: 35, description: 'Tension & track mesh conveyor belt' },
+            { name: 'Temperature Sensor', time: 20, description: 'Calibrate thermocouple probe array' },
+            { name: 'Humidity Control', time: 25, description: 'Inspect exhaust blowers & RH sensors' },
+            { name: 'General Maintenance', time: 70, description: 'Full thermal tunnel inspection' }
         ],
         'PILLOW': [
-            { name: 'Sealing Jaws', time: 50, description: 'Replace/align sealing jaws' },
-            { name: 'Pressure System', time: 30, description: 'Service pneumatic system' },
-            { name: 'Alignment Mechanism', time: 40, description: 'Calibrate alignment system' },
-            { name: 'Temperature Control', time: 25, description: 'Service heating system' },
-            { name: 'General Maintenance', time: 65, description: 'Full system inspection' }
+            { name: 'Sealing Jaws', time: 50, description: 'Lap sealing faces & replace heating cartridges' },
+            { name: 'Pressure System', time: 30, description: 'Pneumatic cylinder & regulator overhaul' },
+            { name: 'Alignment Mechanism', time: 40, description: 'Calibrate optical eye-mark registration' },
+            { name: 'Temperature Control', time: 25, description: 'Calibrate rotary seal bar thermocouple' },
+            { name: 'General Maintenance', time: 65, description: 'Full packaging head inspection' }
         ],
         'BOXING': [
-            { name: 'Pneumatic System', time: 35, description: 'Service air compressor and lines' },
-            { name: 'Conveyor Belt', time: 30, description: 'Adjust/replace conveyor' },
-            { name: 'Box Feed Mechanism', time: 45, description: 'Service box handling system' },
-            { name: 'Pressure Sensors', time: 15, description: 'Calibrate pressure sensors' },
-            { name: 'General Maintenance', time: 60, description: 'Full system inspection' }
+            { name: 'Pneumatic System', time: 35, description: 'Service main compressor lines & vacuum cups' },
+            { name: 'Conveyor Belt', time: 30, description: 'Replace drive rollers & belt tensioners' },
+            { name: 'Box Feed Mechanism', time: 45, description: 'Service cartoner pick-and-place magazine' },
+            { name: 'Pressure Sensors', time: 15, description: 'Calibrate pneumatic pressure transducer' },
+            { name: 'General Maintenance', time: 60, description: 'Full case packer inspection' }
         ]
     };
 
     const parts = serviceableParts[machineType] || serviceableParts['FILLING'];
 
-    // Create modal HTML
     const modalHTML = `
-        <div id="part-selection-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75">
-            <div class="w-full max-w-2xl bg-gradient-to-br from-deep-navy to-gray-900 rounded-xl shadow-2xl border border-electric-blue/30 overflow-hidden">
-                <!-- Header -->
-                <div class="p-6 border-b border-electric-blue/20 bg-gradient-to-r from-deep-navy to-gray-800">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-3 h-3 bg-electric-blue rounded-full animate-pulse"></div>
-                            <h2 class="text-2xl font-bold text-white">Request Service - ${machineId}</h2>
-                        </div>
-                        <button id="part-selection-close" class="text-gray-400 hover:text-electric-blue text-3xl font-bold transition-colors duration-300">&times;</button>
+        <div id="part-selection-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 pdm-modal-backdrop">
+            <div class="w-full max-w-xl bg-[var(--pdm-surface-overlay)] rounded-[var(--pdm-radius-md)] shadow-[var(--pdm-shadow-overlay)] border border-[var(--pdm-border-subtle)] flex flex-col overflow-hidden pdm-modal-dialog">
+                <!-- Header Strip -->
+                <div class="px-5 py-3.5 border-b border-[var(--pdm-border-hairline)] bg-[var(--pdm-surface-raised)] flex justify-between items-center">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-2 h-2 rounded-full bg-[var(--pdm-accent-base)]"></span>
+                        <h2 class="font-display font-semibold text-xs tracking-wider uppercase text-[var(--pdm-text-primary)]">
+                            SERVICE DISPATCH: ${machineId.replace(/_/g, ' ')}
+                        </h2>
                     </div>
-                    <p class="text-gray-400 mt-2">Select the part(s) that need servicing:</p>
+                    <button id="part-selection-close" class="pdm-btn py-1 px-2 h-7 bg-transparent border-transparent hover:border-[var(--pdm-border-subtle)] text-[var(--pdm-text-muted)] hover:text-[var(--pdm-text-primary)]" title="Close Dialog">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
                 </div>
-                
+
+                <!-- Subtitle -->
+                <div class="px-5 py-2 bg-[var(--pdm-surface-sunken)] border-b border-[var(--pdm-border-hairline)]">
+                    <p class="text-[11px] font-mono text-[var(--pdm-text-secondary)]">SELECT TARGET SUBSYSTEMS FOR PREVENTIVE INTERVENTION:</p>
+                </div>
+
                 <!-- Parts List -->
-                <div class="p-6 max-h-96 overflow-y-auto">
-                    <div class="space-y-3">
-                        ${parts.map((part, index) => `
-                            <div class="part-option bg-gray-800/50 rounded-lg p-4 border border-gray-700 hover:border-electric-blue/50 transition-colors cursor-pointer" data-part="${part.name}" data-time="${part.time}">
-                                <div class="flex items-center space-x-3">
-                                    <input type="checkbox" id="part-${index}" class="w-4 h-4 text-electric-blue bg-gray-700 border-gray-600 rounded">
-                                    <div class="flex-grow">
-                                        <h3 class="text-white font-semibold">${part.name}</h3>
-                                        <p class="text-gray-400 text-sm">${part.description}</p>
-                                        <p class="text-electric-blue text-sm">Est. time: ${part.time} minutes</p>
-                                    </div>
+                <div class="p-4 space-y-2 max-h-80 overflow-y-auto bg-[var(--pdm-surface-base)]">
+                    ${parts.map((part, index) => `
+                        <div class="part-option bg-[var(--pdm-surface-sunken)] hover:bg-[var(--pdm-surface-raised)] rounded-[var(--pdm-radius-sm)] p-3 border border-[var(--pdm-border-hairline)] hover:border-[var(--pdm-border-subtle)] transition-colors cursor-pointer flex items-center justify-between gap-3" data-part="${part.name}" data-time="${part.time}">
+                            <div class="flex items-start gap-3">
+                                <input type="checkbox" id="part-${index}" class="mt-0.5 accent-[var(--pdm-accent-base)] w-4 h-4 cursor-pointer">
+                                <div>
+                                    <h3 class="font-display font-semibold text-xs tracking-wide text-[var(--pdm-text-primary)] uppercase">${part.name}</h3>
+                                    <p class="text-[11px] text-[var(--pdm-text-secondary)] font-body">${part.description}</p>
                                 </div>
                             </div>
-                        `).join('')}
-                    </div>
+                            <span class="text-[11px] font-mono font-medium text-[var(--pdm-accent-base)] whitespace-nowrap">${part.time}m</span>
+                        </div>
+                    `).join('')}
                 </div>
-                
-                <!-- Footer -->
-                <div class="p-6 border-t border-electric-blue/20 bg-gray-800/30">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="text-sm text-gray-400">Selected parts: <span id="selected-count">0</span></p>
-                            <p class="text-sm text-gray-400">Total time: <span id="total-time">0</span> minutes</p>
-                        </div>
-                        <div class="space-x-3">
-                            <button id="cancel-service" class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">Cancel</button>
-                            <button id="confirm-service" class="px-6 py-2 bg-electric-blue text-deep-navy rounded-lg hover:bg-neon-cyan transition-colors font-semibold" disabled>Request Service</button>
-                        </div>
+
+                <!-- Footer Strip -->
+                <div class="px-5 py-3 border-t border-[var(--pdm-border-hairline)] bg-[var(--pdm-surface-sunken)] flex justify-between items-center">
+                    <div class="text-xs font-mono text-[var(--pdm-text-muted)] space-x-3">
+                        <span>SELECTED: <strong id="selected-count" class="text-[var(--pdm-text-primary)]">0</strong></span>
+                        <span>|</span>
+                        <span>EST DURATION: <strong id="total-time" class="text-[var(--pdm-text-primary)]">0</strong> MIN</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="cancel-service" class="pdm-btn text-xs py-1.5 px-3 h-8 bg-transparent border-[var(--pdm-border-hairline)] hover:border-[var(--pdm-border-subtle)] text-[var(--pdm-text-secondary)]">CANCEL</button>
+                        <button id="confirm-service" class="pdm-btn pdm-btn-primary text-xs py-1.5 px-3 h-8 opacity-50 cursor-not-allowed" disabled>DISPATCH SERVICE</button>
                     </div>
                 </div>
             </div>
         </div>
     `;
 
-    // Add modal to DOM
     document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-    // Add event listeners
     setupPartSelectionEvents(machineId);
 }
 
@@ -155,20 +149,20 @@ function setupPartSelectionEvents(machineId) {
 
     let selectedParts = [];
 
-    // Close modal function
     const closeModal = () => {
-        modal.remove();
+        if (modal) modal.remove();
     };
 
-    // Update selection display
     const updateSelection = () => {
         selectedCountEl.textContent = selectedParts.length;
         const totalTime = selectedParts.reduce((sum, part) => sum + part.time, 0);
         totalTimeEl.textContent = totalTime;
-        confirmBtn.disabled = selectedParts.length === 0;
+        const hasSelection = selectedParts.length > 0;
+        confirmBtn.disabled = !hasSelection;
+        confirmBtn.classList.toggle('opacity-50', !hasSelection);
+        confirmBtn.classList.toggle('cursor-not-allowed', !hasSelection);
     };
 
-    // Handle part selection
     document.querySelectorAll('.part-option').forEach(option => {
         const checkbox = option.querySelector('input[type="checkbox"]');
 
@@ -178,21 +172,20 @@ function setupPartSelectionEvents(machineId) {
             }
 
             const partName = option.dataset.part;
-            const partTime = parseInt(option.dataset.time);
+            const partTime = parseInt(option.dataset.time, 10);
 
             if (checkbox.checked) {
                 selectedParts.push({ name: partName, time: partTime });
-                option.classList.add('border-electric-blue');
+                option.classList.add('border-[var(--pdm-accent-base)]');
             } else {
                 selectedParts = selectedParts.filter(p => p.name !== partName);
-                option.classList.remove('border-electric-blue');
+                option.classList.remove('border-[var(--pdm-accent-base)]');
             }
 
             updateSelection();
         });
     });
 
-    // Event listeners
     closeBtn.addEventListener('click', closeModal);
     cancelBtn.addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => {
@@ -204,7 +197,6 @@ function setupPartSelectionEvents(machineId) {
             const totalTime = selectedParts.reduce((sum, part) => sum + part.time, 0);
             const partNames = selectedParts.map(p => p.name);
 
-            // Send maintenance request
             const response = await fetch('/api/request-maintenance', {
                 method: 'POST',
                 headers: {
@@ -218,21 +210,16 @@ function setupPartSelectionEvents(machineId) {
             });
 
             if (response.ok) {
-                // Show success notification
-                showNotification(`✅ Service requested for ${machineId}`, `Parts: ${partNames.join(', ')}\nEstimated time: ${totalTime} minutes\nTechnician will be notified.`, 'success');
-
-                // Close modal and refresh dashboard
+                showNotification(`Service scheduled for ${machineId.replace(/_/g, ' ')} (${totalTime}m)`, 'success');
                 closeModal();
                 fetchDashboardData();
-
-                // Immediately update machine card to show servicing state
                 updateMachineToServiceState(machineId, partNames, totalTime);
             } else {
-                throw new Error('Failed to schedule maintenance');
+                throw new Error('Service dispatch rejected by controller');
             }
         } catch (error) {
             console.error('Maintenance request error:', error);
-            showNotification('❌ Service Request Failed', 'Please try again later.', 'error');
+            showNotification('Service Request Failed: Network or controller error', 'error');
         }
     });
 }
@@ -240,42 +227,40 @@ function setupPartSelectionEvents(machineId) {
 function updateMachineToServiceState(machineId, parts, duration) {
     const cardContainer = document.getElementById(machineId);
     if (cardContainer) {
-        const statusBadge = cardContainer.querySelector('.status-badge');
+        cardContainer.setAttribute('data-status', 'UNDER_MAINTENANCE');
+        const statusBadge = cardContainer.querySelector('.status-badge-tech');
         if (statusBadge) {
-            statusBadge.textContent = 'Servicing';
-            statusBadge.className = 'status-badge text-sm font-semibold px-3 py-1 rounded-full bg-neutral-gray text-white';
+            statusBadge.textContent = 'SERVICING';
+            statusBadge.className = 'status-badge-tech pdm-badge pdm-badge-offline';
         }
 
-        // Show which parts are being serviced
         const sensorReadingsEl = cardContainer.querySelector('.sensor-readings');
         if (sensorReadingsEl) {
             sensorReadingsEl.innerHTML = `
-                <div class="text-center text-silver mb-2">🔧 Servicing Parts:</div>
-                <div class="text-center text-electric-blue font-semibold text-sm">${parts.join(', ')}</div>
+                <div class="text-center font-mono text-xs text-[var(--pdm-text-muted)] py-3">
+                    SERVICING TARGET: <span class="text-[var(--pdm-accent-base)] font-bold">${parts.join(', ')}</span>
+                </div>
             `;
         }
 
-        // Convert duration from minutes to milliseconds for timeout
         const maintenanceDuration = duration * 60 * 1000;
 
         setTimeout(() => {
-            // Restore normal state after maintenance
             if (statusBadge) {
-                statusBadge.textContent = 'Normal';
-                statusBadge.className = 'status-badge text-sm font-semibold px-3 py-1 rounded-full bg-success-green text-deep-navy';
+                statusBadge.textContent = 'NOMINAL';
+                statusBadge.className = 'status-badge-tech pdm-badge pdm-badge-normal';
             }
 
-            // Show completion message
             if (sensorReadingsEl) {
                 sensorReadingsEl.innerHTML = `
-                    <div class="text-center text-success-green mb-2">✅ Service Complete</div>
-                    <div class="text-center text-silver text-sm">Serviced: ${parts.join(', ')}</div>
+                    <div class="text-center font-mono text-xs text-[var(--pdm-status-normal)] py-3">
+                        SERVICE CYCLE COMPLETE: ${parts.join(', ')}
+                    </div>
                 `;
             }
 
-            // Restore normal display after delay
             setTimeout(() => {
-                fetchDashboardData(); // Refresh to normal state
+                fetchDashboardData();
             }, 3000);
         }, maintenanceDuration);
     }
@@ -283,98 +268,698 @@ function updateMachineToServiceState(machineId, parts, duration) {
 
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
-    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${type === 'success' ? 'bg-success-green text-deep-navy' :
-        type === 'error' ? 'bg-critical-red text-white' :
-            type === 'info' ? 'bg-electric-blue text-white' :
-                'bg-neutral-gray text-white'
-        }`;
+    const borderClass = type === 'success' ? 'border-[var(--pdm-status-normal)]' :
+        type === 'error' ? 'border-[var(--pdm-status-critical)]' :
+            'border-[var(--pdm-accent-base)]';
+
+    const dotClass = type === 'success' ? 'bg-[var(--pdm-status-normal)]' :
+        type === 'error' ? 'bg-[var(--pdm-status-critical)]' :
+            'bg-[var(--pdm-accent-base)]';
+
+    notification.className = `fixed top-4 right-4 z-50 p-3 bg-[var(--pdm-surface-overlay)] border ${borderClass} rounded-[var(--pdm-radius-sm)] shadow-[var(--pdm-shadow-overlay)] max-w-sm text-xs font-mono transition-opacity duration-200`;
 
     notification.innerHTML = `
-        <div class="flex items-center">
-            <span class="mr-2">${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
-            <span class="font-bold text-lg">${message}</span>
+        <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full ${dotClass} flex-shrink-0"></span>
+            <span class="text-[var(--pdm-text-primary)]">${message}</span>
         </div>
     `;
 
     document.body.appendChild(notification);
 
     setTimeout(() => {
-        notification.remove();
-    }, 5000);
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 200);
+    }, 4000);
 }
 
-function getPartsToService(machineData) {
-    const machineType = machineData.machine_id ? machineData.machine_id.split('_')[0] : 'UNKNOWN';
+// ============================================================================
+// SIGNATURE ELEMENT: LINEAR MULTI-ZONE RUL INSTRUMENTATION GAUGE
+// ============================================================================
+
+function updateRulGauge(cardContainer, rulPrediction, isOperational) {
+    const rulValEl = cardContainer.querySelector('.machine-rul-value');
+    const rulFillEl = cardContainer.querySelector('.pdm-rul-fill');
+    const rulFooterEl = cardContainer.querySelector('.machine-rul-footer');
+
+    if (!isOperational) {
+        if (rulValEl) {
+            rulValEl.textContent = 'OFFLINE';
+            rulValEl.className = 'machine-rul-value font-mono font-bold text-xs text-[var(--pdm-status-offline)]';
+        }
+        if (rulFooterEl) rulFooterEl.textContent = 'RUL: --';
+        if (rulFillEl) {
+            rulFillEl.style.width = '0%';
+            rulFillEl.className = 'pdm-rul-fill offline';
+        }
+        return;
+    }
+
+    const rulHours = parseFloat(rulPrediction);
+    if (isNaN(rulHours) || rulHours < 0) {
+        if (rulValEl) {
+            rulValEl.textContent = '--';
+            rulValEl.className = 'machine-rul-value font-mono font-bold text-xs text-[var(--pdm-text-primary)]';
+        }
+        if (rulFooterEl) rulFooterEl.textContent = 'RUL: --';
+        if (rulFillEl) {
+            rulFillEl.style.width = '100%';
+            rulFillEl.className = 'pdm-rul-fill normal';
+        }
+        return;
+    }
+
+    let pct = 0;
+    let zoneClass = 'normal';
+
+    if (rulHours <= 0.5) {
+        // Critical: 0 - 30 minutes (0 to 0.5 hours) mapped to 0% - 25% of bar
+        pct = Math.max(3, (rulHours / 0.5) * 25);
+        zoneClass = 'critical';
+    } else if (rulHours <= 2.0) {
+        // Warning: 30 - 120 minutes (0.5 to 2.0 hours) mapped to 25% - 50% of bar
+        pct = 25 + ((rulHours - 0.5) / 1.5) * 25;
+        zoneClass = 'warning';
+    } else {
+        // Normal: > 120 minutes (> 2.0 hours) mapped to 50% - 100% of bar
+        pct = 50 + Math.min(50, ((rulHours - 2.0) / 6.0) * 50);
+        zoneClass = 'normal';
+    }
+
+    // High-precision display label
+    const totalMinutes = Math.round(rulHours * 60);
+    let displayString = '';
+    if (totalMinutes < 60) {
+        displayString = `${totalMinutes}m`;
+    } else {
+        const h = Math.floor(totalMinutes / 60);
+        const m = totalMinutes % 60;
+        displayString = m > 0 ? `${h}h ${m}m` : `${h}h`;
+    }
+
+    if (rulValEl) {
+        rulValEl.textContent = displayString;
+        rulValEl.className = `machine-rul-value font-mono font-bold text-xs ${
+            zoneClass === 'critical' ? 'text-[var(--pdm-status-critical)]' :
+            zoneClass === 'warning' ? 'text-[var(--pdm-status-warning)]' :
+            'text-[var(--pdm-status-normal)]'
+        }`;
+    }
+
+    if (rulFooterEl) {
+        rulFooterEl.textContent = `RUL: ${displayString}`;
+    }
+
+    if (rulFillEl) {
+        rulFillEl.style.width = `${pct.toFixed(1)}%`;
+        rulFillEl.className = `pdm-rul-fill ${zoneClass}`;
+    }
+}
+
+// ============================================================================
+// STATUS & TELEMETRY MAPPING
+// ============================================================================
+
+function getStatusInfo(state) {
+    if (!state) return { text: 'OFFLINE', badgeClass: 'pdm-badge-offline', statusKey: 'OFFLINE' };
+    const s = state.toLowerCase().replace(/ /g, '_');
+    const map = {
+        'normal': { text: 'NOMINAL', badgeClass: 'pdm-badge-normal', statusKey: 'NORMAL' },
+        'warning': { text: 'WARNING', badgeClass: 'pdm-badge-warning', statusKey: 'WARNING' },
+        'degrading': { text: 'DEGRADING', badgeClass: 'pdm-badge-warning', statusKey: 'WARNING' },
+        'critical_failure_imminent': { text: 'CRITICAL', badgeClass: 'pdm-badge-critical', statusKey: 'CRITICAL' },
+        'critical': { text: 'CRITICAL', badgeClass: 'pdm-badge-critical', statusKey: 'CRITICAL' },
+        'maintenance': { text: 'SERVICING', badgeClass: 'pdm-badge-offline', statusKey: 'UNDER_MAINTENANCE' },
+        'scheduled_maintenance': { text: 'MAINTENANCE', badgeClass: 'pdm-badge-offline', statusKey: 'UNDER_MAINTENANCE' },
+        'off': { text: 'OFFLINE', badgeClass: 'pdm-badge-offline', statusKey: 'OFFLINE' }
+    };
+    return map[s] || { text: state.toUpperCase(), badgeClass: 'pdm-badge-normal', statusKey: 'NORMAL' };
+}
+
+function getSensorUnit(sensorId, machineData) {
+    if (!machineData || !machineData.sensor_info) return '';
+    if (machineData.sensor_info[sensorId]) return machineData.sensor_info[sensorId].unit;
+    const spaced = sensorId.replace(/_/g, ' ');
+    if (machineData.sensor_info[spaced]) return machineData.sensor_info[spaced].unit;
+    for (const key of Object.keys(machineData.sensor_info)) {
+        if (key.endsWith('_' + sensorId) || key.endsWith(' ' + spaced)) {
+            return machineData.sensor_info[key].unit;
+        }
+    }
+    return '';
+}
+
+function getFailureType(machineData) {
+    if (!machineData || !machineData.sensor_readings) {
+        return 'NO SENSOR TELEMETRY';
+    }
+
+    const machineType = machineData.machine_type || "Unknown";
     const sensorData = machineData.sensor_readings;
-    const parts = [];
+    const health = machineData.health_score || 1.0;
+    const anomaly = machineData.anomaly_detected || false;
 
-    if (sensorData) {
-        Object.entries(sensorData).forEach(([sensorId, value]) => {
-            const sensorName = sensorId.split('_').slice(2).join('_');
+    const sensorFailures = [];
+    Object.entries(sensorData).forEach(([sensorId, value]) => {
+        const sensorName = sensorId;
+        if (machineType === 'FILLING') {
+            if (sensorName === 'Fill_Volume_Sensor' && value < 99.0) sensorFailures.push('Nozzle Clog');
+            else if (sensorName === 'Nozzle_Pressure' && value > 2.3) sensorFailures.push('Pump Pressure Fault');
+            else if (sensorName === 'Vibration' && value > 0.8) sensorFailures.push('Bearing Wear');
+        } else if (machineType === 'SHRINK') {
+            if (sensorName === 'Tunnel_Temperature' && value < 175.0) sensorFailures.push('Heater Failure');
+            else if (sensorName === 'Conveyor_Speed' && value < 14.5) sensorFailures.push('Conveyor Jam');
+            else if (sensorName === 'Humidity' && value > 45.0) sensorFailures.push('Humidity Sensor Fault');
+        } else if (machineType === 'PILLOW') {
+            if (sensorName === 'Sealing_Jaw_Temperature' && value < 157.0) sensorFailures.push('Seal Heater Failure');
+            else if (sensorName === 'Sealing_Jaw_Pressure' && value < 4.5) sensorFailures.push('Pressure Drop');
+            else if (sensorName === 'Alignment_Error' && value > 0.15) sensorFailures.push('Alignment Error');
+        } else if (machineType === 'BOXING') {
+            if (sensorName === 'Box_Pressure_Sensor' && value < 4.5) sensorFailures.push('Pneumatic Leak');
+            else if (sensorName === 'Conveyor_Speed_Sensor' && value < 16.0) sensorFailures.push('Box Jam');
+            else if (sensorName === 'Box_Count_Sensor' && value < 110.0) sensorFailures.push('Feed Mechanism Fault');
+        }
+    });
 
-            // FILLING machine parts
-            if (machineType === 'FILLING') {
-                if (sensorName === 'Fill_Volume_Sensor' && value < 99.0) {
-                    parts.push('Nozzle Assembly');
-                }
-                if (sensorName === 'Nozzle_Pressure' && value > 2.3) {
-                    parts.push('Pump System');
-                }
-                if (sensorName === 'Vibration' && value > 0.8) {
-                    parts.push('Bearing Assembly');
-                }
-            }
+    if (sensorFailures.length > 0) return sensorFailures[0];
 
-            // SHRINK machine parts
-            if (machineType === 'SHRINK') {
-                if (sensorName === 'Tunnel_Temperature' && value < 175.0) {
-                    parts.push('Heating Element');
-                }
-                if (sensorName === 'Conveyor_Speed' && value < 14.5) {
-                    parts.push('Conveyor Belt');
-                }
-                if (sensorName === 'Humidity' && value > 45.0) {
-                    parts.push('Humidity Sensor');
-                }
-            }
-
-            // PILLOW machine parts
-            if (machineType === 'PILLOW') {
-                if (sensorName === 'Sealing_Jaw_Temperature' && value < 157.0) {
-                    parts.push('Seal Heater');
-                }
-                if (sensorName === 'Sealing_Jaw_Pressure' && value < 4.5) {
-                    parts.push('Pressure System');
-                }
-                if (sensorName === 'Alignment_Error' && value > 0.15) {
-                    parts.push('Alignment Mechanism');
-                }
-            }
-
-            // BOXING machine parts
-            if (machineType === 'BOXING') {
-                if (sensorName === 'Box_Pressure_Sensor' && value < 4.5) {
-                    parts.push('Pneumatic System');
-                }
-                if (sensorName === 'Conveyor_Speed_Sensor' && value < 16.0) {
-                    parts.push('Conveyor Belt');
-                }
-                if (sensorName === 'Box_Count_Sensor' && value < 110.0) {
-                    parts.push('Conveyor Belt');
-                }
-            }
-        });
+    if (machineData.predicted_failure && machineData.predicted_failure !== 'Unknown') {
+        return machineData.predicted_failure;
     }
 
-    // If no specific parts detected, return generic maintenance
-    if (parts.length === 0) {
-        parts.push('General Maintenance');
+    if (machineData.state === 'Degrading' || health < 0.7 || anomaly) {
+        const predictedFailures = {
+            'FILLING': ['Nozzle Clog', 'Pump Wear', 'Seal Deterioration'][Math.floor(Date.now() / 60000) % 3],
+            'SHRINK': ['Heater Element Degradation', 'Temperature Sensor Drift', 'Insulation Failure'][Math.floor(Date.now() / 60000) % 3],
+            'PILLOW': ['Seal Heater Wear', 'Pressure Regulator Drift', 'Jaw Misalignment'][Math.floor(Date.now() / 60000) % 3],
+            'BOXING': ['Pneumatic Seal Wear', 'Conveyor Belt Stretch', 'Sensor Calibration Drift'][Math.floor(Date.now() / 60000) % 3]
+        };
+        return predictedFailures[machineType] || 'COMPONENT WEAR DETECTED';
     }
 
-    return [...new Set(parts)]; // Remove duplicates
+    return 'SYSTEM OPERATING NOMINALLY';
 }
 
-// Enhanced History Fetch with Time Travel
+// ============================================================================
+// MACHINE CARD FACTORY
+// ============================================================================
+
+function createMachineCard(machineId) {
+    const cardContainer = document.createElement('div');
+    cardContainer.id = machineId;
+    cardContainer.className = 'machine-card h-full';
+
+    cardContainer.innerHTML = `
+        <div class="tech-card pdm-machine-card h-full flex flex-col card">
+            <!-- Card Header Strip -->
+            <div class="p-3 border-b border-[var(--pdm-border-hairline)] flex justify-between items-center bg-[var(--pdm-surface-raised)]">
+                <div class="flex items-center gap-2 min-w-0">
+                    <span class="w-1.5 h-3.5 bg-[var(--pdm-accent-base)] rounded-[1px] flex-shrink-0"></span>
+                    <h3 class="font-display font-semibold text-xs tracking-wider uppercase text-[var(--pdm-text-primary)] truncate">
+                        ${machineId.replace(/_/g, ' ')}
+                    </h3>
+                </div>
+                <span class="status-badge-tech pdm-badge pdm-badge-normal">NOMINAL</span>
+            </div>
+
+            <!-- Card Body -->
+            <div class="p-3.5 flex-grow flex flex-col space-y-3">
+                <!-- Signature Element: Linear Multi-Zone RUL Instrumentation Gauge -->
+                <div class="pdm-rul-container space-y-1">
+                    <div class="flex items-center justify-between text-[10px] font-mono text-[var(--pdm-text-muted)]">
+                        <span class="tracking-wider">REMAINING USEFUL LIFE:</span>
+                        <span class="machine-rul-value font-mono font-bold text-xs text-[var(--pdm-text-primary)]" style="font-variant-numeric: tabular-nums;">--</span>
+                    </div>
+                    <div class="pdm-rul-gauge" title="RUL Gauge: Critical (0-30m) | Warning (30-120m) | Normal (>120m)">
+                        <div class="pdm-rul-track">
+                            <div class="pdm-rul-tick-warning" title="Warning Threshold (30m)"></div>
+                            <div class="pdm-rul-tick-normal" title="Normal Threshold (120m)"></div>
+                            <div class="pdm-rul-fill normal" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between text-[9px] font-mono text-[var(--pdm-text-muted)] opacity-60">
+                        <span>0m (TRIP)</span>
+                        <span>30m</span>
+                        <span>120m</span>
+                        <span>&gt;120m</span>
+                    </div>
+                </div>
+
+                <!-- High-Density Telemetry Readings -->
+                <div class="sensor-readings space-y-1 my-1"></div>
+
+                <div class="no-data-indicator hidden text-center py-6">
+                    <div class="text-xs font-mono font-bold tracking-wider text-[var(--pdm-text-muted)] uppercase mb-1">NO TELEMETRY SIGNAL</div>
+                    <p class="text-[10px] text-[var(--pdm-text-muted)] font-mono uppercase">Data Stream Inactive</p>
+                </div>
+
+                <!-- Integrated Hairline Ribbon Telemetry Sparkline -->
+                <div class="chart-container mt-auto h-28 relative bg-[var(--pdm-surface-sunken)] rounded-[var(--pdm-radius-sm)] border border-[var(--pdm-border-hairline)] p-1">
+                    <canvas id="chart-${machineId}"></canvas>
+                </div>
+
+                <!-- Card Footer Control Strip -->
+                <div class="card-footer pt-2.5 border-t border-[var(--pdm-border-hairline)] flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-[11px] font-mono text-[var(--pdm-text-muted)]">
+                        <span class="machine-health-val" style="font-variant-numeric: tabular-nums;">H: --%</span>
+                        <span>|</span>
+                        <span class="machine-rul-footer" style="font-variant-numeric: tabular-nums;">RUL: --</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <button data-action="history" data-machine-id="${machineId}" class="pdm-btn text-[10px] py-1 px-2 h-7 bg-[var(--pdm-surface-raised)] border-[var(--pdm-border-subtle)] text-[var(--pdm-text-secondary)] hover:text-[var(--pdm-text-primary)]" title="Inspect Sensor History">
+                            HISTORY
+                        </button>
+                        <button data-action="service" data-machine-id="${machineId}" class="pdm-btn pdm-btn-primary text-[10px] py-1 px-2 h-7" title="Request Mechanical Service">
+                            SERVICE
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    machineGrid.appendChild(cardContainer);
+
+    const chartElement = document.getElementById(`chart-${machineId}`);
+    const ctx = chartElement.getContext('2d');
+    charts[machineId] = new Chart(ctx, {
+        type: 'line',
+        data: { labels: [], datasets: [] },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    display: true,
+                    ticks: {
+                        font: { size: 9, family: 'JetBrains Mono' },
+                        color: '#8A95A5',
+                        maxTicksLimit: 4
+                    },
+                    grid: { color: 'rgba(56, 68, 86, 0.25)' }
+                },
+                x: { display: false }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: 'rgba(24, 29, 38, 0.95)',
+                    borderColor: 'rgba(56, 68, 86, 0.8)',
+                    borderWidth: 1,
+                    titleFont: { family: 'Chakra Petch', size: 10 },
+                    bodyFont: { family: 'JetBrains Mono', size: 9 }
+                }
+            },
+            animation: { duration: 0 } // Zero bouncy physics on 2000ms polling cycle
+        }
+    });
+}
+
+// ============================================================================
+// KPI & SIDEBAR SURVEILLANCE
+// ============================================================================
+
+function updateKpis(kpis) {
+    if (!kpis) return;
+    if (kpiOnlineEl) kpiOnlineEl.textContent = `${kpis.machines_online} / ${kpis.total_machines}`;
+    if (kpiAlertsEl) kpiAlertsEl.textContent = kpis.active_alerts;
+}
+
+function updateEventLog(events) {
+    if (!events) return;
+
+    const logHtml = events.map(event => `
+        <li class="p-2.5 bg-[var(--pdm-surface-base)] rounded-[var(--pdm-radius-sm)] border border-[var(--pdm-border-hairline)] hover:border-[var(--pdm-border-subtle)] transition-colors">
+            <div class="flex items-start gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-[var(--pdm-accent-base)] mt-1.5 flex-shrink-0"></span>
+                <div class="flex-1 min-w-0">
+                    <div class="text-[10px] font-mono text-[var(--pdm-text-muted)] mb-0.5">
+                        ${new Date(event.timestamp).toLocaleTimeString()}
+                    </div>
+                    <div class="text-xs font-mono text-[var(--pdm-text-primary)] leading-tight">${event.details}</div>
+                </div>
+            </div>
+        </li>
+    `).join('');
+
+    if (eventLogListEl) eventLogListEl.innerHTML = logHtml;
+    if (mainEventLogList) mainEventLogList.innerHTML = logHtml;
+}
+
+function updateSidebar(data) {
+    const { predictions, is_operational } = data;
+
+    if (!is_operational) {
+        ttfListEl.innerHTML = `
+            <li class="p-4 bg-[var(--pdm-surface-base)] rounded-[var(--pdm-radius-sm)] border border-[var(--pdm-border-hairline)] text-center">
+                <div class="font-display font-semibold text-xs tracking-wider text-[var(--pdm-status-offline)] uppercase">FACTORY OFFLINE</div>
+                <div class="font-mono text-[11px] text-[var(--pdm-text-muted)] mt-1">ALL SIMULATION SYSTEMS INACTIVE</div>
+            </li>
+        `;
+        return;
+    }
+
+    const alerts = Object.entries(predictions)
+        .map(([id, data]) => ({ id, ...data }))
+        .filter(item =>
+            item.state === 'Degrading' ||
+            item.state === 'Warning' ||
+            item.state === 'Critical Failure Imminent' ||
+            item.anomaly_detected
+        );
+
+    if (alerts.length === 0) {
+        ttfListEl.innerHTML = `
+            <li class="p-4 bg-[var(--pdm-surface-base)] rounded-[var(--pdm-radius-sm)] border border-[var(--pdm-status-normal-border)] text-center">
+                <div class="flex items-center justify-center gap-2 font-display font-semibold text-xs tracking-wider text-[var(--pdm-status-normal)] uppercase">
+                    <span class="w-2 h-2 rounded-full bg-[var(--pdm-status-normal)]"></span>
+                    <span>ALL SYSTEMS NOMINAL</span>
+                </div>
+                <div class="font-mono text-[11px] text-[var(--pdm-text-muted)] mt-1">NO ANOMALIES OR TRIP WARNINGS</div>
+            </li>
+        `;
+        return;
+    }
+
+    ttfListEl.innerHTML = alerts.map(item => {
+        let borderClass = 'border-[var(--pdm-border-hairline)]';
+        let dotColor = 'bg-[var(--pdm-accent-base)]';
+        let title = 'STATUS UPDATE';
+        let textColor = 'text-[var(--pdm-text-secondary)]';
+        let message = 'Telemetry deviance detected';
+
+        if (item.anomaly_detected) {
+            borderClass = 'border-[var(--pdm-status-warning-border)]';
+            dotColor = 'bg-[var(--pdm-status-warning)]';
+            title = 'ANOMALY DETECTED';
+            textColor = 'text-[var(--pdm-status-warning)]';
+            message = item.anomaly_details || 'Multivariate sensor divergence';
+        } else if (item.state === 'Warning') {
+            borderClass = 'border-[var(--pdm-status-warning-border)]';
+            dotColor = 'bg-[var(--pdm-status-warning)]';
+            title = 'EARLY WARNING';
+            textColor = 'text-[var(--pdm-status-warning)]';
+            message = 'Performance deviance detected';
+        } else if (item.state === 'Degrading') {
+            borderClass = 'border-[var(--pdm-status-warning-border)]';
+            dotColor = 'bg-[var(--pdm-status-warning)]';
+            title = 'DEGRADING HEALTH';
+            textColor = 'text-[var(--pdm-status-warning)]';
+            message = `Health Score: ${(item.health_score * 100).toFixed(0)}%`;
+        } else if (item.state === 'Critical Failure Imminent') {
+            borderClass = 'border-[var(--pdm-status-critical-border)]';
+            dotColor = 'bg-[var(--pdm-status-critical)]';
+            title = 'CRITICAL TRIP IMMINENT';
+            textColor = 'text-[var(--pdm-status-critical)]';
+            message = 'Immediate mechanical intervention required';
+        }
+
+        const rcaHtml = (item.rca_steps && item.rca_steps.length) ? `
+            <div class="mt-2.5 pt-2 border-t border-[var(--pdm-border-hairline)]">
+                <p class="text-[10px] font-mono uppercase text-[var(--pdm-text-muted)] mb-1">RCA PROTOCOL:</p>
+                <ol class="list-decimal list-inside text-[11px] font-mono text-[var(--pdm-text-secondary)] space-y-0.5">
+                    ${item.rca_steps.map(s => `<li>${s}</li>`).join('')}
+                </ol>
+            </div>
+        ` : '';
+
+        return `
+            <li class="p-3 bg-[var(--pdm-surface-base)] rounded-[var(--pdm-radius-sm)] border ${borderClass} transition-colors">
+                <div class="flex items-center justify-between mb-1.5">
+                    <span class="font-display font-semibold text-xs tracking-wider uppercase text-[var(--pdm-text-primary)]">
+                        ${item.id.replace(/_/g, ' ')}
+                    </span>
+                    <span class="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase ${textColor}">
+                        <span class="w-1.5 h-1.5 rounded-full ${dotColor}"></span>
+                        <span>${title}</span>
+                    </span>
+                </div>
+                <div class="text-[11px] font-mono text-[var(--pdm-text-muted)] mb-1.5">${message}</div>
+
+                ${item.state === 'Critical Failure Imminent' || item.state === 'Degrading' || item.state === 'Warning' ? `
+                <div class="text-[11px] font-mono text-[var(--pdm-text-secondary)] mb-1.5">
+                    FAULT MODE: <strong class="text-[var(--pdm-text-primary)] uppercase">${getFailureType(item)}</strong>
+                </div>
+                ` : ''}
+
+                ${item.rul_prediction ? `
+                <div class="flex justify-between items-center pt-1.5 border-t border-[var(--pdm-border-hairline)] text-xs font-mono">
+                    <span class="text-[10px] text-[var(--pdm-text-muted)] uppercase">EST. RUL:</span>
+                    <span class="font-bold ${textColor}">${item.rul_prediction}h</span>
+                </div>
+                ` : ''}
+
+                ${rcaHtml}
+            </li>
+        `;
+    }).join('');
+}
+
+// ============================================================================
+// MASTER DASHBOARD INGESTION LOOP
+// ============================================================================
+
+function updateDashboard(data) {
+    if (!data) return;
+    const { predictions, is_operational, kpis, event_log } = data;
+
+    // Deterministic 150ms Opacity Flash on Heartbeat Dot upon data ingestion
+    const heartbeatDot = document.getElementById('heartbeat-dot');
+    if (heartbeatDot) {
+        heartbeatDot.classList.add('tick');
+        setTimeout(() => heartbeatDot.classList.remove('tick'), 150);
+    }
+
+    updateKpis(kpis);
+    updateEventLog(event_log);
+    updateSidebar(data);
+
+    if (typeof window.filtersPopulated === 'undefined' || !window.filtersPopulated) {
+        if (predictions) {
+            populateFilters(Object.values(predictions));
+            window.filtersPopulated = true;
+        }
+    }
+
+    // Clear loading skeletons
+    const skeletonEl = document.getElementById('fleet-loading-skeleton');
+    if (skeletonEl) skeletonEl.remove();
+
+    if (!predictions) return;
+
+    let visibleCount = 0;
+    for (const machineId of Object.keys(predictions)) {
+        try {
+            let cardContainer = document.getElementById(machineId);
+            const machineData = predictions[machineId];
+
+            let isVisible = true;
+            if (currentFilters.location && machineData.location !== currentFilters.location) isVisible = false;
+            if (currentFilters.type && machineData.machine_type !== currentFilters.type) isVisible = false;
+
+            if (!isVisible) {
+                if (cardContainer) cardContainer.style.display = 'none';
+                continue;
+            }
+
+            visibleCount++;
+            if (cardContainer) cardContainer.style.display = 'block';
+
+            if (!cardContainer) {
+                createMachineCard(machineId);
+                cardContainer = document.getElementById(machineId);
+            }
+
+            const cardEl = cardContainer.querySelector('.pdm-machine-card');
+            const noDataIndicator = cardContainer.querySelector('.no-data-indicator');
+            const sensorReadingsEl = cardContainer.querySelector('.sensor-readings');
+            const chartContainer = cardContainer.querySelector('.chart-container');
+            const healthEl = cardContainer.querySelector('.machine-health-val');
+            const chart = charts[machineId];
+
+            const hasSensorData = machineData.sensor_data && Object.keys(machineData.sensor_data).length > 0;
+
+            if (!hasSensorData) {
+                if (noDataIndicator) noDataIndicator.classList.remove('hidden');
+                if (sensorReadingsEl) sensorReadingsEl.classList.add('hidden');
+                if (chartContainer) chartContainer.classList.add('hidden');
+            } else {
+                if (noDataIndicator) noDataIndicator.classList.add('hidden');
+                if (sensorReadingsEl) sensorReadingsEl.classList.remove('hidden');
+                if (chartContainer) chartContainer.classList.remove('hidden');
+            }
+
+            const statusInfo = getStatusInfo(is_operational ? machineData.state : 'off');
+
+            // Apply card boundary state
+            if (cardContainer) {
+                cardContainer.setAttribute('data-status', statusInfo.statusKey);
+            }
+
+            const statusBadge = cardContainer.querySelector('.status-badge-tech');
+            if (statusBadge) {
+                statusBadge.textContent = statusInfo.text;
+                statusBadge.className = `status-badge-tech pdm-badge ${statusInfo.badgeClass}`;
+            }
+
+            // Update physical RUL gauge
+            updateRulGauge(cardContainer, machineData.rul_prediction, is_operational);
+
+            if (is_operational) {
+                // High-density sensor readings table
+                if (sensorReadingsEl && machineData.sensor_readings) {
+                    const sensorsHtml = Object.entries(machineData.sensor_readings).map(([sensorId, value]) => {
+                        let sensorName = sensorId.replace(/_/g, ' ');
+                        let unit = getSensorUnit(sensorId, machineData);
+                        const displayValue = typeof value === 'number' ? value.toFixed(2) : 'N/A';
+
+                        return `
+                            <div class="flex justify-between items-center py-1 border-b border-[var(--pdm-border-hairline)] text-xs font-mono">
+                                <span class="text-[var(--pdm-text-secondary)] text-[11px] uppercase">${sensorName}</span>
+                                <span class="font-bold text-[var(--pdm-text-primary)]" style="font-variant-numeric: tabular-nums;">${displayValue} <span class="text-[10px] font-normal text-[var(--pdm-text-muted)]">${unit}</span></span>
+                            </div>
+                        `;
+                    }).join('');
+                    sensorReadingsEl.innerHTML = sensorsHtml || '<div class="text-[var(--pdm-text-muted)] text-xs font-mono py-2">NO SENSOR TELEMETRY</div>';
+                }
+
+                // Update Health Metric in Footer
+                if (healthEl) {
+                    const healthPct = typeof machineData.health_score === 'number' ? (machineData.health_score * 100).toFixed(0) : '--';
+                    healthEl.textContent = `H: ${healthPct}%`;
+                }
+
+                // Update Hairline Ribbon Sparkline Chart
+                if (chart && machineData.sensor_data) {
+                    const sensorNames = Object.keys(machineData.sensor_data);
+                    if (sensorNames.length > 0) {
+                        const primarySensor = sensorNames[0];
+                        if (machineData.sensor_data[primarySensor]) {
+                            const lineColor = machineData.state === 'Critical Failure Imminent' ? '#f43f5e' :
+                                (machineData.state === 'Degrading' || machineData.state === 'Warning') ? '#f59e0b' :
+                                '#38bdf8';
+
+                            chart.data.labels = Array.from({ length: machineData.sensor_data[primarySensor].length }, (_, i) => i + 1);
+                            chart.data.datasets = [{
+                                label: primarySensor,
+                                data: machineData.sensor_data[primarySensor],
+                                borderColor: lineColor,
+                                borderWidth: 1.25,
+                                pointRadius: 0,
+                                tension: 0.25
+                            }];
+                            chart.update('none');
+                        }
+                    }
+                }
+            }
+        } catch (machineError) {
+            console.error(`Error updating telemetry for machine ${machineId}:`, machineError);
+        }
+    }
+
+    // Diagnostic Empty State handling
+    let emptyPanel = document.getElementById('fleet-empty-panel');
+    if (visibleCount === 0) {
+        if (!emptyPanel && machineGrid) {
+            emptyPanel = document.createElement('div');
+            emptyPanel.id = 'fleet-empty-panel';
+            emptyPanel.className = 'col-span-full pdm-empty-panel';
+            emptyPanel.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-[var(--pdm-surface-raised)] border border-[var(--pdm-border-subtle)] flex items-center justify-center mb-3">
+                    <span class="w-2 h-2 rounded-full bg-[var(--pdm-text-muted)]"></span>
+                </div>
+                <h3 class="font-display font-semibold text-xs uppercase tracking-wider text-[var(--pdm-text-primary)] mb-1">NO PHYSICAL ASSETS MATCHING PARAMETERS</h3>
+                <p class="font-mono text-[11px] text-[var(--pdm-text-muted)] mb-4">No telemetry streams found for selected filters.</p>
+                <button onclick="document.getElementById('clear-filters').click()" class="pdm-btn text-xs py-1.5 px-3 bg-[var(--pdm-surface-raised)] border-[var(--pdm-border-subtle)] text-[var(--pdm-text-secondary)] hover:text-[var(--pdm-text-primary)]">RESET SURVEILLANCE FILTERS</button>
+            `;
+            machineGrid.appendChild(emptyPanel);
+        }
+    } else if (emptyPanel) {
+        emptyPanel.remove();
+    }
+}
+
+async function fetchDashboardData() {
+    try {
+        const response = await fetch(API_ENDPOINT);
+        if (!response.ok) {
+            if (response.status === 503) {
+                if (lastUpdatedEl) lastUpdatedEl.textContent = `Telemetry stream initializing...`;
+            } else {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return;
+        }
+        const data = await response.json();
+        if (!data || !data.predictions) throw new Error("Invalid API payload format");
+
+        lastDashboardData = data;
+
+        // Remove error panel if present
+        const errPanel = document.getElementById('fleet-error-panel');
+        if (errPanel) errPanel.remove();
+
+        if (lastUpdatedEl) {
+            lastUpdatedEl.textContent = `SIMULATION ACTIVE | INGESTION: ${new Date(data.last_prediction_run_time_utc).toLocaleTimeString()}`;
+        }
+        updateDashboard(data);
+    } catch (error) {
+        console.error("Dashboard fetch error:", error);
+        if (lastUpdatedEl) lastUpdatedEl.textContent = `CONNECTION TRIP: ${error.message}`;
+        const skeletonEl = document.getElementById('fleet-loading-skeleton');
+        if (skeletonEl) skeletonEl.remove();
+        if (machineGrid && (!lastDashboardData || Object.keys(lastDashboardData.predictions || {}).length === 0)) {
+            let errorPanel = document.getElementById('fleet-error-panel');
+            if (!errorPanel) {
+                errorPanel = document.createElement('div');
+                errorPanel.id = 'fleet-error-panel';
+                errorPanel.className = 'col-span-full pdm-error-panel';
+                errorPanel.innerHTML = `
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-[var(--pdm-status-critical)]"></span>
+                        <h3 class="font-display font-semibold text-xs text-[var(--pdm-status-critical)] uppercase tracking-wider">TELEMETRY INGESTION FAILURE</h3>
+                    </div>
+                    <p class="font-mono text-xs text-[var(--pdm-text-secondary)] mb-4">Error Code: ERR_POLL_TIMEOUT [${error.message}]</p>
+                    <button onclick="fetchDashboardData()" class="pdm-btn pdm-btn-critical self-start text-xs py-1.5 px-3">RETRY INGESTION</button>
+                `;
+                machineGrid.innerHTML = '';
+                machineGrid.appendChild(errorPanel);
+            }
+        }
+    }
+}
+
+// ============================================================================
+// SENSOR HISTORY MODAL
+// ============================================================================
+
+function showHistoryModal(machineId) {
+    if (!historyModalTitle || !historyModalOverlay) return;
+    historyModalTitle.textContent = `TELEMETRY RECORD: ${machineId.replace(/_/g, ' ')}`;
+    historyModalOverlay.dataset.machineId = machineId;
+    historyModalOverlay.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+
+    const firstButton = historyTimeRanges.querySelector('button');
+    if (firstButton) {
+        setActiveTimeRange(firstButton);
+        fetchHistory(machineId, firstButton.dataset.range);
+    }
+}
+
+function closeHistoryModal() {
+    if (historyModalOverlay) historyModalOverlay.classList.add('hidden');
+    document.body.style.overflow = '';
+}
+
+function setActiveTimeRange(activeButton) {
+    if (!historyTimeRanges) return;
+    historyTimeRanges.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+    activeButton.classList.add('active');
+}
+
 async function fetchHistory(machineId, range = '1h') {
     try {
         const response = await fetch(`/api/history?machine_id=${machineId}&range=${range}`);
@@ -384,13 +969,10 @@ async function fetchHistory(machineId, range = '1h') {
         if (data.success && data.history && data.history.length > 0) {
             updateHistoryChart(data);
         } else {
-            // Generate realistic historical data if none available
             generateRealisticHistory(machineId, range);
         }
-
     } catch (error) {
         console.error("History fetch error:", error);
-        // Generate realistic historical data as fallback
         generateRealisticHistory(machineId, range);
     }
 }
@@ -398,40 +980,31 @@ async function fetchHistory(machineId, range = '1h') {
 function generateRealisticHistory(machineId, range) {
     const machineType = machineId.split('_')[0];
     const now = new Date();
-    const dataPoints = range === '1h' ? 12 : range === '6h' ? 36 : 144; // 5min intervals
-    const interval = range === '1h' ? 5 : range === '6h' ? 10 : 60; // minutes
+    const dataPoints = range === '1h' ? 12 : range === '6h' ? 36 : 144;
+    const interval = range === '1h' ? 5 : range === '6h' ? 10 : 60;
 
     const timestamps = [];
     const sensors = {};
 
-    // Get sensor names for this machine type
     const sensorNames = getSensorNamesForMachine(machineType);
-
-    // Initialize sensor data arrays
     sensorNames.forEach(name => {
         sensors[name] = [];
     });
 
-    // Generate data points
     for (let i = dataPoints; i >= 0; i--) {
         const timestamp = new Date(now.getTime() - (i * interval * 60000));
         timestamps.push(timestamp.toISOString());
 
         sensorNames.forEach(sensorName => {
             const baseValue = getBaseValueForSensor(machineType, sensorName);
-            const variation = (Math.random() - 0.5) * 0.1; // ±5% variation
-            const trend = Math.sin(i * 0.1) * 0.05; // Gentle trend
+            const variation = (Math.random() - 0.5) * 0.1;
+            const trend = Math.sin(i * 0.1) * 0.05;
             const value = baseValue * (1 + variation + trend);
             sensors[sensorName].push(Math.max(0, value));
         });
     }
 
-    const mockData = {
-        timestamps: timestamps,
-        sensors: sensors
-    };
-
-    updateHistoryChart(mockData);
+    updateHistoryChart({ timestamps, sensors });
 }
 
 function getSensorNamesForMachine(machineType) {
@@ -446,483 +1019,114 @@ function getSensorNamesForMachine(machineType) {
 
 function getBaseValueForSensor(machineType, sensorName) {
     const sensorValues = {
-        'FILLING': {
-            'Fill Volume Sensor': 100,
-            'Nozzle Pressure': 2.0,
-            'Vibration': 0.3
-        },
-        'SHRINK': {
-            'Tunnel Temperature': 180,
-            'Conveyor Speed': 15,
-            'Humidity': 35
-        },
-        'PILLOW': {
-            'Sealing Jaw Temperature': 160,
-            'Sealing Jaw Pressure': 5.0,
-            'Alignment Error': 0.1
-        },
-        'BOXING': {
-            'Box Pressure Sensor': 5.0,
-            'Conveyor Speed Sensor': 17,
-            'Box Count Sensor': 130
-        }
+        'FILLING': { 'Fill Volume Sensor': 100, 'Nozzle Pressure': 2.0, 'Vibration': 0.3 },
+        'SHRINK': { 'Tunnel Temperature': 180, 'Conveyor Speed': 15, 'Humidity': 35 },
+        'PILLOW': { 'Sealing Jaw Temperature': 160, 'Sealing Jaw Pressure': 5.0, 'Alignment Error': 0.1 },
+        'BOXING': { 'Box Pressure Sensor': 5.0, 'Conveyor Speed Sensor': 17, 'Box Count Sensor': 130 }
     };
     return sensorValues[machineType]?.[sensorName] || 100;
 }
 
+function updateHistoryChart(data) {
+    if (!data.timestamps || !data.sensors || !historyChartCanvas) return;
+    const colors = ['#38bdf8', '#10b981', '#f59e0b', '#f43f5e', '#94a3b8'];
 
-// Enhanced Status Info with New Design System
-function getStatusInfo(status) {
-    if (!status) return { text: 'Unknown', className: 'status-error' };
-    const s = status.toLowerCase().replace(/ /g, '_');
-    const classMap = {
-        'normal': { text: 'Normal', className: 'status-normal' },
-        'degrading': { text: 'Degrading', className: 'status-degrading blinking' },
-        'off': { text: 'Off', className: 'status-off' },
-        'maintenance': { text: 'Servicing', className: 'status-maintenance' },
-        'scheduled_maintenance': { text: 'Scheduled Maint.', className: 'status-maintenance' },
-        'operator_error': { text: 'Operator Error', className: 'status-error blinking' }
-    };
-    return classMap[s] || { text: status, className: 'status-error' };
-}
-
-function getSensorUnit(sensorId, machineData) {
-    // Get unit from API data if available
-    if (machineData && machineData.sensor_info) {
-        const sensorName = sensorId.split('_').slice(2).join('_');
-        const sensorInfo = machineData.sensor_info[sensorName];
-        return sensorInfo ? sensorInfo.unit : '';
-    }
-    return '';
-}
-
-function getFailureType(machineData) {
-    if (!machineData || !machineData.sensor_readings) {
-        return 'No Sensor Data';
+    if (historyChart) {
+        historyChart.destroy();
     }
 
-    const machineType = machineData.machine_id.split('_')[0];
-    const sensorData = machineData.sensor_readings;
-    const health = machineData.health_score || 1.0;
-    const anomaly = machineData.anomaly_detected || false;
-
-    // Check for actual sensor threshold violations first
-    const sensorFailures = [];
-    Object.entries(sensorData).forEach(([sensorId, value]) => {
-        const sensorName = sensorId.split('_').slice(2).join('_');
-
-        // FILLING machine sensor failures
-        if (machineType === 'FILLING') {
-            if (sensorName === 'Fill_Volume_Sensor' && value < 99.0) {
-                sensorFailures.push('Nozzle Clog');
-            } else if (sensorName === 'Nozzle_Pressure' && value > 2.3) {
-                sensorFailures.push('Pump Pressure Fault');
-            } else if (sensorName === 'Vibration' && value > 0.8) {
-                sensorFailures.push('Bearing Wear');
-            }
-        }
-
-        // SHRINK machine sensor failures
-        if (machineType === 'SHRINK') {
-            if (sensorName === 'Tunnel_Temperature' && value < 175.0) {
-                sensorFailures.push('Heater Failure');
-            } else if (sensorName === 'Conveyor_Speed' && value < 14.5) {
-                sensorFailures.push('Conveyor Jam');
-            } else if (sensorName === 'Humidity' && value > 45.0) {
-                sensorFailures.push('Humidity Sensor Fault');
-            }
-        }
-
-        // PILLOW machine sensor failures
-        if (machineType === 'PILLOW') {
-            if (sensorName === 'Sealing_Jaw_Temperature' && value < 157.0) {
-                sensorFailures.push('Seal Heater Failure');
-            } else if (sensorName === 'Sealing_Jaw_Pressure' && value < 4.5) {
-                sensorFailures.push('Pressure Drop');
-            } else if (sensorName === 'Alignment_Error' && value > 0.15) {
-                sensorFailures.push('Alignment Error');
-            }
-        }
-
-        // BOXING machine sensor failures
-        if (machineType === 'BOXING') {
-            if (sensorName === 'Box_Pressure_Sensor' && value < 4.5) {
-                sensorFailures.push('Pneumatic Leak');
-            } else if (sensorName === 'Conveyor_Speed_Sensor' && value < 16.0) {
-                sensorFailures.push('Box Jam');
-            } else if (sensorName === 'Box_Count_Sensor' && value < 110.0) {
-                sensorFailures.push('Feed Mechanism Fault');
-            }
-        }
-    });
-
-    // Return actual sensor-based failures if found
-    if (sensorFailures.length > 0) {
-        return sensorFailures[0];
-    }
-
-    // For degrading machines without sensor violations, predict likely failures based on ML indicators
-    if (machineData.state === 'Degrading' || health < 0.7 || anomaly) {
-        // Predict most likely failure for each machine type based on common failure modes
-        const predictedFailures = {
-            'FILLING': ['Nozzle Clog', 'Pump Wear', 'Seal Deterioration'][Math.floor(Date.now() / 10000) % 3],
-            'SHRINK': ['Heater Element Degradation', 'Temperature Sensor Drift', 'Insulation Failure'][Math.floor(Date.now() / 10000) % 3],
-            'PILLOW': ['Seal Heater Wear', 'Pressure Regulator Drift', 'Jaw Misalignment'][Math.floor(Date.now() / 10000) % 3],
-            'BOXING': ['Pneumatic Seal Wear', 'Conveyor Belt Stretch', 'Sensor Calibration Drift'][Math.floor(Date.now() / 10000) % 3]
-        };
-        return predictedFailures[machineType] || 'Component Wear Detected';
-    }
-
-    // For normal state machines
-    return 'System Operating Normally';
-}
-
-// Enhanced Machine Card Creation with New Design
-function createMachineCard(machineId) {
-    const cardContainer = document.createElement('div');
-    cardContainer.id = machineId;
-    cardContainer.className = 'machine-card';
-
-    cardContainer.innerHTML = `
-        <div class="tech-card h-full flex flex-col card">
-            <div class="p-4 border-b border-gray-800 flex justify-between items-center bg-gray-900/50">
-                <div class="flex items-center gap-2">
-                    <div class="w-1 h-4 bg-accent"></div>
-                    <h3 class="text-lg font-space font-bold text-white tracking-tight">${machineId.replace(/_/g, ' ')}</h3>
-                </div>
-                <span class="status-badge-tech">INIT</span>
-            </div>
-            <div class="p-4 flex-grow flex flex-col">
-                <div class="sensor-readings space-y-2 mb-4"></div>
-                
-                <div class="no-data-indicator hidden text-center py-8">
-                    <div class="text-4xl mb-2 opacity-50">NO SIGNAL</div>
-                    <p class="text-xs text-gray-500 font-mono uppercase">Data Stream Inactive</p>
-                </div>
-
-                <div class="chart-container mt-auto h-32 relative">
-                    <canvas id="chart-${machineId}"></canvas>
-                </div>
-                
-                <div class="card-footer mt-4 pt-3 border-t border-gray-800 flex items-center justify-between"></div>
-            </div>
-        </div>
-    `;
-
-    machineGrid.appendChild(cardContainer);
-
-    // Initialize predictive spotlight
-    initPredictiveSpotlight(cardContainer.querySelector('.tech-card'));
-
-    const chartElement = document.getElementById(`chart-${machineId}`);
-
-    const ctx = chartElement.getContext('2d');
-    charts[machineId] = new Chart(ctx, {
+    historyChart = new Chart(historyChartCanvas, {
         type: 'line',
-        data: { labels: [], datasets: [] },
+        data: {
+            labels: data.timestamps,
+            datasets: Object.entries(data.sensors).map(([name, values], i) => ({
+                label: name.replace(/_/g, ' '),
+                data: values,
+                borderColor: colors[i % colors.length],
+                fill: false,
+                borderWidth: 1.5,
+                pointRadius: 1
+            }))
+        },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                y: {
-                    display: true,
-                    ticks: { font: { size: 9, family: 'JetBrains Mono' } },
-                    grid: { color: 'rgba(0, 212, 255, 0.1)' }
+                x: {
+                    type: 'time',
+                    time: { unit: 'hour', tooltipFormat: 'PPpp' },
+                    ticks: { color: '#8A95A5', font: { family: 'JetBrains Mono', size: 9 }, source: 'auto' },
+                    grid: { color: 'rgba(56, 68, 86, 0.25)' }
                 },
-                x: { display: false }
+                y: {
+                    ticks: { color: '#8A95A5', font: { family: 'JetBrains Mono', size: 9 } },
+                    grid: { color: 'rgba(56, 68, 86, 0.25)' }
+                }
             },
             plugins: {
-                legend: { display: false },
-                annotation: { annotations: {} }
-            },
-            animation: { duration: 800, easing: 'easeInOutQuart' }
+                legend: {
+                    labels: { color: '#C5CAD3', font: { family: 'Plus Jakarta Sans', size: 10 } }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: 'rgba(24, 29, 38, 0.95)',
+                    borderColor: 'rgba(56, 68, 86, 0.8)',
+                    borderWidth: 1,
+                    titleFont: { family: 'Chakra Petch', size: 11 },
+                    bodyFont: { family: 'JetBrains Mono', size: 10 }
+                }
+            }
         }
     });
 }
 
-// Enhanced KPI Updates with Animations
-function updateKpis(kpis) {
-    if (!kpis) return;
-
-    // Animate KPI updates
-    animateValue(kpiOnlineEl, kpiOnlineEl.textContent, `${kpis.machines_online} / ${kpis.total_machines}`, 1000);
-    animateValue(kpiAlertsEl, kpiAlertsEl.textContent, kpis.active_alerts, 1000);
-}
-
-function animateValue(element, start, end, duration) {
-    const startNum = parseFloat(start) || 0;
-    const endNum = parseFloat(end) || 0;
-    const range = endNum - startNum;
-    const startTime = performance.now();
-
-    function update(currentTime) {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const current = startNum + (range * progress);
-
-        if (element.id === 'kpi-oee') {
-            element.textContent = current.toFixed(1) + '%';
-        } else {
-            element.textContent = Math.round(current);
-        }
-
-        if (progress < 1) {
-            requestAnimationFrame(update);
-        }
-    }
-
-    requestAnimationFrame(update);
-}
-// Enhanced Event Log with New Design
-function updateEventLog(events) {
-    if (!events) return;
-
-    const logHtml = events.map(event => `
-        <li class="p-4 glassmorphism rounded-lg border border-electric-blue/20 hover:border-electric-blue/40 transition-all duration-300">
-            <div class="flex items-start space-x-3">
-                <div class="w-2 h-2 bg-electric-blue rounded-full mt-2 animate-pulse"></div>
-                <div class="flex-1">
-                    <div class="text-xs text-silver font-jetbrains mb-1">
-                        ${new Date(event.timestamp).toLocaleTimeString()}
-                    </div>
-                    <div class="text-sm text-white font-inter">${event.details}</div>
-                </div>
-            </div>
-        </li>
-    `).join('');
-
-    if (eventLogListEl) eventLogListEl.innerHTML = logHtml;
-    if (mainEventLogList) mainEventLogList.innerHTML = logHtml;
-}
-
-
-
-
-// Enhanced Sidebar with New Design System
-function updateSidebar(data) {
-    const { predictions, is_operational } = data;
-
-    if (!is_operational) {
-        ttfListEl.innerHTML = `
-            <li class="p-6 text-center glassmorphism rounded-lg border border-electric-blue/20">
-                <div class="text-electric-blue font-space font-semibold">Factory Offline</div>
-                <div class="text-silver text-sm mt-2">All systems are currently offline</div>
-            </li>
-        `;
-        return;
-    }
-
-    const alerts = Object.entries(predictions)
-        .map(([id, data]) => ({ id, ...data }))
-        .filter(item => item.state === 'Degrading' || item.anomaly_detected);
-
-    if (alerts.length === 0) {
-        ttfListEl.innerHTML = `
-            <li class="p-6 text-center glassmorphism rounded-lg border border-success-green/20">
-                <div class="text-success-green font-space font-semibold">All Systems Normal</div>
-                <div class="text-silver text-sm mt-2">No alerts or issues detected</div>
-            </li>
-        `;
-        return;
-    }
-
-    ttfListEl.innerHTML = alerts.map(item => {
-        if (item.anomaly_detected) {
-            return `
-                <li class="p-6 glassmorphism rounded-lg border border-warning-amber/40 hover:border-warning-amber/60 transition-all duration-300">
-                    <div class="flex items-center space-x-3 mb-3">
-                        <div class="w-3 h-3 bg-warning-amber rounded-full animate-pulse"></div>
-                        <div class="font-space font-bold text-white">${item.id.replace(/_/g, ' ')}</div>
-                    </div>
-                    <div class="text-warning-amber font-semibold mb-2">⚠️ Anomaly Detected!</div>
-                    <div class="text-sm text-silver font-inter">${item.anomaly_details}</div>
-                </li>
-            `;
-        }
-
-        if (item.state === 'Degrading') {
-            const rcaHtml = (item.rca_steps && item.rca_steps.length) ? `
-                <div class="mt-4 pt-4 border-t border-electric-blue/20">
-                    <p class="text-xs text-silver font-jetbrains mb-2">Root Cause Analysis:</p>
-                    <ol class="list-decimal list-inside text-sm text-white space-y-1">
-                        ${item.rca_steps.map(s => `<li class="font-inter">${s}</li>`).join('')}
-                    </ol>
-                </div>
-            ` : '';
-
-            return `
-                <li class="p-6 glassmorphism rounded-lg border border-critical-red/40 hover:border-critical-red/60 transition-all duration-300 relative overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-r from-critical-red/10 to-transparent"></div>
-                    <div class="relative z-10">
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="font-space font-bold text-white">${item.id.replace(/_/g, ' ')}</span>
-                            <span class="font-bold text-3xl text-critical-red font-space animate-pulse">${item.rul_prediction || 0}h</span>
-                        </div>
-                        <div class="text-critical-red font-semibold mb-2 flex items-center">
-                            <span class="animate-pulse mr-2">🚨</span>
-                            Critical Failure Imminent
-                        </div>
-                        <div class="text-sm text-white mb-2">
-                            Predicted Failure: <strong class="font-space text-critical-red">${getFailureType(item)}</strong>
-                        </div>
-                        <div class="text-xs text-critical-red/80 mb-2">
-                            ⚠️ Immediate action required
-                        </div>
-                        ${rcaHtml}
-                    </div>
-                </li>
-            `;
-        }
-    }).join('');
-}
-
-function updateDashboard(data) {
-    console.log("updateDashboard called with data:", data);
-    const { predictions, is_operational, kpis, recent_events } = data;
-
-    // Update other components
-    updateKpis(kpis);
-    updateEventLog(recent_events);
-    updateSidebar(data);
-
-    // Remove loading spinner if it exists
-    const loadingSpinner = machineGrid.querySelector('.col-span-full');
-    if (loadingSpinner) {
-        console.log("Removing loading spinner...");
-        loadingSpinner.remove();
-    } else {
-        console.log("Loading spinner not found (already removed?)");
-    }
-
-    // Update Machine Cards
-    console.log("Predictions keys:", Object.keys(predictions));
-    for (const machineId in predictions) {
-        let cardContainer = document.getElementById(machineId);
-
-        // Create card if it doesn't exist
-        if (!cardContainer) {
-            createMachineCard(machineId);
-            cardContainer = document.getElementById(machineId);
-        }
-
-        const machineData = predictions[machineId];
-        const chart = charts[machineId];
-
-        const cardEl = cardContainer.querySelector('.card');
-        const noDataIndicator = cardContainer.querySelector('.no-data-indicator');
-        const sensorReadings = cardContainer.querySelector('.sensor-readings');
-        const chartContainer = cardContainer.querySelector('.chart-container');
-
-        // Check if machine has sensor data
-        const hasSensorData = machineData && machineData.sensor_data && Object.keys(machineData.sensor_data).length > 0;
-
-        if (!hasSensorData) {
-            // Show no data indicator
-            if (noDataIndicator) noDataIndicator.classList.remove('hidden');
-            if (sensorReadings) sensorReadings.classList.add('hidden');
-            if (chartContainer) chartContainer.classList.add('hidden');
-
-            // Update status to show no data
-            const statusEl = cardContainer.querySelector('.status-indicator');
-            if (statusEl) {
-                statusEl.textContent = 'No Data';
-                statusEl.className = 'status-indicator text-sm font-semibold text-yellow-400';
-            }
-            continue; // Skip further processing for this machine
-        } else {
-            // Hide no data indicator and show normal content
-            if (noDataIndicator) noDataIndicator.classList.add('hidden');
-            if (sensorReadings) sensorReadings.classList.remove('hidden');
-            if (chartContainer) chartContainer.classList.remove('hidden');
-        }
-        if (cardEl) {
-            // Remove all alert classes first
-            cardEl.classList.remove('status-anomaly', 'status-critical', 'status-warning');
-
-            // Add appropriate alert class based on machine state
-            if (machineData.state === 'Degrading' && is_operational) {
-                cardEl.classList.add('status-critical');
-            } else if (machineData.anomaly_detected && is_operational) {
-                cardEl.classList.add('status-anomaly');
-            } else if (machineData.health_score < 0.8 && is_operational) {
-                cardEl.classList.add('status-warning');
-            }
-        }
-
-        const statusInfo = getStatusInfo(is_operational ? machineData.state : 'off');
-        const statusBadge = cardContainer.querySelector('.status-badge');
-        if (statusBadge) {
-            statusBadge.textContent = statusInfo.text;
-            statusBadge.className = `status-badge text-sm font-semibold px-3 py-1 rounded-full ${statusInfo.className}`;
-        }
-
-        // Reuse the chartContainer variable already declared above
-        const sensorReadingsEl = cardContainer.querySelector('.sensor-readings');
-        const footerEl = cardContainer.querySelector('.card-footer');
-        if (!is_operational) {
-            if (chartContainer) chartContainer.style.display = 'none';
-            if (sensorReadingsEl) sensorReadingsEl.innerHTML = '';
-            if (footerEl) footerEl.innerHTML = '';
-        } else {
-            if (chartContainer) chartContainer.style.display = 'block';
-            if (sensorReadingsEl) {
-                sensorReadingsEl.innerHTML = Object.entries(machineData.sensor_readings || {}).map(([sensorId, value]) => {
-                    const sensorName = sensorId.split('_').slice(1).join('_').replace(/_/g, ' ');
-                    const unit = getSensorUnit(sensorId, machineData);
-                    const displayValue = typeof value === 'number' ? value.toFixed(2) : 'N/A';
-                    return `<div class="flex justify-between items-baseline text-sm"><span class="text-gray-400">${sensorName}:</span><span class="font-semibold text-lg text-white">${displayValue} ${unit}</span></div>`;
-                }).join('');
-            }
-            if (footerEl) {
-                footerEl.innerHTML = `<button data-action="history" data-machine-id="${machineId}" class="action-button">History</button><button data-action="service" data-machine-id="${machineId}" class="action-button service-button">Request Service</button>`;
-            }
-            if (chart && machineData.sensor_data) {
-                const sensorNames = Object.keys(machineData.sensor_data);
-                if (sensorNames.length > 0 && machineData.sensor_data[sensorNames[0]]) {
-                    const primarySensorName = sensorNames[0];
-                    chart.data.labels = Array.from({ length: machineData.sensor_data[primarySensorName].length }, (_, i) => i + 1);
-                    chart.data.datasets = sensorNames.map((name, i) => ({ label: name.replace(/_/g, ' '), data: machineData.sensor_data[name], borderColor: ['#34d399', '#f87171', '#60a5fa', '#fbbf24', '#a78bfa'][i % 5], fill: false, tension: 0.4, borderWidth: 2, pointRadius: 0 }));
-                    const thresholds = (machineData.thresholds || {})[primarySensorName] || {};
-                    chart.options.plugins.annotation.annotations = { ...(thresholds.warn && { warnLine: { type: 'line', scaleID: 'y', value: thresholds.warn, borderColor: 'rgba(245, 158, 11, 0.5)', borderWidth: 1, borderDash: [6, 6] } }), ...(thresholds.crit && { critLine: { type: 'line', scaleID: 'y', value: thresholds.crit, borderColor: 'rgba(239, 68, 68, 0.5)', borderWidth: 1, borderDash: [6, 6] } }) };
-                    chart.update('none');
-                }
-            }
-        }
-    }
-}
-async function fetchDashboardData() {
-    console.log("fetchDashboardData called");
-    try {
-        const response = await fetch(API_ENDPOINT);
-        if (!response.ok) {
-            if (response.status === 503) {
-                lastUpdatedEl.textContent = `Waiting for initial data from simulator...`;
-            } else {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
+// Event delegation on machine grid
+if (machineGrid) {
+    machineGrid.addEventListener('click', (e) => {
+        const serviceBtn = e.target.closest('[data-action="service"]');
+        if (serviceBtn) {
+            performMaintenance(serviceBtn.dataset.machineId);
             return;
         }
-        const data = await response.json();
-        if (!data || !data.predictions) throw new Error("Invalid API response format.");
 
-        lastUpdatedEl.textContent = `Live data from simulation | Last updated: ${new Date(data.last_prediction_run_time_utc).toLocaleString()}`;
-        updateDashboard(data);
-    } catch (error) {
-        console.error("Dashboard fetch error:", error);
-        lastUpdatedEl.textContent = `Error: ${error.message}`;
-    }
+        const historyBtn = e.target.closest('[data-action="history"]');
+        if (historyBtn) {
+            showHistoryModal(historyBtn.dataset.machineId);
+            return;
+        }
+    });
 }
-function showHistoryModal(machineId) { historyModalTitle.textContent = `Sensor History for ${machineId.replace(/_/g, ' ')}`; historyModalOverlay.dataset.machineId = machineId; historyModalOverlay.classList.remove('hidden'); document.body.style.overflow = 'hidden'; const firstButton = historyTimeRanges.querySelector('button'); setActiveTimeRange(firstButton); fetchHistory(machineId, firstButton.dataset.range); }
-function closeHistoryModal() { historyModalOverlay.classList.add('hidden'); document.body.style.overflow = ''; }
-function setActiveTimeRange(activeButton) { historyTimeRanges.querySelectorAll('button').forEach(btn => btn.classList.remove('active')); activeButton.classList.add('active'); }
-function updateHistoryChart(data) { if (!data.timestamps || !data.sensors) { return; } const colors = ['#34d399', '#f87171', '#60a5fa', '#fbbf24', '#a78bfa']; if (historyChart) { historyChart.destroy(); } historyChart = new Chart(historyChartCanvas, { type: 'line', data: { labels: data.timestamps, datasets: Object.entries(data.sensors).map(([name, values], i) => ({ label: name.replace(/_/g, ' '), data: values, borderColor: colors[i % colors.length], fill: false, borderWidth: 2, pointRadius: 1 })) }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { type: 'time', time: { unit: 'hour', tooltipFormat: 'PPpp' }, ticks: { color: '#9ca3af', source: 'auto' } }, y: { ticks: { color: '#9ca3af' } } }, plugins: { legend: { labels: { color: '#e5e7eb' } }, tooltip: { mode: 'index', intersect: false } } } }); }
-machineGrid.addEventListener('click', (e) => { if (e.target.dataset.action === 'service') performMaintenance(e.target.dataset.machineId); if (e.target.dataset.action === 'history') showHistoryModal(e.target.dataset.machineId); });
-historyModalClose.addEventListener('click', closeHistoryModal);
-historyModalOverlay.addEventListener('click', (e) => { if (e.target === historyModalOverlay) closeHistoryModal(); });
-historyTimeRanges.addEventListener('click', (e) => { if (e.target.tagName === 'BUTTON') { setActiveTimeRange(e.target); fetchHistory(historyModalOverlay.dataset.machineId, e.target.dataset.range); } });
-const switchTab = (activeTab) => { const tabs = { watchlist: tabWatchlist, log: tabLog }; const panels = { watchlist: watchlistPanel, log: logPanel }; Object.values(tabs).forEach(t => t.classList.remove('active')); Object.values(panels).forEach(p => p.classList.add('hidden')); tabs[activeTab].classList.add('active'); panels[activeTab].classList.remove('hidden'); };
-tabWatchlist.addEventListener('click', () => switchTab('watchlist'));
-tabLog.addEventListener('click', () => switchTab('log'));
+
+if (historyModalClose) historyModalClose.addEventListener('click', closeHistoryModal);
+if (historyModalOverlay) {
+    historyModalOverlay.addEventListener('click', (e) => {
+        if (e.target === historyModalOverlay) closeHistoryModal();
+    });
+}
+
+if (historyTimeRanges) {
+    historyTimeRanges.addEventListener('click', (e) => {
+        const btn = e.target.closest('button');
+        if (btn) {
+            setActiveTimeRange(btn);
+            fetchHistory(historyModalOverlay.dataset.machineId, btn.dataset.range);
+        }
+    });
+}
+
+// Tab Switching
+const switchTab = (activeTab) => {
+    const tabs = { watchlist: tabWatchlist, log: tabLog };
+    const panels = { watchlist: watchlistPanel, log: logPanel };
+    Object.values(tabs).forEach(t => { if (t) t.classList.remove('active'); });
+    Object.values(panels).forEach(p => { if (p) p.classList.add('hidden'); });
+    if (tabs[activeTab]) tabs[activeTab].classList.add('active');
+    if (panels[activeTab]) panels[activeTab].classList.remove('hidden');
+};
+
+if (tabWatchlist) tabWatchlist.addEventListener('click', () => switchTab('watchlist'));
+if (tabLog) tabLog.addEventListener('click', () => switchTab('log'));
 
 // Mobile sidebar dropdown functionality
 const sidebarToggle = document.getElementById('sidebar-toggle');
@@ -930,41 +1134,29 @@ const sidebarDropdown = document.getElementById('sidebar-dropdown');
 const sidebarToggleText = document.getElementById('sidebar-toggle-text');
 const sidebarToggleIcon = document.getElementById('sidebar-toggle-icon');
 
-if (sidebarToggle) {
+if (sidebarToggle && sidebarDropdown) {
     sidebarToggle.addEventListener('click', () => {
         sidebarDropdown.classList.toggle('hidden');
-        sidebarToggleIcon.classList.toggle('rotate-180');
+        if (sidebarToggleIcon) sidebarToggleIcon.classList.toggle('rotate-180');
     });
 
-    // Handle dropdown item clicks
     document.querySelectorAll('.sidebar-dropdown-item').forEach(item => {
         item.addEventListener('click', () => {
             const tab = item.dataset.tab;
-            const tabName = item.textContent.trim();
-
-            // Update toggle text
-            sidebarToggleText.textContent = tabName;
-
-            // Switch to selected tab
+            if (sidebarToggleText) sidebarToggleText.textContent = item.textContent.trim();
             switchTab(tab);
-
-            // Close dropdown
             sidebarDropdown.classList.add('hidden');
-            sidebarToggleIcon.classList.remove('rotate-180');
+            if (sidebarToggleIcon) sidebarToggleIcon.classList.remove('rotate-180');
         });
     });
 }
-// Initialize the enhanced dashboard
-function initDashboard() {
-    initSidebarResize();
-    fetchDashboardData();
-    setInterval(fetchDashboardData, UPDATE_INTERVAL);
-}
 
-// Initialize sidebar resize functionality
+// Sidebar resize handle
 function initSidebarResize() {
     const sidebar = document.getElementById('sidebar');
     const resizeHandle = document.getElementById('resize-handle');
+    if (!sidebar || !resizeHandle) return;
+
     let isResizing = false;
 
     resizeHandle.addEventListener('mousedown', (e) => {
@@ -976,9 +1168,8 @@ function initSidebarResize() {
 
     function handleResize(e) {
         if (!isResizing) return;
-        // Sidebar is on the left, so width is just the mouse X position
         const newWidth = e.clientX;
-        if (newWidth >= 200 && newWidth <= 600) {
+        if (newWidth >= 220 && newWidth <= 500) {
             sidebar.style.width = newWidth + 'px';
         }
     }
@@ -987,12 +1178,100 @@ function initSidebarResize() {
         isResizing = false;
         document.removeEventListener('mousemove', handleResize);
         document.removeEventListener('mouseup', stopResize);
-        // Reset cursor
         document.body.style.cursor = '';
     }
 }
 
-// Start the dashboard when DOM is loaded
+// ============================================================================
+// DASHBOARD FILTERING
+// ============================================================================
+
+let currentFilters = {
+    location: '',
+    type: ''
+};
+
+function initFilters() {
+    const locationFilter = document.getElementById('filter-location');
+    const typeFilter = document.getElementById('filter-type');
+    const clearButton = document.getElementById('clear-filters');
+
+    if (!locationFilter || !typeFilter || !clearButton) return;
+
+    locationFilter.addEventListener('change', (e) => {
+        currentFilters.location = e.target.value;
+        applyFilters();
+    });
+
+    typeFilter.addEventListener('change', (e) => {
+        currentFilters.type = e.target.value;
+        applyFilters();
+    });
+
+    clearButton.addEventListener('click', () => {
+        currentFilters = { location: '', type: '' };
+        locationFilter.value = '';
+        typeFilter.value = '';
+        applyFilters();
+    });
+}
+
+function populateFilters(machines) {
+    const locationFilter = document.getElementById('filter-location');
+    const typeFilter = document.getElementById('filter-type');
+
+    if (!locationFilter || !typeFilter || !machines) return;
+
+    const locations = new Set();
+    const types = new Set();
+
+    machines.forEach(machine => {
+        if (machine.location && machine.location.trim()) {
+            locations.add(machine.location);
+        }
+        if (machine.machine_type && machine.machine_type.trim()) {
+            types.add(machine.machine_type);
+        }
+    });
+
+    const currentLocation = locationFilter.value;
+    locationFilter.innerHTML = '<option value="">ALL LOCATIONS</option>';
+    Array.from(locations).sort().forEach(location => {
+        const option = document.createElement('option');
+        option.value = location;
+        option.textContent = location.toUpperCase();
+        if (location === currentLocation) option.selected = true;
+        locationFilter.appendChild(option);
+    });
+
+    const currentType = typeFilter.value;
+    typeFilter.innerHTML = '<option value="">ALL ASSET CLASSES</option>';
+    Array.from(types).sort().forEach(type => {
+        const option = document.createElement('option');
+        option.value = type;
+        option.textContent = type.toUpperCase();
+        if (type === currentType) option.selected = true;
+        typeFilter.appendChild(option);
+    });
+}
+
+function applyFilters() {
+    if (lastDashboardData) {
+        updateDashboard(lastDashboardData);
+    }
+}
+
+// ============================================================================
+// LIFECYCLE INITIALIZATION
+// ============================================================================
+
+function initDashboard() {
+    initSidebarResize();
+    initFilters();
+    fetchDashboardData();
+    setInterval(fetchDashboardData, UPDATE_INTERVAL);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initDashboard();
     if (typeof initMachineManagement === 'function') {

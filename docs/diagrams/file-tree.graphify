@@ -1,0 +1,17 @@
+{
+  "title": "File Structure - PDM",
+  "diagramType": "file-tree",
+  "generator": "update-docs-engine",
+  "nodes": [
+    {
+      "id": "root",
+      "label": "PDM/",
+      "sub": "83 files, ~9,215 LOC",
+      "x": 50,
+      "y": 50,
+      "color": "#1E3A8A",
+      "border": "#3B82F6"
+    }
+  ],
+  "edges": []
+}

@@ -1,196 +1,822 @@
-/* Cyber-Industrial Design System */
+/* ==========================================================================
+   PDM — Industrial Predictive Maintenance System
+   Visual Design Contract & Semantic Token Architecture
+   Surface Mode: OPERATE | Variance: 3/10 | Motion: 2/10 | Density: 8/10
+   Base Neutral Hue: 245 (Industrial Cold Steel)
+   ========================================================================== */
 
 :root {
-    /* Base Colors */
-    --bg-dark: #0b1120;
-    /* Deep Navy/Black */
-    --bg-card: #151e32;
-    /* Slightly lighter for cards */
-    --bg-panel: #0f172a;
-    /* Panel background */
+  /* Canvas & Surface Layers (Dark Theme - Control Room Native) */
+  --pdm-canvas: oklch(0.14 0.009 245);          /* Primary console floor */
+  --pdm-surface-base: oklch(0.18 0.011 245);    /* Standard card & panel surface */
+  --pdm-surface-raised: oklch(0.22 0.012 245);  /* Hover, table header, drawer surface */
+  --pdm-surface-overlay: oklch(0.26 0.014 245); /* Modal dialog & popover background */
+  --pdm-surface-sunken: oklch(0.11 0.008 245);   /* Inset telemetry wells & code panels */
 
-    /* Borders & Lines */
-    --border-color: #1e293b;
-    --border-highlight: #334155;
+  /* Hairline Structural Borders (Razor 1px dividers, zero diffuse drops) */
+  --pdm-border-hairline: oklch(0.25 0.010 245); /* Hairline divider between panels */
+  --pdm-border-subtle: oklch(0.32 0.012 245);   /* Standard card & input borders */
+  --pdm-border-strong: oklch(0.42 0.015 245);   /* Focus rings, selected tab underlines */
 
-    /* Accents */
-    --accent-primary: #06b6d4;
-    /* Cyan */
-    --accent-secondary: #3b82f6;
-    /* Blue */
-    --accent-glow: rgba(6, 182, 212, 0.15);
+  /* Monochromatic Typographic Gradients */
+  --pdm-text-primary: oklch(0.96 0.005 245);    /* Crisp readout headers, primary metrics */
+  --pdm-text-secondary: oklch(0.75 0.008 245);  /* Field labels, tabular column headers */
+  --pdm-text-muted: oklch(0.55 0.010 245);      /* Engineering units, timestamps, inactive icons */
+  --pdm-text-inverse: oklch(0.14 0.009 245);    /* Text on solid status badges */
 
-    /* Status Colors */
-    --status-normal: #10b981;
-    /* Emerald */
-    --status-warning: #f59e0b;
-    /* Amber */
-    --status-critical: #f43f5e;
-    /* Rose */
-    --status-offline: #64748b;
-    /* Slate */
+  /* ONE Locked Technical Accent (Non-Alert Interactive Chrome, <80% Saturation) */
+  --pdm-accent-base: oklch(0.68 0.12 225);      /* Technical industrial cyan */
+  --pdm-accent-muted: oklch(0.25 0.04 225);     /* Accent subtle background fill */
+  --pdm-accent-hover: oklch(0.74 0.13 225);     /* Active interactive state */
 
-    /* Text */
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
+  /* Semantic Operational State Signals (Strictly Reserved for Machinery Status) */
+  /* Normal / Healthy State (Nominal operation, RUL > 120m) */
+  --pdm-status-normal: oklch(0.65 0.16 150);        /* Muted industrial emerald */
+  --pdm-status-normal-bg: oklch(0.20 0.04 150);     /* Emerald well fill */
+  --pdm-status-normal-border: oklch(0.40 0.08 150); /* Emerald hairline indicator */
+
+  /* Warning / Degrading State (Predictive wear detected, 30m < RUL <= 120m) */
+  --pdm-status-warning: oklch(0.75 0.16 75);        /* Industrial amber */
+  --pdm-status-warning-bg: oklch(0.22 0.05 75);     /* Amber warning fill */
+  --pdm-status-warning-border: oklch(0.45 0.10 75); /* Amber hairline indicator */
+
+  /* Critical / Imminent Trip State (Action required, RUL <= 30m) */
+  --pdm-status-critical: oklch(0.60 0.22 25);       /* Safety vermilion */
+  --pdm-status-critical-bg: oklch(0.20 0.06 25);    /* Vermilion alert fill */
+  --pdm-status-critical-border: oklch(0.42 0.12 25);/* Vermilion hairline indicator */
+
+  /* Maintenance / Offline State (Active service dispatch or unpowered) */
+  --pdm-status-offline: oklch(0.55 0.015 245);      /* Slate neutral */
+  --pdm-status-offline-bg: oklch(0.18 0.010 245);   /* Muted gray fill */
+  --pdm-status-offline-border: oklch(0.30 0.012 245);
+
+  /* Elevation Shadows (Strict Razor Occlusion - Zero Saturated Glows) */
+  --pdm-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --pdm-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
+  --pdm-shadow-overlay: 0 16px 32px -4px rgba(0, 0, 0, 0.7);
+
+  /* Spacing Scale (4px Base Grid) */
+  --pdm-space-1: 4px;
+  --pdm-space-2: 8px;
+  --pdm-space-3: 12px;
+  --pdm-space-4: 16px;
+  --pdm-space-5: 20px;
+  --pdm-space-6: 24px;
+  --pdm-space-8: 32px;
+
+  /* Corner Radii (Crisp Machined Radii - No Pill-Shaped Over-Rounding) */
+  --pdm-radius-none: 0px;
+  --pdm-radius-sm: 2px;
+  --pdm-radius-md: 4px;
+  --pdm-radius-lg: 6px;
+
+  /* Typography Scales */
+  --font-display: "Chakra Petch", "Barlow Semi Condensed", -apple-system, sans-serif;
+  --font-body: "Plus Jakarta Sans", -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "IBM Plex Mono", monospace;
+
+  /* Legacy aliases for backward compatibility */
+  --bg-dark: var(--pdm-canvas);
+  --bg-card: var(--pdm-surface-base);
+  --bg-panel: var(--pdm-surface-base);
+  --border-color: var(--pdm-border-subtle);
+  --border-highlight: var(--pdm-border-strong);
+  --accent-primary: var(--pdm-accent-base);
+  --accent-secondary: var(--pdm-accent-base);
+  --accent-glow: transparent;
+  --status-normal: var(--pdm-status-normal);
+  --status-warning: var(--pdm-status-warning);
+  --status-critical: var(--pdm-status-critical);
+  --status-offline: var(--pdm-status-offline);
+  --text-primary: var(--pdm-text-primary);
+  --text-secondary: var(--pdm-text-secondary);
+  --text-muted: var(--pdm-text-muted);
 }
 
-body {
-    background-color: var(--bg-dark);
-    color: var(--text-primary);
-    font-family: 'Inter', sans-serif;
+/* Light Theme High-Contrast Mode */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --pdm-canvas: oklch(0.96 0.005 245);
+    --pdm-surface-base: oklch(1.0 0.0 0);
+    --pdm-surface-raised: oklch(0.93 0.006 245);
+    --pdm-surface-overlay: oklch(1.0 0.0 0);
+    --pdm-surface-sunken: oklch(0.91 0.008 245);
+
+    --pdm-border-hairline: oklch(0.85 0.008 245);
+    --pdm-border-subtle: oklch(0.75 0.012 245);
+    --pdm-border-strong: oklch(0.50 0.015 245);
+
+    --pdm-text-primary: oklch(0.15 0.010 245);
+    --pdm-text-secondary: oklch(0.35 0.012 245);
+    --pdm-text-muted: oklch(0.52 0.010 245);
+    --pdm-text-inverse: oklch(0.98 0.002 245);
+
+    --pdm-accent-base: oklch(0.50 0.14 225);
+    --pdm-accent-muted: oklch(0.90 0.03 225);
+    --pdm-accent-hover: oklch(0.42 0.15 225);
+
+    --pdm-status-normal: oklch(0.45 0.16 150);
+    --pdm-status-normal-bg: oklch(0.92 0.04 150);
+    --pdm-status-normal-border: oklch(0.70 0.10 150);
+
+    --pdm-status-warning: oklch(0.55 0.17 70);
+    --pdm-status-warning-bg: oklch(0.93 0.05 75);
+    --pdm-status-warning-border: oklch(0.75 0.12 75);
+
+    --pdm-status-critical: oklch(0.48 0.22 25);
+    --pdm-status-critical-bg: oklch(0.92 0.06 25);
+    --pdm-status-critical-border: oklch(0.70 0.15 25);
+
+    --pdm-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --pdm-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --pdm-shadow-overlay: 0 16px 32px -4px rgba(0, 0, 0, 0.15);
+  }
 }
 
-/* Typography Overrides */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    font-family: 'Space Grotesk', sans-serif;
-    letter-spacing: -0.02em;
+/* ==========================================================================
+   Base Element Reset & Typography
+   ========================================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
-.font-mono {
-    font-family: 'JetBrains Mono', monospace;
+html, body {
+  height: 100%;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+  background-color: var(--pdm-canvas);
+  color: var(--pdm-text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: contain;
 }
 
-/* Utility Classes */
-.text-accent {
-    color: var(--accent-primary);
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--pdm-text-primary);
 }
 
-.bg-accent {
-    background-color: var(--accent-primary);
+/* Monospace & Tabular Numeric Engine */
+.font-mono,
+code,
+pre,
+.pdm-telemetry-value,
+.tabular-nums {
+  font-family: var(--font-mono) !important;
+  font-variant-numeric: tabular-nums !important;
+  font-feature-settings: "tnum" 1, "zero" 1 !important;
 }
 
-.border-accent {
-    border-color: var(--accent-primary);
+.font-display {
+  font-family: var(--font-display);
 }
 
-.text-normal {
-    color: var(--status-normal);
+.font-body {
+  font-family: var(--font-body);
 }
 
-.text-warning {
-    color: var(--status-warning);
+/* Typography Scale Classes */
+.pdm-display-lg {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  line-height: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
 }
 
-.text-critical {
-    color: var(--status-critical);
+.pdm-display-sm {
+  font-family: var(--font-display);
+  font-size: 0.8125rem;
+  line-height: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
-/* Technical Card Style */
-.tech-card {
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    /* Sharper corners */
-    position: relative;
-    overflow: hidden;
-    transition: all 0.2s ease;
+.pdm-telemetry-value {
+  font-family: var(--font-mono);
+  font-size: 1.0625rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
 }
 
-.tech-card:hover {
-    border-color: var(--border-highlight);
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+.pdm-telemetry-unit {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--pdm-text-muted);
+  text-transform: uppercase;
+  margin-left: 2px;
 }
 
-/* Subtle corner accents */
-.tech-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 2px;
-    height: 10px;
-    background-color: var(--accent-primary);
-    opacity: 0.5;
+.pdm-label {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  line-height: 0.875rem;
+  font-weight: 600;
+  color: var(--pdm-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-.tech-card::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 10px;
-    height: 2px;
-    background-color: var(--accent-primary);
-    opacity: 0.5;
+/* ==========================================================================
+   Structural Panels & Hairline Containers
+   ========================================================================== */
+
+.pdm-panel {
+  background-color: var(--pdm-surface-base);
+  border: 1px solid var(--pdm-border-hairline);
+  border-radius: var(--pdm-radius-md);
 }
 
-/* Glassmorphism (Subtle/Technical) */
-.glass-panel {
-    background: rgba(15, 23, 42, 0.8);
-    backdrop-filter: blur(8px);
-    border-bottom: 1px solid var(--border-color);
+.pdm-panel-raised {
+  background-color: var(--pdm-surface-raised);
+  border: 1px solid var(--pdm-border-subtle);
+  border-radius: var(--pdm-radius-md);
 }
 
-/* Sidebar */
-.sidebar-link {
-    border-left: 2px solid transparent;
-    transition: all 0.2s;
+.pdm-panel-sunken {
+  background-color: var(--pdm-surface-sunken);
+  border: 1px solid var(--pdm-border-hairline);
+  border-radius: var(--pdm-radius-sm);
 }
 
-.sidebar-link:hover,
-.sidebar-link.active {
-    background-color: rgba(6, 182, 212, 0.05);
-    border-left-color: var(--accent-primary);
-    color: var(--text-primary);
+.pdm-panel-overlay {
+  background-color: var(--pdm-surface-overlay);
+  border: 1px solid var(--pdm-border-subtle);
+  border-radius: var(--pdm-radius-lg);
+  box-shadow: var(--pdm-shadow-overlay);
 }
 
-/* Status Badge (Technical) */
+/* Technical Card (Pure Machined Structure - Zero Decorative Corner Wings) */
+.tech-card,
+.pdm-machine-card {
+  background-color: var(--pdm-surface-base);
+  border: 1px solid var(--pdm-border-subtle);
+  border-radius: var(--pdm-radius-md);
+  position: relative;
+  overflow: hidden;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color 150ms cubic-bezier(0.23, 1, 0.32, 1), background-color 150ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tech-card:hover,
+  .pdm-machine-card:hover {
+    border-color: var(--pdm-border-strong);
+    background-color: var(--pdm-surface-raised);
+  }
+}
+
+/* Status state indicators on cards */
+.pdm-machine-card[data-status="CRITICAL"] {
+  border-color: var(--pdm-status-critical-border);
+}
+
+.pdm-machine-card[data-status="WARNING"] {
+  border-color: var(--pdm-status-warning-border);
+}
+
+.pdm-machine-card[data-status="NORMAL"] {
+  border-color: var(--pdm-border-subtle);
+}
+
+.pdm-machine-card[data-status="UNDER_MAINTENANCE"] {
+  border-color: var(--pdm-status-offline-border);
+  opacity: 0.75;
+}
+
+/* Glass panel replaced with high-contrast opaque panel */
+.glass-panel,
+.glassmorphism {
+  background-color: var(--pdm-surface-base);
+  border-color: var(--pdm-border-hairline);
+  box-shadow: var(--pdm-shadow-sm);
+}
+
+/* ==========================================================================
+   Signature Element: Linear Multi-Zone RUL Instrumentation Gauge
+   ========================================================================== */
+
+.pdm-rul-gauge {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  background-color: var(--pdm-surface-sunken);
+  border: 1px solid var(--pdm-border-hairline);
+  border-radius: 2px;
+  overflow: hidden;
+  display: flex;
+}
+
+/* 3 physical zones */
+.pdm-rul-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    var(--pdm-status-critical-bg) 0%,
+    var(--pdm-status-critical-bg) 25%,
+    var(--pdm-status-warning-bg) 25%,
+    var(--pdm-status-warning-bg) 50%,
+    var(--pdm-status-normal-bg) 50%,
+    var(--pdm-status-normal-bg) 100%
+  );
+}
+
+/* Zone boundary tick lines at 25% (30m) and 50% (120m) */
+.pdm-rul-tick-warning {
+  position: absolute;
+  left: 25%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background-color: var(--pdm-status-critical-border);
+  z-index: 2;
+}
+
+.pdm-rul-tick-normal {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background-color: var(--pdm-status-warning-border);
+  z-index: 2;
+}
+
+/* Current RUL value bar */
+.pdm-rul-fill {
+  height: 100%;
+  transition: width 200ms cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative;
+  z-index: 1;
+}
+
+.pdm-rul-fill.critical {
+  background-color: var(--pdm-status-critical);
+}
+
+.pdm-rul-fill.warning {
+  background-color: var(--pdm-status-warning);
+}
+
+.pdm-rul-fill.normal {
+  background-color: var(--pdm-status-normal);
+}
+
+.pdm-rul-fill.offline {
+  background-color: var(--pdm-status-offline);
+}
+
+/* Integrated Hairline Telemetry Ribbon (Sparkline container) */
+.pdm-sparkline-container {
+  width: 100%;
+  height: 28px;
+  background-color: var(--pdm-surface-sunken);
+  border: 1px solid var(--pdm-border-hairline);
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.pdm-sparkline-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.pdm-sparkline-path {
+  fill: none;
+  stroke-width: 1.25px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.pdm-sparkline-path.normal {
+  stroke: var(--pdm-status-normal);
+}
+
+.pdm-sparkline-path.warning {
+  stroke: var(--pdm-status-warning);
+}
+
+.pdm-sparkline-path.critical {
+  stroke: var(--pdm-status-critical);
+}
+
+.pdm-sparkline-path.neutral {
+  stroke: var(--pdm-accent-base);
+}
+
+/* ==========================================================================
+   Operational State Badges & Indicators
+   ========================================================================== */
+
+.pdm-badge {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 3px 6px;
+  border-radius: var(--pdm-radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.pdm-badge-normal {
+  background-color: var(--pdm-status-normal-bg);
+  border: 1px solid var(--pdm-status-normal-border);
+  color: var(--pdm-status-normal);
+}
+
+.pdm-badge-warning {
+  background-color: var(--pdm-status-warning-bg);
+  border: 1px solid var(--pdm-status-warning-border);
+  color: var(--pdm-status-warning);
+}
+
+.pdm-badge-critical {
+  background-color: var(--pdm-status-critical-bg);
+  border: 1px solid var(--pdm-status-critical-border);
+  color: var(--pdm-status-critical);
+}
+
+.pdm-badge-offline {
+  background-color: var(--pdm-status-offline-bg);
+  border: 1px solid var(--pdm-status-offline-border);
+  color: var(--pdm-status-offline);
+}
+
+.pdm-badge-accent {
+  background-color: var(--pdm-accent-muted);
+  border: 1px solid var(--pdm-accent-base);
+  color: var(--pdm-accent-base);
+}
+
+/* Degraded / Partial Channel Indicator Badge */
+.pdm-badge-degraded {
+  background-color: var(--pdm-status-warning-bg);
+  border: 1px dashed var(--pdm-status-warning-border);
+  color: var(--pdm-status-warning);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  padding: 2px 5px;
+}
+
+/* Backward compatibility for status-badge-tech */
 .status-badge-tech {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    padding: 2px 8px;
-    border-radius: 2px;
-    border: 1px solid currentColor;
-    background: rgba(0, 0, 0, 0.2);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 2px;
+  border: 1px solid currentColor;
+  background: var(--pdm-surface-sunken);
+  letter-spacing: 0.03em;
 }
 
-/* Scrollbar */
+/* Semantic utility text classes */
+.text-normal { color: var(--pdm-status-normal) !important; }
+.text-warning { color: var(--pdm-status-warning) !important; }
+.text-critical { color: var(--pdm-status-critical) !important; }
+.text-offline { color: var(--pdm-status-offline) !important; }
+.text-accent { color: var(--pdm-accent-base) !important; }
+.text-secondary { color: var(--pdm-text-secondary) !important; }
+.text-muted { color: var(--pdm-text-muted) !important; }
+
+.bg-normal { background-color: var(--pdm-status-normal) !important; }
+.bg-warning { background-color: var(--pdm-status-warning) !important; }
+.bg-critical { background-color: var(--pdm-status-critical) !important; }
+.bg-accent { background-color: var(--pdm-accent-base) !important; }
+
+.border-normal { border-color: var(--pdm-status-normal-border) !important; }
+.border-warning { border-color: var(--pdm-status-warning-border) !important; }
+.border-critical { border-color: var(--pdm-status-critical-border) !important; }
+.border-accent { border-color: var(--pdm-accent-base) !important; }
+.border-hairline { border-color: var(--pdm-border-hairline) !important; }
+.border-subtle { border-color: var(--pdm-border-subtle) !important; }
+
+/* ==========================================================================
+   Interactive Controls & Form Inputs (40px touch minimum)
+   ========================================================================== */
+
+.pdm-btn {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 8px 12px;
+  min-height: 36px;
+  border-radius: var(--pdm-radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  border: 1px solid var(--pdm-border-subtle);
+  background-color: var(--pdm-surface-raised);
+  color: var(--pdm-text-primary);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 150ms cubic-bezier(0.23, 1, 0.32, 1),
+              border-color 150ms cubic-bezier(0.23, 1, 0.32, 1),
+              color 150ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pdm-btn:hover {
+    background-color: var(--pdm-surface-overlay);
+    border-color: var(--pdm-border-strong);
+  }
+}
+
+.pdm-btn-primary {
+  background-color: var(--pdm-accent-base);
+  border-color: var(--pdm-accent-base);
+  color: var(--pdm-text-inverse);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pdm-btn-primary:hover {
+    background-color: var(--pdm-accent-hover);
+    border-color: var(--pdm-accent-hover);
+  }
+}
+
+.pdm-btn-critical {
+  background-color: var(--pdm-status-critical-bg);
+  border-color: var(--pdm-status-critical-border);
+  color: var(--pdm-status-critical);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pdm-btn-critical:hover {
+    background-color: var(--pdm-status-critical);
+    color: var(--pdm-text-primary);
+  }
+}
+
+/* Segmented Control Pill */
+.pdm-segmented-group {
+  display: inline-flex;
+  background-color: var(--pdm-surface-sunken);
+  border: 1px solid var(--pdm-border-hairline);
+  border-radius: var(--pdm-radius-sm);
+  padding: 2px;
+  gap: 2px;
+}
+
+.pdm-segmented-btn {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  min-height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--pdm-text-secondary);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+  touch-action: manipulation;
+}
+
+.pdm-segmented-btn.active,
+.pdm-segmented-btn[aria-checked="true"] {
+  background-color: var(--pdm-surface-raised);
+  color: var(--pdm-text-primary);
+  border: 1px solid var(--pdm-border-subtle);
+}
+
+/* High-contrast Technical Inputs */
+.pdm-input,
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+select,
+textarea {
+  background-color: var(--pdm-surface-sunken);
+  border: 1px solid var(--pdm-border-subtle);
+  color: var(--pdm-text-primary);
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  padding: 6px 10px;
+  border-radius: var(--pdm-radius-sm);
+  outline: none;
+  min-height: 36px;
+  transition: border-color 150ms ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--pdm-accent-base);
+}
+
+@media (pointer: coarse) {
+  .pdm-input,
+  input,
+  select,
+  textarea {
+    font-size: 16px !important; /* Prevent iOS zoom */
+    min-height: 40px !important;
+  }
+}
+
+/* Sidebar navigation item */
+.sidebar-item,
+.sidebar-tab {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--pdm-radius-sm);
+  cursor: pointer;
+  color: var(--pdm-text-secondary);
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.sidebar-tab.active {
+  background-color: var(--pdm-surface-raised);
+  border-color: var(--pdm-border-subtle);
+  color: var(--pdm-text-primary);
+}
+
+/* ==========================================================================
+   The Five View States
+   ========================================================================== */
+
+/* State 1: Loading Skeleton (Zero CLS, Monochromatic) */
+.pdm-skeleton {
+  background-color: var(--pdm-surface-sunken);
+  border-radius: 2px;
+  animation: pdm-skeleton-fade 1.2s infinite ease-in-out;
+}
+
+@keyframes pdm-skeleton-fade {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.65; }
+}
+
+.pdm-skeleton-card {
+  min-height: 210px;
+  padding: 12px;
+  background-color: var(--pdm-surface-base);
+  border: 1px solid var(--pdm-border-hairline);
+  border-radius: var(--pdm-radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* State 2: Empty Diagnostic Panel */
+.pdm-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  text-align: center;
+  background-color: var(--pdm-surface-base);
+  border: 1px dashed var(--pdm-border-subtle);
+  border-radius: var(--pdm-radius-md);
+  margin: 16px 0;
+  gap: 12px;
+}
+
+.pdm-empty-icon {
+  width: 32px;
+  height: 32px;
+  color: var(--pdm-text-muted);
+}
+
+/* State 3: Error State */
+.pdm-error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  text-align: center;
+  background-color: var(--pdm-status-critical-bg);
+  border: 1px solid var(--pdm-status-critical-border);
+  border-radius: var(--pdm-radius-md);
+  gap: 10px;
+}
+
+.pdm-error-code {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--pdm-status-critical);
+  background-color: var(--pdm-surface-sunken);
+  padding: 4px 8px;
+  border-radius: 2px;
+  border: 1px solid var(--pdm-status-critical-border);
+}
+
+/* State 4: Degraded Channel Indicator */
+.pdm-degraded-channel {
+  background-color: var(--pdm-status-warning-bg);
+  border-left: 2px solid var(--pdm-status-warning);
+  padding: 4px 8px;
+  font-size: 0.6875rem;
+  font-family: var(--font-mono);
+  color: var(--pdm-status-warning);
+}
+
+/* ==========================================================================
+   Motion Laws & Real-Time Data Heartbeat
+   ========================================================================== */
+
+/* Deterministic 150ms Data Heartbeat Ticker */
+.pdm-ticker-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--pdm-status-normal);
+  display: inline-block;
+  opacity: 0.5;
+  transition: opacity 150ms ease;
+}
+
+.pdm-ticker-dot.tick {
+  opacity: 1;
+}
+
+/* Modal Transition */
+.pdm-modal-backdrop {
+  background-color: rgba(10, 12, 16, 0.75);
+  transition: opacity 150ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.pdm-modal-dialog {
+  transition: transform 150ms cubic-bezier(0.23, 1, 0.32, 1),
+              opacity 150ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Reduced Motion Enforcement */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ==========================================================================
+   Layout Containers & Scrollbars
+   ========================================================================== */
+
+#machine-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 12px;
+}
+
+/* Hairline Scrollbars */
 ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--bg-dark);
+  background: var(--pdm-surface-sunken);
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--border-highlight);
-    border-radius: 3px;
+  background: var(--pdm-border-subtle);
+  border-radius: 2px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background: var(--accent-primary);
-}
-
-/* Machine Grid */
-#machine-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1rem;
-}
-
-/* Animations */
-@keyframes pulse-glow {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.5;
-    }
-}
-
-.animate-pulse-slow {
-    animation: pulse-glow 3s infinite;
+@media (hover: hover) and (pointer: fine) {
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--pdm-border-strong);
+  }
 }

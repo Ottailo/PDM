@@ -1,64 +1,91 @@
-<!-- Enhanced Sidebar -->
+<!-- High-Density Telemetry Sidebar Dock -->
 <aside id="sidebar"
-    class="w-full lg:w-96 lg:h-screen flex flex-col flex-shrink-0 glassmorphism border-r border-electric-blue/30 relative">
+    class="w-full lg:w-80 h-full flex flex-col flex-shrink-0 bg-[var(--pdm-surface-base)] border-r border-[var(--pdm-border-hairline)] relative select-none">
+
     <!-- Resize Handle (desktop only) -->
     <div id="resize-handle"
-        class="absolute right-0 top-0 w-1 h-full bg-electric-blue/30 hover:bg-electric-blue/60 cursor-col-resize transition-colors z-10 hidden lg:block">
+        class="absolute right-0 top-0 w-1 h-full bg-[var(--pdm-border-hairline)] hover:bg-[var(--pdm-accent-base)] cursor-col-resize transition-colors z-10 hidden lg:block"
+        title="Drag to resize dock">
     </div>
 
-    <!-- Mobile Dropdown Toggle -->
-    <div class="lg:hidden p-4 border-b border-electric-blue/20">
+    <!-- Mobile Segmented Toggle -->
+    <div class="lg:hidden p-3 border-b border-[var(--pdm-border-hairline)] bg-[var(--pdm-surface-sunken)]">
         <button id="sidebar-toggle"
-            class="w-full flex items-center justify-between px-4 py-3 bg-gray-800 rounded-lg text-electric-blue font-semibold hover:bg-gray-700 transition-colors">
-            <span id="sidebar-toggle-text">Watchlist</span>
-            <svg id="sidebar-toggle-icon" class="w-5 h-5 transform transition-transform" fill="none"
+            class="w-full flex items-center justify-between px-3 py-2 bg-[var(--pdm-surface-base)] border border-[var(--pdm-border-subtle)] rounded-[var(--pdm-radius-sm)] text-[var(--pdm-text-primary)] font-display text-xs uppercase tracking-wider">
+            <span id="sidebar-toggle-text" class="flex items-center gap-2">
+                <svg class="w-3.5 h-3.5 text-[var(--pdm-accent-base)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="9" stroke-width="1.5"/>
+                    <circle cx="12" cy="12" r="3" stroke-width="1.5"/>
+                </svg>
+                <span>WATCHLIST</span>
+            </span>
+            <svg id="sidebar-toggle-icon" class="w-4 h-4 transform transition-transform" fill="none"
                 stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7"></path>
             </svg>
         </button>
 
         <!-- Mobile Dropdown Menu -->
         <div id="sidebar-dropdown"
-            class="hidden mt-2 bg-gray-800 rounded-lg border border-electric-blue/30 overflow-hidden">
-            <div class="sidebar-dropdown-item px-4 py-3 cursor-pointer hover:bg-gray-700 transition-colors text-electric-blue"
+            class="hidden mt-2 bg-[var(--pdm-surface-raised)] rounded-[var(--pdm-radius-sm)] border border-[var(--pdm-border-subtle)] overflow-hidden">
+            <div class="sidebar-dropdown-item px-3 py-2.5 cursor-pointer hover:bg-[var(--pdm-surface-overlay)] transition-colors text-[var(--pdm-accent-base)] font-display text-xs uppercase flex items-center gap-2"
                 data-tab="watchlist">
-                🎯 Watchlist
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="9" stroke-width="1.5"/>
+                    <circle cx="12" cy="12" r="3" stroke-width="1.5"/>
+                </svg>
+                <span>Watchlist</span>
             </div>
-            <div class="sidebar-dropdown-item px-4 py-3 cursor-pointer hover:bg-gray-700 transition-colors text-silver"
+            <div class="sidebar-dropdown-item px-3 py-2.5 cursor-pointer hover:bg-[var(--pdm-surface-overlay)] transition-colors text-[var(--pdm-text-secondary)] font-display text-xs uppercase flex items-center gap-2"
                 data-tab="log">
-                📋 Event Log
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                </svg>
+                <span>Event Log</span>
             </div>
         </div>
     </div>
 
-    <!-- Desktop Tab Headers -->
-    <div class="hidden lg:block p-6 border-b border-electric-blue/20">
-        <div class="flex space-x-1">
-            <div id="tab-watchlist"
-                class="sidebar-item sidebar-tab active px-4 py-2 rounded-lg cursor-pointer font-semibold text-electric-blue">
-                Watchlist
-            </div>
-            <div id="tab-log"
-                class="sidebar-item sidebar-tab px-4 py-2 rounded-lg cursor-pointer font-semibold text-silver hover:text-electric-blue">
-                Event Log
-            </div>
+    <!-- Desktop Segmented Tab Headers -->
+    <div class="hidden lg:block p-3 border-b border-[var(--pdm-border-hairline)] bg-[var(--pdm-surface-sunken)]">
+        <div class="pdm-segmented-group w-full flex">
+            <button id="tab-watchlist"
+                class="pdm-segmented-btn active flex-1 flex items-center justify-center gap-1.5"
+                title="Remaining Useful Life Watchlist">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="9" stroke-width="1.5"/>
+                    <circle cx="12" cy="12" r="3" stroke-width="1.5"/>
+                </svg>
+                <span>WATCHLIST</span>
+            </button>
+            <button id="tab-log"
+                class="pdm-segmented-btn flex-1 flex items-center justify-center gap-1.5"
+                title="Industrial Event & Alarm Log">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                </svg>
+                <span>EVENT LOG</span>
+            </button>
         </div>
     </div>
 
-    <!-- Sidebar Content -->
-    <div id="watchlist-panel" class="sidebar-panel flex-grow overflow-y-auto p-6">
-        <ul id="ttf-list" class="space-y-4"></ul>
+    <!-- Sidebar Content Panels -->
+    <div id="watchlist-panel" class="sidebar-panel flex-grow overflow-y-auto p-3">
+        <ul id="ttf-list" class="space-y-2"></ul>
     </div>
-    <div id="log-panel" class="sidebar-panel flex-grow overflow-y-auto p-6 hidden">
-        <ul id="event-log-list" class="space-y-3 text-sm"></ul>
+    <div id="log-panel" class="sidebar-panel flex-grow overflow-y-auto p-3 hidden">
+        <ul id="event-log-list" class="space-y-2 text-xs"></ul>
     </div>
 
-    <!-- Admin Link -->
+    <!-- Admin Link Bar -->
     {% if current_user.is_authenticated and current_user.role == 'admin' %}
-    <div class="p-4 border-t border-electric-blue/20 mt-auto">
+    <div class="p-3 border-t border-[var(--pdm-border-hairline)] bg-[var(--pdm-surface-sunken)] mt-auto">
         <a href="{{ url_for('admin.dashboard') }}"
-            class="block w-full text-center px-4 py-2 bg-warning-amber/20 text-warning-amber border border-warning-amber/50 rounded-lg hover:bg-warning-amber/30 transition-colors font-bold">
-            🛡️ Admin Dashboard
+            class="pdm-btn w-full justify-center bg-[var(--pdm-surface-base)] border-[var(--pdm-border-subtle)] hover:border-[var(--pdm-status-warning)] text-[var(--pdm-status-warning)]">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+            <span>ADMIN CONSOLE</span>
         </a>
     </div>
     {% endif %}
