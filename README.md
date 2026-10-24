@@ -13,8 +13,8 @@
 | **Status** | 🟢 Active |
 | **Primary Language(s)** | Python 3.10+, JavaScript (ES6+), HTML5/Jinja2, CSS3 |
 | **Tech Stack** | Flask 3.0, TensorFlow 2.15 (Keras), Scikit-learn, SQLAlchemy 2.0, Alembic, Tailwind CSS, Chart.js 4.4, SQLite/Postgres |
-| **Last Major Update** | 2026-10-15 (Auto-synced) |
-| **Estimated LOC** | ~9,215 LOC |
+| **Last Major Update** | 2026-10-24 (Auto-synced) |
+| **Estimated LOC** | ~10,358 LOC |
 | **Test Coverage** | Unit & API integration tests in `scripts/test_api.py` |
 
 ---
@@ -43,6 +43,16 @@ A factory operations floor running with zero unplanned stoppages. Operators moni
 ---
 
 ## 🏗️ Architecture Overview
+
+[![Interactive AI Knowledge Graph](https://img.shields.io/badge/Architecture-Interactive%20AI%20Knowledge%20Graph-02d2e3?style=for-the-badge&logo=diagram-next)](https://ottailo.vercel.app/projects/pdm)
+
+> 🧭 **Explore Interactively (Understand-Anything Paradigm)**:
+> - **Live Portfolio Dashboard**: Explore this system in the live [Interactive AI Knowledge Graph](https://ottailo.vercel.app/projects/pdm) with node telemetry, clickable layer inspectors, live search, and dependency tracers.
+> - **Offline HTML Viewer**: Open [`docs/architecture-graph.html`](./docs/architecture-graph.html) directly in any web browser with zero installation.
+> - **Understand Anything CLI**: Run `/understand-dashboard` or launch the standalone zero-dependency viewer:
+>   ```bash
+>   npx https://github.com/Egonex-AI/Understand-Anything/releases/latest/download/understand-anything-viewer.tgz .
+>   ```
 
 ### Exhaustive Multi-Plane System Architecture
 
@@ -545,5 +555,5 @@ python scripts/check_data_generation.py
 
 ## 📝 Document Meta
 - **Generated:** 2026-09-13
-- **Last Verified Current:** 2026-10-15
+- **Last Verified Current:** 2026-10-24
 - **Verification Frequency:** Bi-annually or upon model retraining.

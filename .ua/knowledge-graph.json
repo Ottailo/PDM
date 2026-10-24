@@ -1,0 +1,340 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "Predictive Maintenance Platform",
+    "languages": [
+      "Python"
+    ],
+    "frameworks": [
+      "PyTorch",
+      "SciPy FFT",
+      "TimescaleDB",
+      "FastAPI",
+      "Kafka/MQTT"
+    ],
+    "description": "Industrial IoT machine degradation monitoring, FFT spectral kurtosis extraction, Deep Autoencoder anomaly scoring, and Weibull RUL estimation.",
+    "analyzedAt": "2026-10-24T12:00:00.000Z",
+    "gitCommitHash": "main"
+  },
+  "nodes": [
+    {
+      "id": "sensor-stream-ingress",
+      "name": "Industrial IoT Sensor Ingress",
+      "type": "interface",
+      "layer": "ingress",
+      "complexity": "moderate",
+      "tech": "MQTT Broker \u00b7 Kafka / HTTP Stream",
+      "sla": "< 10ms stream ingestion",
+      "summary": "Ingests continuous 1000Hz vibration, temperature, pressure, and acoustic sensor telemetry from plant manufacturing equipment.",
+      "tags": [
+        "iot",
+        "sensors",
+        "mqtt",
+        "telemetry"
+      ],
+      "inputs": [
+        "Raw Sensor Analog-to-Digital Stream"
+      ],
+      "outputs": [
+        "Structured Telemetry Packet (Timestamp, Sensor ID, Value)"
+      ]
+    },
+    {
+      "id": "pdm-telemetry-gateway",
+      "name": "FastAPI Ingestion Gateway",
+      "type": "endpoint",
+      "layer": "ingress",
+      "complexity": "simple",
+      "tech": "FastAPI \u00b7 Redis Buffer Ingestion",
+      "sla": "< 3ms gateway latency",
+      "summary": "Validates device authentication certificates, performs schema normalization, and buffers readings into high-throughput queue.",
+      "tags": [
+        "fastapi",
+        "gateway",
+        "queue",
+        "ingress"
+      ],
+      "inputs": [
+        "POST /api/v1/telemetry",
+        "Device Token"
+      ],
+      "outputs": [
+        "Sanitized Sensor Stream Batch"
+      ]
+    },
+    {
+      "id": "fft-spectral-extractor",
+      "name": "FFT Spectral & Feature Extractor",
+      "type": "pipeline",
+      "layer": "engine",
+      "complexity": "critical",
+      "tech": "SciPy FFT \u00b7 Fast Fourier Transform \u00b7 Kurtosis",
+      "sla": "< 18ms spectrum calculation",
+      "summary": "Converts raw time-series vibration waveforms into frequency-domain power spectrums, extracting peak harmonics, skewness, and crest factors.",
+      "tags": [
+        "dsp",
+        "fft",
+        "signal-processing",
+        "spectral"
+      ],
+      "inputs": [
+        "1024-Sample Waveform Buffer"
+      ],
+      "outputs": [
+        "Frequency Spectrum Array",
+        "Spectral Kurtosis Index"
+      ]
+    },
+    {
+      "id": "autoencoder-anomaly-detector",
+      "name": "Deep Autoencoder Anomaly Scorer",
+      "type": "service",
+      "layer": "engine",
+      "complexity": "critical",
+      "tech": "PyTorch Deep Autoencoder \u00b7 Reconstruction Error",
+      "sla": "< 12ms inference",
+      "summary": "Trained on nominal healthy machine baselines; flags early mechanical degradation by measuring reconstruction error spikes.",
+      "tags": [
+        "deep-learning",
+        "autoencoder",
+        "anomaly",
+        "pytorch"
+      ],
+      "inputs": [
+        "Normalized Spectral Feature Vector"
+      ],
+      "outputs": [
+        "Anomaly Reconstruction Loss",
+        "Defect Probability"
+      ]
+    },
+    {
+      "id": "rul-forecaster",
+      "name": "Remaining Useful Life (RUL) Forecaster",
+      "type": "pipeline",
+      "layer": "engine",
+      "complexity": "moderate",
+      "tech": "Weibull Proportional Hazards \u00b7 LSTM Predictor",
+      "sla": "< 25ms forecast",
+      "summary": "Projects bearing and motor wear curves to estimate Remaining Useful Life (RUL) in operational hours before catastrophic failure.",
+      "tags": [
+        "rul",
+        "weibull",
+        "prognostics",
+        "wear-curve"
+      ],
+      "inputs": [
+        "Cumulative Degradation Index",
+        "Operating Temperature"
+      ],
+      "outputs": [
+        "Estimated RUL (Hours)",
+        "Confidence Interval (95%)"
+      ]
+    },
+    {
+      "id": "timeseries-telemetry-db",
+      "name": "TimescaleDB Time-Series Archive",
+      "type": "table",
+      "layer": "persistence",
+      "complexity": "moderate",
+      "tech": "TimescaleDB (PostgreSQL) \u00b7 Hypertables",
+      "sla": "< 4ms partition write",
+      "summary": "High-density partitioned time-series storage preserving billions of historical sensor readings with automated downsampling chunks.",
+      "tags": [
+        "timeseries",
+        "timescaledb",
+        "hypertables",
+        "history"
+      ],
+      "inputs": [
+        "Telemetry Metric Tuple"
+      ],
+      "outputs": [
+        "Downsampled Rolling Trends"
+      ]
+    },
+    {
+      "id": "maintenance-dispatch-hub",
+      "name": "Automated Maintenance Dispatch",
+      "type": "service",
+      "layer": "persistence",
+      "complexity": "simple",
+      "tech": "Telegram Bot API \u00b7 ERP Webhook",
+      "sla": "< 50ms dispatch",
+      "summary": "Automatically synthesizes and routes emergency work orders, replacement parts lists, and technician alerts upon failure detection.",
+      "tags": [
+        "dispatch",
+        "webhook",
+        "telegram",
+        "maintenance"
+      ],
+      "inputs": [
+        "Critical Anomaly Alert",
+        "Asset ID"
+      ],
+      "outputs": [
+        "Dispatched Work Order Ticket",
+        "Technician Notification"
+      ]
+    },
+    {
+      "id": "vibration-kill-breaker",
+      "name": "Emergency Machine Shutdown Relay",
+      "type": "circuit-breaker",
+      "layer": "safety",
+      "complexity": "critical",
+      "tech": "Hardware PLC Relay & Interlock Trigger",
+      "sla": "< 2ms hardware trip",
+      "summary": "Trips instantly when vibration velocity exceeds ISO 10816 Class IV critical danger limit (11.2 mm/s RMS), cutting motor power to prevent plant explosion.",
+      "tags": [
+        "safety",
+        "relay",
+        "iso-10816",
+        "emergency-stop"
+      ],
+      "inputs": [
+        "RMS Vibration Velocity (mm/s)"
+      ],
+      "outputs": [
+        "Emergency Power Cut Relay Trigger",
+        "Audible Alarm"
+      ]
+    },
+    {
+      "id": "sensor-drift-guard",
+      "name": "Sensor Drift & Disconnect Filter",
+      "type": "circuit-breaker",
+      "layer": "safety",
+      "complexity": "simple",
+      "tech": "Zero-Variance & Out-of-Bounds Watchdog",
+      "sla": "< 1ms validation",
+      "summary": "Filters out false alarms caused by detached probes or ADC wiring faults (e.g. static flatline 0.00V readings or impossible physical jumps).",
+      "tags": [
+        "safety",
+        "drift",
+        "filtering",
+        "adc-fault"
+      ],
+      "inputs": [
+        "Raw Sensor Voltage"
+      ],
+      "outputs": [
+        "Valid Telemetry Flag / Probe Fault Warning"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "sensor-stream-ingress",
+      "target": "pdm-telemetry-gateway",
+      "label": "Raw IoT Stream",
+      "type": "stream"
+    },
+    {
+      "source": "pdm-telemetry-gateway",
+      "target": "fft-spectral-extractor",
+      "label": "Normalized Readings",
+      "type": "data"
+    },
+    {
+      "source": "fft-spectral-extractor",
+      "target": "autoencoder-anomaly-detector",
+      "label": "Spectral Kurtosis",
+      "type": "data"
+    },
+    {
+      "source": "autoencoder-anomaly-detector",
+      "target": "rul-forecaster",
+      "label": "Degradation Rate",
+      "type": "data"
+    },
+    {
+      "source": "autoencoder-anomaly-detector",
+      "target": "maintenance-dispatch-hub",
+      "label": "Anomaly Event",
+      "type": "control"
+    },
+    {
+      "source": "pdm-telemetry-gateway",
+      "target": "timeseries-telemetry-db",
+      "label": "Telemetry Stream",
+      "type": "data"
+    },
+    {
+      "source": "fft-spectral-extractor",
+      "target": "vibration-kill-breaker",
+      "label": "RMS Vibration Metric",
+      "type": "safety"
+    },
+    {
+      "source": "pdm-telemetry-gateway",
+      "target": "sensor-drift-guard",
+      "label": "Probe Voltage Check",
+      "type": "safety"
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:ingress",
+      "name": "Ingress & Gateway Layer",
+      "description": "External client HUDs, edge authentication, and API endpoints.",
+      "nodeIds": [
+        "sensor-stream-ingress",
+        "pdm-telemetry-gateway"
+      ]
+    },
+    {
+      "id": "layer:engine",
+      "name": "Core Engine & Orchestration Layer",
+      "description": "Autonomous loops, deterministic classifiers, and execution pipelines.",
+      "nodeIds": [
+        "fft-spectral-extractor",
+        "autoencoder-anomaly-detector",
+        "rul-forecaster"
+      ]
+    },
+    {
+      "id": "layer:persistence",
+      "name": "State & Data Persistence Layer",
+      "description": "Relational tables, vector embeddings, caches, and time-series archives.",
+      "nodeIds": [
+        "timeseries-telemetry-db",
+        "maintenance-dispatch-hub"
+      ]
+    },
+    {
+      "id": "layer:safety",
+      "name": "Circuit Breakers & Defensive Guardrails Layer",
+      "description": "Defensive circuit breakers, kill switches, and anti-cheat traps.",
+      "nodeIds": [
+        "vibration-kill-breaker",
+        "sensor-drift-guard"
+      ]
+    }
+  ],
+  "tours": [
+    {
+      "title": "Autonomous Execution Walkthrough",
+      "description": "Step-by-step telemetry through the Predictive Maintenance Platform architecture pipeline.",
+      "steps": [
+        {
+          "nodeId": "sensor-stream-ingress",
+          "explanation": "Ingests continuous 1000Hz vibration, temperature, pressure, and acoustic sensor telemetry from plant manufacturing equipment."
+        },
+        {
+          "nodeId": "pdm-telemetry-gateway",
+          "explanation": "Validates device authentication certificates, performs schema normalization, and buffers readings into high-throughput queue."
+        },
+        {
+          "nodeId": "fft-spectral-extractor",
+          "explanation": "Converts raw time-series vibration waveforms into frequency-domain power spectrums, extracting peak harmonics, skewness, and crest factors."
+        },
+        {
+          "nodeId": "autoencoder-anomaly-detector",
+          "explanation": "Trained on nominal healthy machine baselines; flags early mechanical degradation by measuring reconstruction error spikes."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Predictive Maintenance Platform // Interactive AI Knowledge Graph</title>
+  <style>
+    :root {
+      --bg: #060911;
+      --card-bg: rgba(13, 19, 32, 0.94);
+      --border: rgba(255, 255, 255, 0.1);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-ingress: #02d2e3;
+      --accent-engine: #f59e0b;
+      --accent-persistence: #a855f7;
+      --accent-safety: #ef4444;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: rgba(10, 14, 23, 0.95);
+      border-bottom: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      z-index: 10;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      background: rgba(2, 210, 227, 0.12);
+      color: var(--accent-ingress);
+      border: 1px solid rgba(2, 210, 227, 0.3);
+    }
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .filter-btn {
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-muted);
+      font-size: 11px;
+      font-family: var(--font-mono);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    .search-box input {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      color: #fff;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      outline: none;
+    }
+    .main-stage {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      cursor: grab;
+      background-size: 24px 24px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+    .main-stage:active { cursor: grabbing; }
+    .stage-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform-origin: 0 0;
+      width: 1150px;
+      height: 600px;
+    }
+    svg.edges-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: visible;
+    }
+    .edge-line {
+      stroke-dasharray: 6 4;
+      animation: dash 24s linear infinite;
+    }
+    @keyframes dash { to { stroke-dashoffset: -1000; } }
+    .node-card {
+      position: absolute;
+      width: 220px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.2s, box-shadow 0.2s, opacity 0.2s;
+      user-select: none;
+    }
+    .node-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.8);
+      z-index: 10;
+    }
+    .node-card.selected {
+      border-color: #02d2e3;
+      box-shadow: 0 0 0 2px #02d2e3, 0 12px 30px rgba(2, 210, 227, 0.35);
+      z-index: 15;
+    }
+    .node-card.dimmed {
+      opacity: 0.25;
+      filter: grayscale(60%);
+    }
+    .node-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .node-title {
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 4px;
+    }
+    .node-tech {
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .node-footer {
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 6px;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--text-muted);
+    }
+    .drawer {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 320px;
+      height: 100%;
+      background: rgba(9, 13, 22, 0.98);
+      border-left: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      padding: 16px;
+      overflow-y: auto;
+      z-index: 25;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .drawer-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .drawer-section-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+    .drawer-summary {
+      font-size: 12px;
+      line-height: 1.6;
+      color: #cbd5e1;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .controls {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      display: flex;
+      gap: 6px;
+      z-index: 10;
+      background: rgba(10, 14, 23, 0.9);
+      padding: 6px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .ctrl-btn {
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .ctrl-btn:hover { background: rgba(255, 255, 255, 0.12); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <span class="badge">UNDERSTAND-ANYTHING ARCHITECTURE</span>
+      <strong>Predictive Maintenance Platform</strong>
+      <span style="color: var(--text-muted)">// v2.4.0</span>
+    </div>
+    <div class="filter-group">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search node or tech..." oninput="handleSearch(this.value)">
+      </div>
+      <button class="filter-btn active" onclick="filterLayer('all')">ALL</button>
+      <button class="filter-btn" onclick="filterLayer('ingress')">INGRESS</button>
+      <button class="filter-btn" onclick="filterLayer('engine')">ENGINE</button>
+      <button class="filter-btn" onclick="filterLayer('persistence')">PERSISTENCE</button>
+      <button class="filter-btn" onclick="filterLayer('safety')">CIRCUIT BREAKERS</button>
+    </div>
+  </header>
+
+  <div class="main-stage" id="viewport">
+    <div class="stage-container" id="stage">
+      <svg class="edges-layer" id="edgesLayer"></svg>
+      <div id="nodesContainer"></div>
+    </div>
+
+    <div class="controls">
+      <button class="ctrl-btn" onclick="zoomIn()">Zoom +</button>
+      <button class="ctrl-btn" onclick="zoomOut()">Zoom -</button>
+      <button class="ctrl-btn" onclick="resetView()">Reset (100%)</button>
+    </div>
+
+    <div class="drawer" id="drawer">
+      <div>
+        <div class="drawer-title" id="drawerTitle">Component Inspector</div>
+        <div id="drawerSubtitle" style="font-family: var(--font-mono); font-size: 10px; color: var(--accent-ingress);">Select a node to inspect telemetry</div>
+      </div>
+      <div>
+        <div class="drawer-section-label">Plain-English Role</div>
+        <div class="drawer-summary" id="drawerSummary">Click any component card in the architecture graph to view detailed technical specifications, target SLA, upstream inputs, downstream outputs, and defensive failure modes.</div>
+      </div>
+      <div>
+        <div class="drawer-section-label">Runtime &amp; SLA</div>
+        <div id="drawerTech" style="font-family: var(--font-mono); font-size: 11px; color: #f59e0b;">-</div>
+        <div id="drawerSla" style="font-family: var(--font-mono); font-size: 11px; color: #10b981; margin-top: 2px;">-</div>
+      </div>
+      <div>
+        <div class="drawer-section-label">Data Contracts</div>
+        <div id="drawerIO" style="font-family: var(--font-mono); font-size: 11px; color: #cbd5e1; display: flex; flex-direction: column; gap: 4px;">-</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const GRAPH = {"version": "1.0.0", "project": {"name": "Predictive Maintenance Platform", "languages": ["Python"], "frameworks": ["PyTorch", "SciPy FFT", "TimescaleDB", "FastAPI", "Kafka/MQTT"], "description": "Industrial IoT machine degradation monitoring, FFT spectral kurtosis extraction, Deep Autoencoder anomaly scoring, and Weibull RUL estimation.", "analyzedAt": "2026-10-24T12:00:00.000Z", "gitCommitHash": "main"}, "nodes": [{"id": "sensor-stream-ingress", "name": "Industrial IoT Sensor Ingress", "type": "interface", "layer": "ingress", "complexity": "moderate", "tech": "MQTT Broker \u00b7 Kafka / HTTP Stream", "sla": "< 10ms stream ingestion", "summary": "Ingests continuous 1000Hz vibration, temperature, pressure, and acoustic sensor telemetry from plant manufacturing equipment.", "tags": ["iot", "sensors", "mqtt", "telemetry"], "inputs": ["Raw Sensor Analog-to-Digital Stream"], "outputs": ["Structured Telemetry Packet (Timestamp, Sensor ID, Value)"]}, {"id": "pdm-telemetry-gateway", "name": "FastAPI Ingestion Gateway", "type": "endpoint", "layer": "ingress", "complexity": "simple", "tech": "FastAPI \u00b7 Redis Buffer Ingestion", "sla": "< 3ms gateway latency", "summary": "Validates device authentication certificates, performs schema normalization, and buffers readings into high-throughput queue.", "tags": ["fastapi", "gateway", "queue", "ingress"], "inputs": ["POST /api/v1/telemetry", "Device Token"], "outputs": ["Sanitized Sensor Stream Batch"]}, {"id": "fft-spectral-extractor", "name": "FFT Spectral & Feature Extractor", "type": "pipeline", "layer": "engine", "complexity": "critical", "tech": "SciPy FFT \u00b7 Fast Fourier Transform \u00b7 Kurtosis", "sla": "< 18ms spectrum calculation", "summary": "Converts raw time-series vibration waveforms into frequency-domain power spectrums, extracting peak harmonics, skewness, and crest factors.", "tags": ["dsp", "fft", "signal-processing", "spectral"], "inputs": ["1024-Sample Waveform Buffer"], "outputs": ["Frequency Spectrum Array", "Spectral Kurtosis Index"]}, {"id": "autoencoder-anomaly-detector", "name": "Deep Autoencoder Anomaly Scorer", "type": "service", "layer": "engine", "complexity": "critical", "tech": "PyTorch Deep Autoencoder \u00b7 Reconstruction Error", "sla": "< 12ms inference", "summary": "Trained on nominal healthy machine baselines; flags early mechanical degradation by measuring reconstruction error spikes.", "tags": ["deep-learning", "autoencoder", "anomaly", "pytorch"], "inputs": ["Normalized Spectral Feature Vector"], "outputs": ["Anomaly Reconstruction Loss", "Defect Probability"]}, {"id": "rul-forecaster", "name": "Remaining Useful Life (RUL) Forecaster", "type": "pipeline", "layer": "engine", "complexity": "moderate", "tech": "Weibull Proportional Hazards \u00b7 LSTM Predictor", "sla": "< 25ms forecast", "summary": "Projects bearing and motor wear curves to estimate Remaining Useful Life (RUL) in operational hours before catastrophic failure.", "tags": ["rul", "weibull", "prognostics", "wear-curve"], "inputs": ["Cumulative Degradation Index", "Operating Temperature"], "outputs": ["Estimated RUL (Hours)", "Confidence Interval (95%)"]}, {"id": "timeseries-telemetry-db", "name": "TimescaleDB Time-Series Archive", "type": "table", "layer": "persistence", "complexity": "moderate", "tech": "TimescaleDB (PostgreSQL) \u00b7 Hypertables", "sla": "< 4ms partition write", "summary": "High-density partitioned time-series storage preserving billions of historical sensor readings with automated downsampling chunks.", "tags": ["timeseries", "timescaledb", "hypertables", "history"], "inputs": ["Telemetry Metric Tuple"], "outputs": ["Downsampled Rolling Trends"]}, {"id": "maintenance-dispatch-hub", "name": "Automated Maintenance Dispatch", "type": "service", "layer": "persistence", "complexity": "simple", "tech": "Telegram Bot API \u00b7 ERP Webhook", "sla": "< 50ms dispatch", "summary": "Automatically synthesizes and routes emergency work orders, replacement parts lists, and technician alerts upon failure detection.", "tags": ["dispatch", "webhook", "telegram", "maintenance"], "inputs": ["Critical Anomaly Alert", "Asset ID"], "outputs": ["Dispatched Work Order Ticket", "Technician Notification"]}, {"id": "vibration-kill-breaker", "name": "Emergency Machine Shutdown Relay", "type": "circuit-breaker", "layer": "safety", "complexity": "critical", "tech": "Hardware PLC Relay & Interlock Trigger", "sla": "< 2ms hardware trip", "summary": "Trips instantly when vibration velocity exceeds ISO 10816 Class IV critical danger limit (11.2 mm/s RMS), cutting motor power to prevent plant explosion.", "tags": ["safety", "relay", "iso-10816", "emergency-stop"], "inputs": ["RMS Vibration Velocity (mm/s)"], "outputs": ["Emergency Power Cut Relay Trigger", "Audible Alarm"]}, {"id": "sensor-drift-guard", "name": "Sensor Drift & Disconnect Filter", "type": "circuit-breaker", "layer": "safety", "complexity": "simple", "tech": "Zero-Variance & Out-of-Bounds Watchdog", "sla": "< 1ms validation", "summary": "Filters out false alarms caused by detached probes or ADC wiring faults (e.g. static flatline 0.00V readings or impossible physical jumps).", "tags": ["safety", "drift", "filtering", "adc-fault"], "inputs": ["Raw Sensor Voltage"], "outputs": ["Valid Telemetry Flag / Probe Fault Warning"]}], "edges": [{"source": "sensor-stream-ingress", "target": "pdm-telemetry-gateway", "label": "Raw IoT Stream", "type": "stream"}, {"source": "pdm-telemetry-gateway", "target": "fft-spectral-extractor", "label": "Normalized Readings", "type": "data"}, {"source": "fft-spectral-extractor", "target": "autoencoder-anomaly-detector", "label": "Spectral Kurtosis", "type": "data"}, {"source": "autoencoder-anomaly-detector", "target": "rul-forecaster", "label": "Degradation Rate", "type": "data"}, {"source": "autoencoder-anomaly-detector", "target": "maintenance-dispatch-hub", "label": "Anomaly Event", "type": "control"}, {"source": "pdm-telemetry-gateway", "target": "timeseries-telemetry-db", "label": "Telemetry Stream", "type": "data"}, {"source": "fft-spectral-extractor", "target": "vibration-kill-breaker", "label": "RMS Vibration Metric", "type": "safety"}, {"source": "pdm-telemetry-gateway", "target": "sensor-drift-guard", "label": "Probe Voltage Check", "type": "safety"}], "layers": [{"id": "layer:ingress", "name": "Ingress & Gateway Layer", "description": "External client HUDs, edge authentication, and API endpoints.", "nodeIds": ["sensor-stream-ingress", "pdm-telemetry-gateway"]}, {"id": "layer:engine", "name": "Core Engine & Orchestration Layer", "description": "Autonomous loops, deterministic classifiers, and execution pipelines.", "nodeIds": ["fft-spectral-extractor", "autoencoder-anomaly-detector", "rul-forecaster"]}, {"id": "layer:persistence", "name": "State & Data Persistence Layer", "description": "Relational tables, vector embeddings, caches, and time-series archives.", "nodeIds": ["timeseries-telemetry-db", "maintenance-dispatch-hub"]}, {"id": "layer:safety", "name": "Circuit Breakers & Defensive Guardrails Layer", "description": "Defensive circuit breakers, kill switches, and anti-cheat traps.", "nodeIds": ["vibration-kill-breaker", "sensor-drift-guard"]}], "tours": [{"title": "Autonomous Execution Walkthrough", "description": "Step-by-step telemetry through the Predictive Maintenance Platform architecture pipeline.", "steps": [{"nodeId": "sensor-stream-ingress", "explanation": "Ingests continuous 1000Hz vibration, temperature, pressure, and acoustic sensor telemetry from plant manufacturing equipment."}, {"nodeId": "pdm-telemetry-gateway", "explanation": "Validates device authentication certificates, performs schema normalization, and buffers readings into high-throughput queue."}, {"nodeId": "fft-spectral-extractor", "explanation": "Converts raw time-series vibration waveforms into frequency-domain power spectrums, extracting peak harmonics, skewness, and crest factors."}, {"nodeId": "autoencoder-anomaly-detector", "explanation": "Trained on nominal healthy machine baselines; flags early mechanical degradation by measuring reconstruction error spikes."}]}]};
+
+    const LAYER_COLORS = {
+      ingress: { color: '#02d2e3', bg: 'rgba(2, 210, 227, 0.12)', border: 'rgba(2, 210, 227, 0.3)' },
+      engine: { color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)', border: 'rgba(245, 158, 11, 0.3)' },
+      persistence: { color: '#a855f7', bg: 'rgba(168, 85, 247, 0.12)', border: 'rgba(168, 85, 247, 0.3)' },
+      safety: { color: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)', border: 'rgba(239, 68, 68, 0.3)' }
+    };
+
+    let zoom = 0.9;
+    let pan = { x: 40, y: 30 };
+    let isPanning = false;
+    let panStart = { x: 0, y: 0 };
+    let selectedLayer = 'all';
+    let searchQuery = '';
+    let selectedNodeId = GRAPH.nodes[2] ? GRAPH.nodes[2].id : GRAPH.nodes[0].id;
+    let nodePositions = {};
+
+    // Initialize positions
+    GRAPH.nodes.forEach((n, idx) => {
+      const colMap = { ingress: 50, engine: 320, persistence: 600, safety: 880 };
+      const colIdx = GRAPH.nodes.filter(x => x.layer === n.layer).indexOf(n);
+      nodePositions[n.id] = {
+        x: colMap[n.layer] || (idx * 260),
+        y: 60 + (colIdx * 130)
+      };
+    });
+
+    function updateTransform() {
+      const stage = document.getElementById('stage');
+      stage.style.transform = `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`;
+    }
+
+    function renderEdges() {
+      const svg = document.getElementById('edgesLayer');
+      svg.innerHTML = '';
+      GRAPH.edges.forEach(edge => {
+        const s = nodePositions[edge.source];
+        const t = nodePositions[edge.target];
+        if (!s || !t) return;
+
+        const sx = s.x + 220;
+        const sy = s.y + 45;
+        const tx = t.x;
+        const ty = t.y + 45;
+        const dx = Math.abs(tx - sx) * 0.55;
+
+        const pathD = `M ${sx} ${sy} C ${sx + dx} ${sy}, ${tx - dx} ${ty}, ${tx} ${ty}`;
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', pathD);
+        path.setAttribute('fill', 'none');
+        path.setAttribute('class', 'edge-line');
+
+        const isSelected = selectedNodeId && (edge.source === selectedNodeId || edge.target === selectedNodeId);
+        path.setAttribute('stroke', edge.type === 'safety' ? '#ef4444' : edge.type === 'control' ? '#f59e0b' : '#02d2e3');
+        path.setAttribute('stroke-width', isSelected ? '2.5' : '1.5');
+        path.setAttribute('opacity', isSelected ? '0.95' : '0.4');
+
+        svg.appendChild(path);
+      });
+    }
+
+    function renderNodes() {
+      const container = document.getElementById('nodesContainer');
+      container.innerHTML = '';
+
+      GRAPH.nodes.forEach(node => {
+        const pos = nodePositions[node.id];
+        const layerCfg = LAYER_COLORS[node.layer] || LAYER_COLORS.ingress;
+        const isSelected = node.id === selectedNodeId;
+
+        let visible = true;
+        if (selectedLayer !== 'all' && node.layer !== selectedLayer) visible = false;
+        if (searchQuery) {
+          const q = searchQuery.toLowerCase();
+          const match = node.name.toLowerCase().includes(q) || (node.tech && node.tech.toLowerCase().includes(q)) || node.summary.toLowerCase().includes(q);
+          if (!match) visible = false;
+        }
+
+        const card = document.createElement('div');
+        card.className = `node-card ${isSelected ? 'selected' : ''} ${!visible ? 'dimmed' : ''}`;
+        card.style.left = `${pos.x}px`;
+        card.style.top = `${pos.y}px`;
+        card.style.borderColor = isSelected ? layerCfg.color : layerCfg.border;
+
+        card.innerHTML = `
+          <div class="node-header">
+            <span style="color: ${layerCfg.color}">${node.type}</span>
+            <span style="color: ${node.complexity === 'critical' ? '#ef4444' : '#f59e0b'}">${node.complexity}</span>
+          </div>
+          <div class="node-title">${node.name}</div>
+          <div class="node-tech">${node.tech || ''}</div>
+          <div class="node-footer">
+            <span>${node.layer.toUpperCase()}</span>
+            <span style="color: #10b981">${node.sla || ''}</span>
+          </div>
+        `;
+
+        card.onclick = () => selectNode(node.id);
+        container.appendChild(card);
+      });
+    }
+
+    function selectNode(id) {
+      selectedNodeId = id;
+      const node = GRAPH.nodes.find(n => n.id === id);
+      if (!node) return;
+
+      document.getElementById('drawerTitle').innerText = node.name;
+      document.getElementById('drawerSubtitle').innerText = `${node.layer.toUpperCase()} // ${node.type.toUpperCase()} // ${node.complexity.toUpperCase()}`;
+      document.getElementById('drawerSummary').innerText = node.summary;
+      document.getElementById('drawerTech').innerText = node.tech || '-';
+      document.getElementById('drawerSla').innerText = `Target SLA: ${node.sla || 'N/A'}`;
+
+      const ioContainer = document.getElementById('drawerIO');
+      ioContainer.innerHTML = '';
+      if (node.inputs) {
+        node.inputs.forEach(inp => {
+          ioContainer.innerHTML += `<div style="color: #38bdf8">IN: ${inp}</div>`;
+        });
+      }
+      if (node.outputs) {
+        node.outputs.forEach(out => {
+          ioContainer.innerHTML += `<div style="color: #10b981">OUT: ${out}</div>`;
+        });
+      }
+
+      renderNodes();
+      renderEdges();
+    }
+
+    function filterLayer(layer) {
+      selectedLayer = layer;
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.innerText.toLowerCase() === layer.toLowerCase() || (layer === 'all' && btn.innerText === 'ALL'));
+      });
+      renderNodes();
+    }
+
+    function handleSearch(q) {
+      searchQuery = q.trim();
+      renderNodes();
+    }
+
+    function zoomIn() { zoom = Math.min(zoom + 0.15, 2.0); updateTransform(); }
+    function zoomOut() { zoom = Math.max(zoom - 0.15, 0.4); updateTransform(); }
+    function resetView() { zoom = 0.9; pan = { x: 40, y: 30 }; updateTransform(); }
+
+    // Viewport Panning
+    const vp = document.getElementById('viewport');
+    vp.onmousedown = (e) => {
+      if (e.target.closest('.node-card') || e.target.closest('.drawer') || e.target.closest('.controls')) return;
+      isPanning = true;
+      panStart = { x: e.clientX - pan.x, y: e.clientY - pan.y };
+    };
+    window.onmousemove = (e) => {
+      if (!isPanning) return;
+      pan.x = e.clientX - panStart.x;
+      pan.y = e.clientY - panStart.y;
+      updateTransform();
+    };
+    window.onmouseup = () => { isPanning = false; };
+    vp.onwheel = (e) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.08 : 0.08;
+      zoom = Math.min(Math.max(zoom + delta, 0.4), 2.0);
+      updateTransform();
+    };
+
+    // Initial render
+    updateTransform();
+    renderNodes();
+    renderEdges();
+    selectNode(selectedNodeId);
+  </script>
+</body>
+</html>
