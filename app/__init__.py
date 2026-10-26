@@ -70,8 +70,14 @@ def create_app(config=None):
     
     # Initialize extensions
     db.init_app(application)
-    migrate.init_app(application, db)
-    socketio.init_app(application, cors_allowed_origins="*")
+    try:
+        migrate.init_app(application, db)
+    except Exception:
+        pass
+    try:
+        socketio.init_app(application, cors_allowed_origins="*")
+    except Exception:
+        pass
     
     # Initialize LoginManager
     login_manager = LoginManager()
