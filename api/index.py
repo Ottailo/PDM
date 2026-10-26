@@ -28,12 +28,28 @@ def app(environ, start_response):
         start_response(status, response_headers)
         return [f"PDM Vercel Boot Exception:\n\n{boot_error}".encode('utf-8')]
     
+    # Instant Diagnostic probe for Vercel routing
+    if 'diag' in environ.get('QUERY_STRING', '') or environ.get('PATH_INFO') == '/diag':
+        status = '200 OK'
+        headers = [('Content-Type', 'application/json')]
+        start_response(status, headers)
+        import json
+        diag_info = {
+            'PATH_INFO': environ.get('PATH_INFO'),
+            'SCRIPT_NAME': environ.get('SCRIPT_NAME'),
+            'RAW_URI': environ.get('RAW_URI'),
+            'REQUEST_URI': environ.get('REQUEST_URI'),
+            'HTTP_X_MATCHED_PATH': environ.get('HTTP_X_MATCHED_PATH'),
+            'HTTP_X_FORWARDED_URI': environ.get('HTTP_X_FORWARDED_URI'),
+            'QUERY_STRING': environ.get('QUERY_STRING'),
+            'ALL_MATCH_KEYS': {k: str(v) for k, v in environ.items() if any(x in k.upper() for x in ['PATH', 'URI', 'MATCH', 'VERCEL', 'ROUTE'])}
+        }
+        return [json.dumps(diag_info, indent=2).encode('utf-8')]
+    
     # Path correction for Vercel rewrites:
-    # When rewritten to /api/index, restore original user path from Vercel headers
     matched_path = environ.get('HTTP_X_MATCHED_PATH') or environ.get('HTTP_X_FORWARDED_URI') or environ.get('RAW_URI')
     if matched_path:
         clean_path = matched_path.split('?')[0]
-        # Only rewrite if current path is pointing to the function handler itself
         if environ.get('PATH_INFO') in ['/api/index', '/api/index.py']:
             environ['PATH_INFO'] = clean_path
     
