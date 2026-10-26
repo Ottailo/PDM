@@ -4,7 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDM — Operator Authentication Console</title>
+    <title>Machivital — Operator Authentication Console</title>
+
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/machivital-icon.svg') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#0d1015">
 
     <!-- DIN-Caliber Instrumentation Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,23 +27,39 @@
             theme: {
                 extend: {
                     colors: {
-                        'pdm-canvas': 'var(--pdm-canvas)',
-                        'pdm-surface-base': 'var(--pdm-surface-base)',
-                        'pdm-surface-raised': 'var(--pdm-surface-raised)',
-                        'pdm-surface-overlay': 'var(--pdm-surface-overlay)',
-                        'pdm-surface-sunken': 'var(--pdm-surface-sunken)',
-                        'pdm-border-hairline': 'var(--pdm-border-hairline)',
-                        'pdm-border-subtle': 'var(--pdm-border-subtle)',
-                        'pdm-border-strong': 'var(--pdm-border-strong)',
-                        'pdm-accent': 'var(--pdm-accent-base)',
-                        'pdm-accent-muted': 'var(--pdm-accent-muted)',
-                        'pdm-normal': 'var(--pdm-status-normal)',
-                        'pdm-warning': 'var(--pdm-status-warning)',
-                        'pdm-critical': 'var(--pdm-status-critical)',
-                        'pdm-offline': 'var(--pdm-status-offline)',
-                        'pdm-text-primary': 'var(--pdm-text-primary)',
-                        'pdm-text-secondary': 'var(--pdm-text-secondary)',
-                        'pdm-text-muted': 'var(--pdm-text-muted)',
+                        'mv-canvas': 'var(--mv-canvas)',
+                        'mv-surface-base': 'var(--mv-surface-base)',
+                        'mv-surface-raised': 'var(--mv-surface-raised)',
+                        'mv-surface-overlay': 'var(--mv-surface-overlay)',
+                        'mv-surface-sunken': 'var(--mv-surface-sunken)',
+                        'mv-border-hairline': 'var(--mv-border-hairline)',
+                        'mv-border-subtle': 'var(--mv-border-subtle)',
+                        'mv-border-strong': 'var(--mv-border-strong)',
+                        'mv-accent': 'var(--mv-accent-base)',
+                        'mv-accent-muted': 'var(--mv-accent-muted)',
+                        'mv-normal': 'var(--mv-status-normal)',
+                        'mv-warning': 'var(--mv-status-warning)',
+                        'mv-critical': 'var(--mv-status-critical)',
+                        'mv-offline': 'var(--mv-status-offline)',
+                        'mv-text-primary': 'var(--mv-text-primary)',
+                        'mv-text-secondary': 'var(--mv-text-secondary)',
+                        'mv-text-muted': 'var(--mv-text-muted)',
+                        'pdm-canvas': 'var(--mv-canvas)',
+                        'pdm-surface-base': 'var(--mv-surface-base)',
+                        'pdm-surface-raised': 'var(--mv-surface-raised)',
+                        'pdm-surface-overlay': 'var(--mv-surface-overlay)',
+                        'pdm-surface-sunken': 'var(--mv-surface-sunken)',
+                        'pdm-border-hairline': 'var(--mv-border-hairline)',
+                        'pdm-border-subtle': 'var(--mv-border-subtle)',
+                        'pdm-border-strong': 'var(--mv-border-strong)',
+                        'pdm-accent': 'var(--mv-accent-base)',
+                        'pdm-normal': 'var(--mv-status-normal)',
+                        'pdm-warning': 'var(--mv-status-warning)',
+                        'pdm-critical': 'var(--mv-status-critical)',
+                        'pdm-offline': 'var(--mv-status-offline)',
+                        'pdm-text-primary': 'var(--mv-text-primary)',
+                        'pdm-text-secondary': 'var(--mv-text-secondary)',
+                        'pdm-text-muted': 'var(--mv-text-muted)',
                     },
                     fontFamily: {
                         sans: ['"Plus Jakarta Sans"', 'sans-serif'],
@@ -52,36 +72,36 @@
     </script>
 
     <!-- Industrial Design System CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=3.5">
 </head>
 
 <body
-    class="bg-[var(--pdm-canvas)] text-[var(--pdm-text-primary)] font-sans antialiased h-screen h-[100dvh] flex items-center justify-center p-4">
+    class="bg-[var(--mv-canvas)] text-[var(--mv-text-primary)] font-sans antialiased h-screen h-[100dvh] flex items-center justify-center p-4">
 
     <!-- Console Authentication Card -->
-    <div class="w-full max-w-sm bg-[var(--pdm-surface-base)] border border-[var(--pdm-border-subtle)] rounded-[var(--pdm-radius-md)] shadow-[var(--pdm-shadow-md)] overflow-hidden">
+    <div class="w-full max-w-sm bg-[var(--mv-surface-base)] border border-[var(--mv-border-subtle)] rounded-[3px] shadow-2xl overflow-hidden">
 
         <!-- Header Bar with System ID -->
-        <div class="px-5 py-4 border-b border-[var(--pdm-border-hairline)] bg-[var(--pdm-surface-sunken)] flex items-center justify-between">
+        <div class="px-5 py-4 border-b border-[var(--mv-border-hairline)] bg-[var(--mv-surface-sunken)] flex items-center justify-between">
             <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-[var(--pdm-status-normal)]"></span>
-                <span class="font-display font-semibold text-xs tracking-wider text-[var(--pdm-text-primary)] uppercase">PDM // SECURE CONSOLE</span>
+                <span class="w-2 h-2 rounded-full bg-[var(--mv-status-normal)]"></span>
+                <span class="font-display font-semibold text-xs tracking-wider text-[var(--mv-text-primary)] uppercase">MACHIVITAL // SECURE ACCESS</span>
             </div>
-            <span class="font-mono text-[10px] text-[var(--pdm-text-muted)] uppercase tracking-wider">v3.0.0</span>
+            <span class="font-mono text-[10px] text-[var(--mv-accent-base)] uppercase tracking-wider font-bold">v3.5</span>
         </div>
 
         <div class="p-6">
             <!-- Console Identifier -->
             <div class="mb-6">
-                <h1 class="pdm-display-lg text-[var(--pdm-text-primary)]">OPERATOR LOGIN</h1>
-                <p class="text-xs text-[var(--pdm-text-muted)] mt-1 font-sans">Discrete Packaging Line Telemetry Access</p>
+                <h1 class="pdm-display-lg text-[var(--mv-text-primary)]">OPERATOR LOGIN</h1>
+                <p class="text-xs text-[var(--mv-text-muted)] mt-1 font-sans">Autonomous Machinery Vitality &amp; Telemetry</p>
             </div>
 
             <!-- Flashed Messages -->
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
                     {% for message in messages %}
-                        <div class="pdm-degraded-channel mb-4 rounded-sm flex items-center gap-2">
+                        <div class="pdm-degraded-channel mb-4 rounded-sm flex items-center gap-2 text-xs">
                             <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                             </svg>
@@ -96,20 +116,20 @@
                 <div>
                     <label class="block pdm-label mb-1.5" for="username">Operator ID / Username</label>
                     <input type="text" id="username" name="username" required autocomplete="username"
-                        class="w-full pdm-input focus:border-[var(--pdm-accent-base)]"
+                        class="w-full pdm-input focus:border-[var(--mv-accent-base)]"
                         placeholder="e.g. operator_line1">
                 </div>
 
                 <div>
                     <label class="block pdm-label mb-1.5" for="password">Security Credential</label>
                     <input type="password" id="password" name="password" required autocomplete="current-password"
-                        class="w-full pdm-input focus:border-[var(--pdm-accent-base)]"
+                        class="w-full pdm-input focus:border-[var(--mv-accent-base)]"
                         placeholder="••••••••">
                 </div>
 
                 <div class="flex items-center justify-between pt-1">
-                    <label class="flex items-center text-xs text-[var(--pdm-text-secondary)] cursor-pointer select-none">
-                        <input type="checkbox" name="remember" class="mr-2 accent-[var(--pdm-accent-base)]">
+                    <label class="flex items-center text-xs text-[var(--mv-text-secondary)] cursor-pointer select-none">
+                        <input type="checkbox" name="remember" class="mr-2 accent-[var(--mv-accent-base)]">
                         <span>Persist Session</span>
                     </label>
                 </div>
@@ -124,9 +144,9 @@
             </form>
 
             <!-- Diagnostic Hint -->
-            <div class="mt-6 pt-4 border-t border-[var(--pdm-border-hairline)] flex items-center justify-between text-[11px] font-mono text-[var(--pdm-text-muted)]">
-                <span>SYSTEM: READY</span>
-                <span>SEC: LEVEL-3</span>
+            <div class="mt-6 pt-4 border-t border-[var(--mv-border-hairline)] flex items-center justify-between text-[11px] font-mono text-[var(--mv-text-muted)]">
+                <span>SYSTEM: NOMINAL</span>
+                <span>SEC: LEVEL-3 TLS</span>
             </div>
         </div>
     </div>

@@ -1,5 +1,5 @@
 """
-Vercel Serverless WSGI Entrypoint for PDM (Predictive Maintenance Telemetry Console)
+Vercel Serverless WSGI Entrypoint for Machivital (Industrial Machinery Vitality & Autonomous Telemetry)
 """
 import os
 import sys

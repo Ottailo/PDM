@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- Precision Industrial Outer Frame -->
+  <rect width="120" height="120" rx="16" fill="#0d1015"/>
+  <rect x="1" y="1" width="118" height="118" rx="15" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/>
+  <rect x="6" y="6" width="108" height="108" rx="12" stroke="rgba(56,189,248,0.15)" stroke-width="1" stroke-dasharray="4 4"/>
+  
+  <!-- Vitality Pulse Waveform -->
+  <path d="M18 64H38L48 42L58 84L70 28L80 72L90 64H102" stroke="#38bdf8" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Status Nodes -->
+  <circle cx="70" cy="28" r="4.5" fill="#10b981"/>
+  <circle cx="58" cy="84" r="3.5" fill="#f59e0b"/>
+  <circle cx="102" cy="64" r="4" fill="#38bdf8"/>
+</svg>

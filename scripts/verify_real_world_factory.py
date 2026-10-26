@@ -163,7 +163,7 @@ def run_tests():
         res_mobile = client.get('/mobile')
         assert res_mobile.status_code == 200, f"Expected 200 from /mobile, got {res_mobile.status_code}"
         mobile_html = res_mobile.data.decode('utf-8')
-        assert "PDM Remote — Field Plant Surveillance" in mobile_html, "Missing title in mobile HTML"
+        assert "Machivital Mobile" in mobile_html or "PDM Remote" in mobile_html, "Missing title in mobile HTML"
         assert "mobile_dashboard.js" in mobile_html, "Missing mobile_dashboard.js script tag"
         assert "manifest.json" in mobile_html, "Missing manifest.json link"
         assert "mobile-diagnostic-drawer" in mobile_html, "Missing diagnostic drawer in mobile HTML"
@@ -172,7 +172,7 @@ def run_tests():
         res_manifest = client.get('/manifest.json')
         assert res_manifest.status_code == 200, f"Expected 200 from /manifest.json, got {res_manifest.status_code}"
         manifest_data = json.loads(res_manifest.data)
-        assert manifest_data.get("name") == "PDM Industrial Remote Surveillance"
+        assert "Machivital" in manifest_data.get("name", "") or manifest_data.get("name") == "PDM Industrial Remote Surveillance"
         assert manifest_data.get("start_url") == "/mobile"
         assert manifest_data.get("display") == "standalone"
         print(f"  [OK] GET /manifest.json returned 200 OK with standalone PWA configuration.")

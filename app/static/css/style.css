@@ -1,135 +1,149 @@
 /* ==========================================================================
-   PDM — Industrial Predictive Maintenance System
-   Visual Design Contract & Semantic Token Architecture
-   Surface Mode: OPERATE | Variance: 3/10 | Motion: 2/10 | Density: 8/10
-   Base Neutral Hue: 245 (Industrial Cold Steel)
+   MACHIVITAL — Industrial Machinery Vitality & Autonomous Telemetry
+   Design Archetype E: SIGNAL DENSITY (Serious OPERATE Surface)
+   Surface Mode: OPERATE | Variance: 3/10 | Motion: 1/10 | Density: 9/10
+   Base Neutral Hue: 250 (Graphite Cold Steel)
    ========================================================================== */
 
 :root {
   /* Canvas & Surface Layers (Dark Theme - Control Room Native) */
-  --pdm-canvas: oklch(0.14 0.009 245);          /* Primary console floor */
-  --pdm-surface-base: oklch(0.18 0.011 245);    /* Standard card & panel surface */
-  --pdm-surface-raised: oklch(0.22 0.012 245);  /* Hover, table header, drawer surface */
-  --pdm-surface-overlay: oklch(0.26 0.014 245); /* Modal dialog & popover background */
-  --pdm-surface-sunken: oklch(0.11 0.008 245);   /* Inset telemetry wells & code panels */
+  --mv-canvas: oklch(0.11 0.006 250);          /* Primary console dark floor #0c0e12 */
+  --mv-surface-base: oklch(0.14 0.007 250);    /* Standard card & instrument surface #12161e */
+  --mv-surface-raised: oklch(0.17 0.008 250);  /* Header, toolbar & elevated panel #181e28 */
+  --mv-surface-overlay: oklch(0.20 0.010 250); /* Modal dialog & drawer background #1f2633 */
+  --mv-surface-sunken: oklch(0.09 0.005 250);  /* Inset telemetry wells & oscilloscope #090b0e */
 
   /* Hairline Structural Borders (Razor 1px dividers, zero diffuse drops) */
-  --pdm-border-hairline: oklch(0.25 0.010 245); /* Hairline divider between panels */
-  --pdm-border-subtle: oklch(0.32 0.012 245);   /* Standard card & input borders */
-  --pdm-border-strong: oklch(0.42 0.015 245);   /* Focus rings, selected tab underlines */
+  --mv-border-hairline: rgba(255, 255, 255, 0.07); /* Razor hairline divider between panels */
+  --mv-border-subtle: oklch(0.26 0.010 250);       /* Standard card & input borders */
+  --mv-border-strong: oklch(0.38 0.012 250);       /* Focus rings, selected tab lines */
 
   /* Monochromatic Typographic Gradients */
-  --pdm-text-primary: oklch(0.96 0.005 245);    /* Crisp readout headers, primary metrics */
-  --pdm-text-secondary: oklch(0.75 0.008 245);  /* Field labels, tabular column headers */
-  --pdm-text-muted: oklch(0.55 0.010 245);      /* Engineering units, timestamps, inactive icons */
-  --pdm-text-inverse: oklch(0.14 0.009 245);    /* Text on solid status badges */
+  --mv-text-primary: oklch(0.93 0.006 80);    /* Crisp readout headers, primary numbers #eceeed */
+  --mv-text-secondary: oklch(0.70 0.008 80);  /* Field labels, tabular column headers #b0b5be */
+  --mv-text-muted: oklch(0.50 0.006 80);      /* Engineering units, timestamps, inactive icons #7b8390 */
+  --mv-text-inverse: oklch(0.11 0.006 250);   /* Dark text on bright status badges */
 
-  /* ONE Locked Technical Accent (Non-Alert Interactive Chrome, <80% Saturation) */
-  --pdm-accent-base: oklch(0.68 0.12 225);      /* Technical industrial cyan */
-  --pdm-accent-muted: oklch(0.25 0.04 225);     /* Accent subtle background fill */
-  --pdm-accent-hover: oklch(0.74 0.13 225);     /* Active interactive state */
+  /* ONE Locked Technical Accent (Non-Alert Interactive Chrome, <5% Screen Area) */
+  --mv-accent-base: oklch(0.65 0.12 225);      /* Technical industrial sky cyan #38bdf8 */
+  --mv-accent-muted: rgba(56, 189, 248, 0.10); /* Accent subtle background fill */
+  --mv-accent-hover: oklch(0.72 0.14 225);     /* Active interactive state */
 
   /* Semantic Operational State Signals (Strictly Reserved for Machinery Status) */
-  /* Normal / Healthy State (Nominal operation, RUL > 120m) */
-  --pdm-status-normal: oklch(0.65 0.16 150);        /* Muted industrial emerald */
-  --pdm-status-normal-bg: oklch(0.20 0.04 150);     /* Emerald well fill */
-  --pdm-status-normal-border: oklch(0.40 0.08 150); /* Emerald hairline indicator */
+  /* Normal / Nominal State (Nominal operation, RUL > 120m) */
+  --mv-status-normal: oklch(0.65 0.16 150);        /* Muted industrial emerald #10b981 */
+  --mv-status-normal-bg: rgba(16, 185, 129, 0.12); /* Emerald well fill */
+  --mv-status-normal-border: rgba(16, 185, 129, 0.35); /* Emerald hairline indicator */
 
   /* Warning / Degrading State (Predictive wear detected, 30m < RUL <= 120m) */
-  --pdm-status-warning: oklch(0.75 0.16 75);        /* Industrial amber */
-  --pdm-status-warning-bg: oklch(0.22 0.05 75);     /* Amber warning fill */
-  --pdm-status-warning-border: oklch(0.45 0.10 75); /* Amber hairline indicator */
+  --mv-status-warning: oklch(0.75 0.16 75);        /* Industrial amber #f59e0b */
+  --mv-status-warning-bg: rgba(245, 158, 11, 0.12); /* Amber warning fill */
+  --mv-status-warning-border: rgba(245, 158, 11, 0.35); /* Amber hairline indicator */
 
   /* Critical / Imminent Trip State (Action required, RUL <= 30m) */
-  --pdm-status-critical: oklch(0.60 0.22 25);       /* Safety vermilion */
-  --pdm-status-critical-bg: oklch(0.20 0.06 25);    /* Vermilion alert fill */
-  --pdm-status-critical-border: oklch(0.42 0.12 25);/* Vermilion hairline indicator */
+  --mv-status-critical: oklch(0.60 0.22 25);       /* Safety vermilion #f43f5e */
+  --mv-status-critical-bg: rgba(244, 63, 94, 0.14); /* Vermilion alert fill */
+  --mv-status-critical-border: rgba(244, 63, 94, 0.40); /* Vermilion hairline indicator */
 
-  /* Maintenance / Offline State (Active service dispatch or unpowered) */
-  --pdm-status-offline: oklch(0.55 0.015 245);      /* Slate neutral */
-  --pdm-status-offline-bg: oklch(0.18 0.010 245);   /* Muted gray fill */
-  --pdm-status-offline-border: oklch(0.30 0.012 245);
+  /* Maintenance / Offline State (Active service dispatch or awaiting stream) */
+  --mv-status-offline: oklch(0.50 0.010 250);      /* Slate neutral #64748b */
+  --mv-status-offline-bg: rgba(100, 116, 139, 0.12); /* Muted slate fill */
+  --mv-status-offline-border: rgba(100, 116, 139, 0.25);
 
-  /* Elevation Shadows (Strict Razor Occlusion - Zero Saturated Glows) */
-  --pdm-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
-  --pdm-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
-  --pdm-shadow-overlay: 0 16px 32px -4px rgba(0, 0, 0, 0.7);
-
-  /* Spacing Scale (4px Base Grid) */
-  --pdm-space-1: 4px;
-  --pdm-space-2: 8px;
-  --pdm-space-3: 12px;
-  --pdm-space-4: 16px;
-  --pdm-space-5: 20px;
-  --pdm-space-6: 24px;
-  --pdm-space-8: 32px;
-
-  /* Corner Radii (Crisp Machined Radii - No Pill-Shaped Over-Rounding) */
-  --pdm-radius-none: 0px;
-  --pdm-radius-sm: 2px;
-  --pdm-radius-md: 4px;
-  --pdm-radius-lg: 6px;
+  /* Corner Radii (Crisp Machined Precision - Zero Pill Cards) */
+  --mv-radius-none: 0px;
+  --mv-radius-sm: 2px;
+  --mv-radius-md: 3px;
+  --mv-radius-lg: 4px;
 
   /* Typography Scales */
-  --font-display: "Chakra Petch", "Barlow Semi Condensed", -apple-system, sans-serif;
+  --font-display: "Chakra Petch", -apple-system, sans-serif;
   --font-body: "Plus Jakarta Sans", -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono", "IBM Plex Mono", monospace;
+  --font-mono: "JetBrains Mono", monospace;
 
-  /* Legacy aliases for backward compatibility */
-  --bg-dark: var(--pdm-canvas);
-  --bg-card: var(--pdm-surface-base);
-  --bg-panel: var(--pdm-surface-base);
-  --border-color: var(--pdm-border-subtle);
-  --border-highlight: var(--pdm-border-strong);
-  --accent-primary: var(--pdm-accent-base);
-  --accent-secondary: var(--pdm-accent-base);
+  /* Backward-Compatibility Mapping for Existing PDM Tokens */
+  --pdm-canvas: var(--mv-canvas);
+  --pdm-surface-base: var(--mv-surface-base);
+  --pdm-surface-raised: var(--mv-surface-raised);
+  --pdm-surface-overlay: var(--mv-surface-overlay);
+  --pdm-surface-sunken: var(--mv-surface-sunken);
+  --pdm-border-hairline: var(--mv-border-hairline);
+  --pdm-border-subtle: var(--mv-border-subtle);
+  --pdm-border-strong: var(--mv-border-strong);
+  --pdm-text-primary: var(--mv-text-primary);
+  --pdm-text-secondary: var(--mv-text-secondary);
+  --pdm-text-muted: var(--mv-text-muted);
+  --pdm-text-inverse: var(--mv-text-inverse);
+  --pdm-accent-base: var(--mv-accent-base);
+  --pdm-accent-muted: var(--mv-accent-muted);
+  --pdm-accent-hover: var(--mv-accent-hover);
+  --pdm-status-normal: var(--mv-status-normal);
+  --pdm-status-normal-bg: var(--mv-status-normal-bg);
+  --pdm-status-normal-border: var(--mv-status-normal-border);
+  --pdm-status-warning: var(--mv-status-warning);
+  --pdm-status-warning-bg: var(--mv-status-warning-bg);
+  --pdm-status-warning-border: var(--mv-status-warning-border);
+  --pdm-status-critical: var(--mv-status-critical);
+  --pdm-status-critical-bg: var(--mv-status-critical-bg);
+  --pdm-status-critical-border: var(--mv-status-critical-border);
+  --pdm-status-offline: var(--mv-status-offline);
+  --pdm-status-offline-bg: var(--mv-status-offline-bg);
+  --pdm-status-offline-border: var(--mv-status-offline-border);
+  --pdm-radius-sm: var(--mv-radius-sm);
+  --pdm-radius-md: var(--mv-radius-md);
+  --pdm-radius-lg: var(--mv-radius-lg);
+
+  /* Legacy aliases */
+  --bg-dark: var(--mv-canvas);
+  --bg-card: var(--mv-surface-base);
+  --bg-panel: var(--mv-surface-base);
+  --border-color: var(--mv-border-subtle);
+  --border-highlight: var(--mv-border-strong);
+  --accent-primary: var(--mv-accent-base);
+  --accent-secondary: var(--mv-accent-base);
   --accent-glow: transparent;
-  --status-normal: var(--pdm-status-normal);
-  --status-warning: var(--pdm-status-warning);
-  --status-critical: var(--pdm-status-critical);
-  --status-offline: var(--pdm-status-offline);
-  --text-primary: var(--pdm-text-primary);
-  --text-secondary: var(--pdm-text-secondary);
-  --text-muted: var(--pdm-text-muted);
+  --status-normal: var(--mv-status-normal);
+  --status-warning: var(--mv-status-warning);
+  --status-critical: var(--mv-status-critical);
+  --status-offline: var(--mv-status-offline);
+  --text-primary: var(--mv-text-primary);
+  --text-secondary: var(--mv-text-secondary);
+  --text-muted: var(--mv-text-muted);
 }
 
-/* Light Theme High-Contrast Mode */
+/* Light Theme High-Contrast Fallback Mode */
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
-    --pdm-canvas: oklch(0.96 0.005 245);
-    --pdm-surface-base: oklch(1.0 0.0 0);
-    --pdm-surface-raised: oklch(0.93 0.006 245);
-    --pdm-surface-overlay: oklch(1.0 0.0 0);
-    --pdm-surface-sunken: oklch(0.91 0.008 245);
+    --mv-canvas: oklch(0.96 0.005 250);
+    --mv-surface-base: #ffffff;
+    --mv-surface-raised: oklch(0.93 0.006 250);
+    --mv-surface-overlay: #ffffff;
+    --mv-surface-sunken: oklch(0.91 0.008 250);
 
-    --pdm-border-hairline: oklch(0.85 0.008 245);
-    --pdm-border-subtle: oklch(0.75 0.012 245);
-    --pdm-border-strong: oklch(0.50 0.015 245);
+    --mv-border-hairline: oklch(0.85 0.008 250);
+    --mv-border-subtle: oklch(0.75 0.012 250);
+    --mv-border-strong: oklch(0.50 0.015 250);
 
-    --pdm-text-primary: oklch(0.15 0.010 245);
-    --pdm-text-secondary: oklch(0.35 0.012 245);
-    --pdm-text-muted: oklch(0.52 0.010 245);
-    --pdm-text-inverse: oklch(0.98 0.002 245);
+    --mv-text-primary: oklch(0.15 0.010 250);
+    --mv-text-secondary: oklch(0.35 0.012 250);
+    --mv-text-muted: oklch(0.52 0.010 250);
+    --mv-text-inverse: oklch(0.98 0.002 250);
 
-    --pdm-accent-base: oklch(0.50 0.14 225);
-    --pdm-accent-muted: oklch(0.90 0.03 225);
-    --pdm-accent-hover: oklch(0.42 0.15 225);
+    --mv-accent-base: oklch(0.50 0.14 225);
+    --mv-accent-muted: rgba(2, 132, 199, 0.10);
+    --mv-accent-hover: oklch(0.42 0.15 225);
 
-    --pdm-status-normal: oklch(0.45 0.16 150);
-    --pdm-status-normal-bg: oklch(0.92 0.04 150);
-    --pdm-status-normal-border: oklch(0.70 0.10 150);
+    --mv-status-normal: oklch(0.45 0.16 150);
+    --mv-status-normal-bg: rgba(16, 185, 129, 0.15);
+    --mv-status-normal-border: oklch(0.70 0.10 150);
 
-    --pdm-status-warning: oklch(0.55 0.17 70);
-    --pdm-status-warning-bg: oklch(0.93 0.05 75);
-    --pdm-status-warning-border: oklch(0.75 0.12 75);
+    --mv-status-warning: oklch(0.55 0.17 70);
+    --mv-status-warning-bg: rgba(245, 158, 11, 0.15);
+    --mv-status-warning-border: oklch(0.75 0.12 75);
 
-    --pdm-status-critical: oklch(0.48 0.22 25);
-    --pdm-status-critical-bg: oklch(0.92 0.06 25);
-    --pdm-status-critical-border: oklch(0.70 0.15 25);
-
-    --pdm-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    --pdm-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    --pdm-shadow-overlay: 0 16px 32px -4px rgba(0, 0, 0, 0.15);
+    --mv-status-critical: oklch(0.48 0.22 25);
+    --mv-status-critical-bg: rgba(244, 63, 94, 0.15);
+    --mv-status-critical-border: oklch(0.70 0.15 25);
   }
 }
 
@@ -146,8 +160,8 @@ html, body {
   height: 100dvh;
   margin: 0;
   padding: 0;
-  background-color: var(--pdm-canvas);
-  color: var(--pdm-text-primary);
+  background-color: var(--mv-canvas);
+  color: var(--mv-text-primary);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -158,10 +172,10 @@ html, body {
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   margin: 0;
-  color: var(--pdm-text-primary);
+  color: var(--mv-text-primary);
 }
 
 /* Monospace & Tabular Numeric Engine */
@@ -188,8 +202,8 @@ pre,
   font-family: var(--font-display);
   font-size: 1.125rem;
   line-height: 1.375rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
@@ -198,7 +212,7 @@ pre,
   font-size: 0.8125rem;
   line-height: 1rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
@@ -214,7 +228,7 @@ pre,
 .pdm-telemetry-unit {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
-  color: var(--pdm-text-muted);
+  color: var(--mv-text-muted);
   text-transform: uppercase;
   margin-left: 2px;
 }
@@ -224,9 +238,9 @@ pre,
   font-size: 0.6875rem;
   line-height: 0.875rem;
   font-weight: 600;
-  color: var(--pdm-text-secondary);
+  color: var(--mv-text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 }
 
 /* ==========================================================================
@@ -234,89 +248,83 @@ pre,
    ========================================================================== */
 
 .pdm-panel {
-  background-color: var(--pdm-surface-base);
-  border: 1px solid var(--pdm-border-hairline);
-  border-radius: var(--pdm-radius-md);
+  background-color: var(--mv-surface-base);
+  border: 1px solid var(--mv-border-hairline);
+  border-radius: var(--mv-radius-md);
 }
 
 .pdm-panel-raised {
-  background-color: var(--pdm-surface-raised);
-  border: 1px solid var(--pdm-border-subtle);
-  border-radius: var(--pdm-radius-md);
+  background-color: var(--mv-surface-raised);
+  border: 1px solid var(--mv-border-subtle);
+  border-radius: var(--mv-radius-md);
 }
 
 .pdm-panel-sunken {
-  background-color: var(--pdm-surface-sunken);
-  border: 1px solid var(--pdm-border-hairline);
-  border-radius: var(--pdm-radius-sm);
+  background-color: var(--mv-surface-sunken);
+  border: 1px solid var(--mv-border-hairline);
+  border-radius: var(--mv-radius-sm);
 }
 
 .pdm-panel-overlay {
-  background-color: var(--pdm-surface-overlay);
-  border: 1px solid var(--pdm-border-subtle);
-  border-radius: var(--pdm-radius-lg);
-  box-shadow: var(--pdm-shadow-overlay);
+  background-color: var(--mv-surface-overlay);
+  border: 1px solid var(--mv-border-subtle);
+  border-radius: var(--mv-radius-lg);
+  box-shadow: 0 16px 32px -4px rgba(0, 0, 0, 0.7);
 }
 
-/* Technical Card (Pure Machined Structure - Zero Decorative Corner Wings) */
+/* Technical Card (Machivital Instrument Bezel) */
 .tech-card,
 .pdm-machine-card {
-  background-color: var(--pdm-surface-base);
-  border: 1px solid var(--pdm-border-subtle);
-  border-radius: var(--pdm-radius-md);
+  background-color: var(--mv-surface-base);
+  border: 1px solid var(--mv-border-subtle);
+  border-radius: var(--mv-radius-md);
   position: relative;
   overflow: hidden;
-  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  transition: border-color 150ms cubic-bezier(0.23, 1, 0.32, 1), background-color 150ms ease;
+  transition: border-color 140ms ease, background-color 140ms ease;
 }
 
 @media (hover: hover) and (pointer: fine) {
   .tech-card:hover,
   .pdm-machine-card:hover {
-    border-color: var(--pdm-border-strong);
-    background-color: var(--pdm-surface-raised);
+    border-color: var(--mv-border-strong);
   }
 }
 
-/* Status state indicators on cards */
+/* Status-dependent state highlights */
 .pdm-machine-card[data-status="CRITICAL"] {
-  border-color: var(--pdm-status-critical-border);
+  border-color: var(--mv-status-critical-border);
+  box-shadow: inset 2px 0 0 0 var(--mv-status-critical);
 }
 
 .pdm-machine-card[data-status="WARNING"] {
-  border-color: var(--pdm-status-warning-border);
+  border-color: var(--mv-status-warning-border);
+  box-shadow: inset 2px 0 0 0 var(--mv-status-warning);
 }
 
 .pdm-machine-card[data-status="NORMAL"] {
-  border-color: var(--pdm-border-subtle);
+  border-color: var(--mv-border-subtle);
+  box-shadow: inset 2px 0 0 0 var(--mv-status-normal);
 }
 
-.pdm-machine-card[data-status="UNDER_MAINTENANCE"] {
-  border-color: var(--pdm-status-offline-border);
-  opacity: 0.75;
-}
-
-/* Glass panel replaced with high-contrast opaque panel */
-.glass-panel,
-.glassmorphism {
-  background-color: var(--pdm-surface-base);
-  border-color: var(--pdm-border-hairline);
-  box-shadow: var(--pdm-shadow-sm);
+.pdm-machine-card[data-status="UNDER_MAINTENANCE"],
+.pdm-machine-card[data-status="OFFLINE"] {
+  border-color: var(--mv-status-offline-border);
+  box-shadow: inset 2px 0 0 0 var(--mv-status-offline);
+  opacity: 0.85;
 }
 
 /* ==========================================================================
-   Signature Element: Linear Multi-Zone RUL Instrumentation Gauge
+   Linear Multi-Zone RUL Instrumentation Gauge
    ========================================================================== */
 
 .pdm-rul-gauge {
   position: relative;
   width: 100%;
-  height: 6px;
-  background-color: var(--pdm-surface-sunken);
-  border: 1px solid var(--pdm-border-hairline);
+  height: 7px;
+  background-color: var(--mv-surface-sunken);
+  border: 1px solid var(--mv-border-hairline);
   border-radius: 2px;
   overflow: hidden;
   display: flex;
@@ -329,12 +337,12 @@ pre,
   height: 100%;
   background: linear-gradient(
     to right,
-    var(--pdm-status-critical-bg) 0%,
-    var(--pdm-status-critical-bg) 25%,
-    var(--pdm-status-warning-bg) 25%,
-    var(--pdm-status-warning-bg) 50%,
-    var(--pdm-status-normal-bg) 50%,
-    var(--pdm-status-normal-bg) 100%
+    var(--mv-status-critical-bg) 0%,
+    var(--mv-status-critical-bg) 25%,
+    var(--mv-status-warning-bg) 25%,
+    var(--mv-status-warning-bg) 50%,
+    var(--mv-status-normal-bg) 50%,
+    var(--mv-status-normal-bg) 100%
   );
 }
 
@@ -345,7 +353,7 @@ pre,
   top: 0;
   bottom: 0;
   width: 1px;
-  background-color: var(--pdm-status-critical-border);
+  background-color: var(--mv-status-critical-border);
   z-index: 2;
 }
 
@@ -355,73 +363,41 @@ pre,
   top: 0;
   bottom: 0;
   width: 1px;
-  background-color: var(--pdm-status-warning-border);
+  background-color: var(--mv-status-warning-border);
   z-index: 2;
 }
 
 /* Current RUL value bar */
 .pdm-rul-fill {
   height: 100%;
-  transition: width 200ms cubic-bezier(0.23, 1, 0.32, 1);
+  transition: width 180ms ease-out;
   position: relative;
   z-index: 1;
 }
 
 .pdm-rul-fill.critical {
-  background-color: var(--pdm-status-critical);
+  background-color: var(--mv-status-critical);
 }
 
 .pdm-rul-fill.warning {
-  background-color: var(--pdm-status-warning);
+  background-color: var(--mv-status-warning);
 }
 
 .pdm-rul-fill.normal {
-  background-color: var(--pdm-status-normal);
+  background-color: var(--mv-status-normal);
 }
 
 .pdm-rul-fill.offline {
-  background-color: var(--pdm-status-offline);
+  background-color: var(--mv-status-offline);
 }
 
-/* Integrated Hairline Telemetry Ribbon (Sparkline container) */
-.pdm-sparkline-container {
-  width: 100%;
-  height: 28px;
-  background-color: var(--pdm-surface-sunken);
-  border: 1px solid var(--pdm-border-hairline);
-  border-radius: 2px;
-  position: relative;
-  overflow: hidden;
-}
-
-.pdm-sparkline-svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.pdm-sparkline-path {
-  fill: none;
-  stroke-width: 1.25px;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-}
-
-.pdm-sparkline-path.normal {
-  stroke: var(--pdm-status-normal);
-}
-
-.pdm-sparkline-path.warning {
-  stroke: var(--pdm-status-warning);
-}
-
-.pdm-sparkline-path.critical {
-  stroke: var(--pdm-status-critical);
-}
-
-.pdm-sparkline-path.neutral {
-  stroke: var(--pdm-accent-base);
+/* Oscilloscope / Sparkline Container */
+.chart-container {
+  background-color: var(--mv-surface-sunken);
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
 /* ==========================================================================
@@ -435,86 +411,75 @@ pre,
   font-weight: 600;
   text-transform: uppercase;
   padding: 3px 6px;
-  border-radius: var(--pdm-radius-sm);
+  border-radius: var(--mv-radius-sm);
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   white-space: nowrap;
 }
 
 .pdm-badge-normal {
-  background-color: var(--pdm-status-normal-bg);
-  border: 1px solid var(--pdm-status-normal-border);
-  color: var(--pdm-status-normal);
+  background-color: var(--mv-status-normal-bg);
+  border: 1px solid var(--mv-status-normal-border);
+  color: var(--mv-status-normal);
 }
 
 .pdm-badge-warning {
-  background-color: var(--pdm-status-warning-bg);
-  border: 1px solid var(--pdm-status-warning-border);
-  color: var(--pdm-status-warning);
+  background-color: var(--mv-status-warning-bg);
+  border: 1px solid var(--mv-status-warning-border);
+  color: var(--mv-status-warning);
 }
 
 .pdm-badge-critical {
-  background-color: var(--pdm-status-critical-bg);
-  border: 1px solid var(--pdm-status-critical-border);
-  color: var(--pdm-status-critical);
+  background-color: var(--mv-status-critical-bg);
+  border: 1px solid var(--mv-status-critical-border);
+  color: var(--mv-status-critical);
 }
 
 .pdm-badge-offline {
-  background-color: var(--pdm-status-offline-bg);
-  border: 1px solid var(--pdm-status-offline-border);
-  color: var(--pdm-status-offline);
+  background-color: var(--mv-status-offline-bg);
+  border: 1px solid var(--mv-status-offline-border);
+  color: var(--mv-status-offline);
 }
 
 .pdm-badge-accent {
-  background-color: var(--pdm-accent-muted);
-  border: 1px solid var(--pdm-accent-base);
-  color: var(--pdm-accent-base);
+  background-color: var(--mv-accent-muted);
+  border: 1px solid var(--mv-accent-base);
+  color: var(--mv-accent-base);
 }
 
-/* Degraded / Partial Channel Indicator Badge */
-.pdm-badge-degraded {
-  background-color: var(--pdm-status-warning-bg);
-  border: 1px dashed var(--pdm-status-warning-border);
-  color: var(--pdm-status-warning);
-  font-family: var(--font-mono);
-  font-size: 0.625rem;
-  padding: 2px 5px;
-}
-
-/* Backward compatibility for status-badge-tech */
 .status-badge-tech {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
   text-transform: uppercase;
-  padding: 2px 6px;
+  padding: 2.5px 6px;
   border-radius: 2px;
   border: 1px solid currentColor;
-  background: var(--pdm-surface-sunken);
-  letter-spacing: 0.03em;
+  background: var(--mv-surface-sunken);
+  letter-spacing: 0.04em;
 }
 
 /* Semantic utility text classes */
-.text-normal { color: var(--pdm-status-normal) !important; }
-.text-warning { color: var(--pdm-status-warning) !important; }
-.text-critical { color: var(--pdm-status-critical) !important; }
-.text-offline { color: var(--pdm-status-offline) !important; }
-.text-accent { color: var(--pdm-accent-base) !important; }
-.text-secondary { color: var(--pdm-text-secondary) !important; }
-.text-muted { color: var(--pdm-text-muted) !important; }
+.text-normal { color: var(--mv-status-normal) !important; }
+.text-warning { color: var(--mv-status-warning) !important; }
+.text-critical { color: var(--mv-status-critical) !important; }
+.text-offline { color: var(--mv-status-offline) !important; }
+.text-accent { color: var(--mv-accent-base) !important; }
+.text-secondary { color: var(--mv-text-secondary) !important; }
+.text-muted { color: var(--mv-text-muted) !important; }
 
-.bg-normal { background-color: var(--pdm-status-normal) !important; }
-.bg-warning { background-color: var(--pdm-status-warning) !important; }
-.bg-critical { background-color: var(--pdm-status-critical) !important; }
-.bg-accent { background-color: var(--pdm-accent-base) !important; }
+.bg-normal { background-color: var(--mv-status-normal) !important; }
+.bg-warning { background-color: var(--mv-status-warning) !important; }
+.bg-critical { background-color: var(--mv-status-critical) !important; }
+.bg-accent { background-color: var(--mv-accent-base) !important; }
 
-.border-normal { border-color: var(--pdm-status-normal-border) !important; }
-.border-warning { border-color: var(--pdm-status-warning-border) !important; }
-.border-critical { border-color: var(--pdm-status-critical-border) !important; }
-.border-accent { border-color: var(--pdm-accent-base) !important; }
-.border-hairline { border-color: var(--pdm-border-hairline) !important; }
-.border-subtle { border-color: var(--pdm-border-subtle) !important; }
+.border-normal { border-color: var(--mv-status-normal-border) !important; }
+.border-warning { border-color: var(--mv-status-warning-border) !important; }
+.border-critical { border-color: var(--mv-status-critical-border) !important; }
+.border-accent { border-color: var(--mv-accent-base) !important; }
+.border-hairline { border-color: var(--mv-border-hairline) !important; }
+.border-subtle { border-color: var(--mv-border-subtle) !important; }
 
 /* ==========================================================================
    Interactive Controls & Form Inputs (40px touch minimum)
@@ -525,65 +490,65 @@ pre,
   font-size: 0.75rem;
   line-height: 1rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  padding: 8px 12px;
-  min-height: 36px;
-  border-radius: var(--pdm-radius-sm);
+  padding: 6px 12px;
+  min-height: 32px;
+  border-radius: var(--mv-radius-sm);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   cursor: pointer;
-  border: 1px solid var(--pdm-border-subtle);
-  background-color: var(--pdm-surface-raised);
-  color: var(--pdm-text-primary);
+  border: 1px solid var(--mv-border-subtle);
+  background-color: var(--mv-surface-raised);
+  color: var(--mv-text-primary);
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-  transition: background-color 150ms cubic-bezier(0.23, 1, 0.32, 1),
-              border-color 150ms cubic-bezier(0.23, 1, 0.32, 1),
-              color 150ms cubic-bezier(0.23, 1, 0.32, 1);
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
 }
 
 @media (hover: hover) and (pointer: fine) {
   .pdm-btn:hover {
-    background-color: var(--pdm-surface-overlay);
-    border-color: var(--pdm-border-strong);
+    background-color: var(--mv-surface-overlay);
+    border-color: var(--mv-border-strong);
   }
 }
 
 .pdm-btn-primary {
-  background-color: var(--pdm-accent-base);
-  border-color: var(--pdm-accent-base);
-  color: var(--pdm-text-inverse);
+  background-color: var(--mv-accent-base);
+  border-color: var(--mv-accent-base);
+  color: var(--mv-text-inverse);
+  font-weight: 700;
 }
 
 @media (hover: hover) and (pointer: fine) {
   .pdm-btn-primary:hover {
-    background-color: var(--pdm-accent-hover);
-    border-color: var(--pdm-accent-hover);
+    background-color: var(--mv-accent-hover);
+    border-color: var(--mv-accent-hover);
+    color: var(--mv-text-inverse);
   }
 }
 
 .pdm-btn-critical {
-  background-color: var(--pdm-status-critical-bg);
-  border-color: var(--pdm-status-critical-border);
-  color: var(--pdm-status-critical);
+  background-color: var(--mv-status-critical-bg);
+  border-color: var(--mv-status-critical-border);
+  color: var(--mv-status-critical);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .pdm-btn-critical:hover {
-    background-color: var(--pdm-status-critical);
-    color: var(--pdm-text-primary);
+    background-color: var(--mv-status-critical);
+    color: #ffffff;
   }
 }
 
 /* Segmented Control Pill */
 .pdm-segmented-group {
   display: inline-flex;
-  background-color: var(--pdm-surface-sunken);
-  border: 1px solid var(--pdm-border-hairline);
-  border-radius: var(--pdm-radius-sm);
+  background-color: var(--mv-surface-sunken);
+  border: 1px solid var(--mv-border-hairline);
+  border-radius: var(--mv-radius-sm);
   padding: 2px;
   gap: 2px;
 }
@@ -593,11 +558,12 @@ pre,
   font-size: 0.6875rem;
   font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
   padding: 4px 10px;
   min-height: 28px;
-  border: none;
+  border: 1px solid transparent;
   background: transparent;
-  color: var(--pdm-text-secondary);
+  color: var(--mv-text-secondary);
   border-radius: 2px;
   cursor: pointer;
   transition: background-color 120ms ease, color 120ms ease;
@@ -606,12 +572,12 @@ pre,
 
 .pdm-segmented-btn.active,
 .pdm-segmented-btn[aria-checked="true"] {
-  background-color: var(--pdm-surface-raised);
-  color: var(--pdm-text-primary);
-  border: 1px solid var(--pdm-border-subtle);
+  background-color: var(--mv-surface-raised);
+  color: var(--mv-text-primary);
+  border-color: var(--mv-border-subtle);
 }
 
-/* High-contrast Technical Inputs */
+/* Technical Inputs */
 .pdm-input,
 input[type="text"],
 input[type="password"],
@@ -619,22 +585,22 @@ input[type="email"],
 input[type="number"],
 select,
 textarea {
-  background-color: var(--pdm-surface-sunken);
-  border: 1px solid var(--pdm-border-subtle);
-  color: var(--pdm-text-primary);
+  background-color: var(--mv-surface-sunken);
+  border: 1px solid var(--mv-border-subtle);
+  color: var(--mv-text-primary);
   font-family: var(--font-body);
   font-size: 0.8125rem;
   padding: 6px 10px;
-  border-radius: var(--pdm-radius-sm);
+  border-radius: var(--mv-radius-sm);
   outline: none;
-  min-height: 36px;
-  transition: border-color 150ms ease;
+  min-height: 34px;
+  transition: border-color 140ms ease;
 }
 
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: var(--pdm-accent-base);
+  border-color: var(--mv-accent-base);
 }
 
 @media (pointer: coarse) {
@@ -647,35 +613,13 @@ textarea:focus {
   }
 }
 
-/* Sidebar navigation item */
-.sidebar-item,
-.sidebar-tab {
-  font-family: var(--font-display);
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  padding: 6px 12px;
-  border: 1px solid transparent;
-  border-radius: var(--pdm-radius-sm);
-  cursor: pointer;
-  color: var(--pdm-text-secondary);
-  transition: background-color 150ms ease, color 150ms ease;
-}
-
-.sidebar-tab.active {
-  background-color: var(--pdm-surface-raised);
-  border-color: var(--pdm-border-subtle);
-  color: var(--pdm-text-primary);
-}
-
 /* ==========================================================================
    The Five View States
    ========================================================================== */
 
 /* State 1: Loading Skeleton (Zero CLS, Monochromatic) */
 .pdm-skeleton {
-  background-color: var(--pdm-surface-sunken);
+  background-color: var(--mv-surface-sunken);
   border-radius: 2px;
   animation: pdm-skeleton-fade 1.2s infinite ease-in-out;
 }
@@ -685,36 +629,19 @@ textarea:focus {
   50% { opacity: 0.65; }
 }
 
-.pdm-skeleton-card {
-  min-height: 210px;
-  padding: 12px;
-  background-color: var(--pdm-surface-base);
-  border: 1px solid var(--pdm-border-hairline);
-  border-radius: var(--pdm-radius-md);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
 /* State 2: Empty Diagnostic Panel */
-.pdm-empty-state {
+.pdm-empty-panel {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 24px;
+  padding: 48px 24px;
   text-align: center;
-  background-color: var(--pdm-surface-base);
-  border: 1px dashed var(--pdm-border-subtle);
-  border-radius: var(--pdm-radius-md);
+  background-color: var(--mv-surface-base);
+  border: 1px dashed var(--mv-border-subtle);
+  border-radius: var(--mv-radius-md);
   margin: 16px 0;
-  gap: 12px;
-}
-
-.pdm-empty-icon {
-  width: 32px;
-  height: 32px;
-  color: var(--pdm-text-muted);
+  gap: 8px;
 }
 
 /* State 3: Error State */
@@ -725,30 +652,20 @@ textarea:focus {
   justify-content: center;
   padding: 32px 24px;
   text-align: center;
-  background-color: var(--pdm-status-critical-bg);
-  border: 1px solid var(--pdm-status-critical-border);
-  border-radius: var(--pdm-radius-md);
+  background-color: var(--mv-status-critical-bg);
+  border: 1px solid var(--mv-status-critical-border);
+  border-radius: var(--mv-radius-md);
   gap: 10px;
-}
-
-.pdm-error-code {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--pdm-status-critical);
-  background-color: var(--pdm-surface-sunken);
-  padding: 4px 8px;
-  border-radius: 2px;
-  border: 1px solid var(--pdm-status-critical-border);
 }
 
 /* State 4: Degraded Channel Indicator */
 .pdm-degraded-channel {
-  background-color: var(--pdm-status-warning-bg);
-  border-left: 2px solid var(--pdm-status-warning);
-  padding: 4px 8px;
+  background-color: var(--mv-status-warning-bg);
+  border-left: 2px solid var(--mv-status-warning);
+  padding: 6px 10px;
   font-size: 0.6875rem;
   font-family: var(--font-mono);
-  color: var(--pdm-status-warning);
+  color: var(--mv-status-warning);
 }
 
 /* ==========================================================================
@@ -757,28 +674,27 @@ textarea:focus {
 
 /* Deterministic 150ms Data Heartbeat Ticker */
 .pdm-ticker-dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background-color: var(--pdm-status-normal);
+  background-color: var(--mv-status-normal);
   display: inline-block;
-  opacity: 0.5;
-  transition: opacity 150ms ease;
+  opacity: 0.4;
+  transition: opacity 140ms ease;
 }
 
 .pdm-ticker-dot.tick {
   opacity: 1;
 }
 
-/* Modal Transition */
+/* Modal Transitions */
 .pdm-modal-backdrop {
-  background-color: rgba(10, 12, 16, 0.75);
-  transition: opacity 150ms cubic-bezier(0.23, 1, 0.32, 1);
+  background-color: rgba(10, 12, 16, 0.85);
+  transition: opacity 140ms ease;
 }
 
 .pdm-modal-dialog {
-  transition: transform 150ms cubic-bezier(0.23, 1, 0.32, 1),
-              opacity 150ms cubic-bezier(0.23, 1, 0.32, 1);
+  transition: transform 140ms ease, opacity 140ms ease;
 }
 
 /* Reduced Motion Enforcement */
@@ -790,33 +706,23 @@ textarea:focus {
   }
 }
 
-/* ==========================================================================
-   Layout Containers & Scrollbars
-   ========================================================================== */
-
-#machine-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 12px;
-}
-
-/* Hairline Scrollbars */
+/* Layout Containers & Scrollbars */
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--pdm-surface-sunken);
+  background: var(--mv-surface-sunken);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--pdm-border-subtle);
+  background: var(--mv-border-subtle);
   border-radius: 2px;
 }
 
 @media (hover: hover) and (pointer: fine) {
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--pdm-border-strong);
+    background: var(--mv-border-strong);
   }
 }

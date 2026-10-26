@@ -183,7 +183,7 @@ def create_app(config=None):
                 db.session.commit()
 
             if User.query.filter_by(username='admin').first() is None:
-                admin_user = User(username='admin', email='admin@pdm.local', role='admin', company_id=1)
+                admin_user = User(username='admin', email='admin@machivital.local', role='admin', company_id=1)
                 admin_user.set_password('admin')
                 db.session.add(admin_user)
                 db.session.commit()

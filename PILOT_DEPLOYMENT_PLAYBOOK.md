@@ -1,6 +1,6 @@
-# PDM Industrial Pilot Deployment & Physical Machine Onboarding Playbook
+# Machivital — Industrial Pilot Deployment & Physical Machine Onboarding Playbook
 
-This document is the operational and engineering blueprint for piloting the **Predictive Maintenance Telemetry Console (PDM)** in a real-world manufacturing plant, packaging line, CNC workshop, or industrial facility.
+This document is the operational and engineering blueprint for piloting the **Machivital Autonomous Machinery Vitality & Telemetry Console** in a real-world manufacturing plant, packaging line, CNC workshop, or industrial facility.
 
 ---
 

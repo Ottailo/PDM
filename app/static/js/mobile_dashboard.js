@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Haptic & Audio Support
 function initHaptics() {
-    const stored = localStorage.getItem('pdm_mobile_haptics');
+    const stored = localStorage.getItem('machivital_mobile_haptics') || localStorage.getItem('pdm_mobile_haptics');
     if (stored !== null) {
         hapticsEnabled = stored === 'true';
     }
@@ -34,7 +34,7 @@ function initHaptics() {
 
 function toggleHaptics() {
     hapticsEnabled = !hapticsEnabled;
-    localStorage.setItem('pdm_mobile_haptics', hapticsEnabled ? 'true' : 'false');
+    localStorage.setItem('machivital_mobile_haptics', hapticsEnabled ? 'true' : 'false');
     updateHapticButtonLabel();
     if (hapticsEnabled && navigator.vibrate) {
         navigator.vibrate(60);
@@ -304,21 +304,21 @@ function renderSurveillanceCards() {
         const lastSeen = formatLastSeen(m.last_seen_seconds, m.telemetry_status);
 
         html += `
-        <div class="bg-[var(--pdm-surface-base)] border ${statusMeta.cardBorder} rounded-lg p-3 space-y-2.5 shadow-sm active:bg-[var(--pdm-surface-raised)] transition-colors">
+        <div class="bg-[var(--mv-surface-base)] border ${statusMeta.cardBorder} rounded-[3px] p-3 space-y-2.5 shadow-sm active:bg-[var(--mv-surface-raised)] transition-colors">
             <!-- Card Header: Machine ID, Type, Badge -->
             <div class="flex items-center justify-between">
                 <div>
                     <div class="flex items-center gap-2">
-                        <span class="font-display font-bold text-sm tracking-wide text-[var(--pdm-text-primary)]">${id}</span>
-                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] text-[var(--pdm-text-muted)] uppercase">
+                        <span class="font-mono font-bold text-sm tracking-wide text-[var(--mv-text-primary)]">${id}</span>
+                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded-[2px] bg-[var(--mv-surface-sunken)] border border-[var(--mv-border-hairline)] text-[var(--mv-text-muted)] uppercase">
                             ${m.machine_type || 'ASSET'}
                         </span>
                     </div>
-                    <div class="text-[10px] font-mono text-[var(--pdm-text-muted)] mt-0.5">
+                    <div class="text-[10px] font-mono text-[var(--mv-text-muted)] mt-0.5">
                         LOC: ${m.location || 'MAIN FLOOR'}
                     </div>
                 </div>
-                <span class="font-mono text-[10px] font-bold px-2 py-0.5 rounded ${statusMeta.badgeClass}">
+                <span class="font-mono text-[10px] font-bold px-2 py-0.5 rounded-[2px] ${statusMeta.badgeClass}">
                     ${statusMeta.text}
                 </span>
             </div>
@@ -326,10 +326,10 @@ function renderSurveillanceCards() {
             <!-- RUL Gauge Instrumentation Bar -->
             <div class="space-y-1">
                 <div class="flex items-center justify-between text-[10px] font-mono">
-                    <span class="text-[var(--pdm-text-muted)]">REMAINING USEFUL LIFE:</span>
+                    <span class="text-[var(--mv-text-muted)]">REMAINING USEFUL LIFE:</span>
                     <span class="font-bold ${statusMeta.rulTextClass}">${rul.label}</span>
                 </div>
-                <div class="h-1.5 w-full bg-[var(--pdm-surface-sunken)] rounded-full overflow-hidden flex border border-[var(--pdm-border-hairline)]">
+                <div class="h-1.5 w-full bg-[var(--mv-surface-sunken)] rounded-[2px] overflow-hidden flex border border-[var(--mv-border-hairline)]">
                     <div style="width: ${rul.fillPercent}%" class="h-full ${rul.barColor} transition-all duration-300"></div>
                 </div>
             </div>
@@ -342,7 +342,7 @@ function renderSurveillanceCards() {
             </div>
 
             <!-- Edge Telemetry Watchdog Footnote -->
-            <div class="pt-1 border-t border-[var(--pdm-border-hairline)] flex items-center justify-between text-[9px] font-mono text-[var(--pdm-text-muted)]">
+            <div class="pt-1 border-t border-[var(--mv-border-hairline)] flex items-center justify-between text-[9px] font-mono text-[var(--mv-text-muted)]">
                 <span>SIGNAL: <strong class="${statusMeta.signalClass}">${lastSeen}</strong></span>
                 <span>CHANNELS: ${Object.keys(readings).length} ACTIVE</span>
             </div>
@@ -350,14 +350,14 @@ function renderSurveillanceCards() {
             <!-- Mobile Quick Actions -->
             <div class="grid grid-cols-2 gap-2 pt-1">
                 <button onclick="openDiagnosticDrawer('${id}')"
-                    class="py-1.5 px-2 bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-subtle)] hover:border-[var(--pdm-accent-base)] text-[var(--pdm-text-primary)] font-mono text-[10px] font-bold rounded flex items-center justify-center gap-1 active:scale-98">
-                    <svg class="w-3 h-3 text-[var(--pdm-accent-base)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="py-1.5 px-2 bg-[var(--mv-surface-sunken)] border border-[var(--mv-border-subtle)] hover:border-[var(--mv-accent-base)] text-[var(--mv-text-primary)] font-mono text-[10px] font-bold rounded-[2px] flex items-center justify-center gap-1 active:scale-98">
+                    <svg class="w-3 h-3 text-[var(--mv-accent-base)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                     </svg>
                     DIAGNOSE
                 </button>
                 <button onclick="openWorkOrderModalFor('${id}')"
-                    class="py-1.5 px-2 bg-[var(--pdm-surface-raised)] border border-[var(--pdm-border-subtle)] text-[var(--pdm-text-secondary)] font-mono text-[10px] font-bold rounded flex items-center justify-center gap-1 active:scale-98">
+                    class="py-1.5 px-2 bg-[var(--mv-surface-raised)] border border-[var(--mv-border-subtle)] text-[var(--mv-text-secondary)] font-mono text-[10px] font-bold rounded-[2px] flex items-center justify-center gap-1 active:scale-98">
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                     </svg>
@@ -576,7 +576,7 @@ async function openDiagnosticDrawer(machineId) {
 
     // Show loading state
     document.getElementById('drawer-severity').textContent = 'CALCULATING...';
-    document.getElementById('drawer-root-cause').textContent = 'Querying OMNIRoute LLM Mechatronic Reasoning Engine...';
+    document.getElementById('drawer-root-cause').textContent = 'Querying Machivital Cognitive Diagnostic Engine...';
     document.getElementById('drawer-checklist').innerHTML = '<div class="text-[10px] text-[var(--pdm-text-muted)]">Generating physical inspection steps...</div>';
     document.getElementById('drawer-parts-list').innerHTML = '';
 

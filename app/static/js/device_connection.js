@@ -56,7 +56,7 @@ function showDeviceConnectionModal(machineId) {
 
             const mqttCode = document.getElementById('code-mqtt-cmd');
             if (mqttCode) {
-                mqttCode.textContent = `python scripts/edge/pdm_mqtt_subscriber.py --broker 192.168.1.50 --topic pdm/${machineId}/telemetry --machine-id ${machineId} --key ${data.device_token}`;
+                mqttCode.textContent = `python scripts/edge/pdm_mqtt_subscriber.py --broker 192.168.1.50 --topic machivital/${machineId}/telemetry --machine-id ${machineId} --key ${data.device_token}`;
             }
 
             // Populate Channels Table

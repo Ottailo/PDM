@@ -1,4 +1,4 @@
-# PDM — Industrial Predictive Maintenance Platform
+# Machivital — Industrial Machinery Vitality & Autonomous Telemetry Platform
 
 > Real-time industrial machine telemetry, dual-output GRU failure prediction, and maintenance scheduling platform for manufacturing lines.
 

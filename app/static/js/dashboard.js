@@ -500,12 +500,17 @@ function createMachineCard(machineId) {
     cardContainer.innerHTML = `
         <div class="tech-card pdm-machine-card h-full flex flex-col card">
             <!-- Card Header Strip -->
-            <div class="p-3 border-b border-[var(--pdm-border-hairline)] flex justify-between items-center bg-[var(--pdm-surface-raised)]">
-                <div class="flex items-center gap-2 min-w-0">
-                    <span class="w-1.5 h-3.5 bg-[var(--pdm-accent-base)] rounded-[1px] flex-shrink-0"></span>
-                    <h3 class="font-display font-semibold text-xs tracking-wider uppercase text-[var(--pdm-text-primary)] truncate">
-                        ${machineId.replace(/_/g, ' ')}
-                    </h3>
+            <div class="p-3 border-b border-[var(--mv-border-hairline)] flex justify-between items-center bg-[var(--mv-surface-raised)]">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <span class="w-1.5 h-4 bg-[var(--mv-accent-base)] rounded-[1px] flex-shrink-0"></span>
+                    <div class="min-w-0">
+                        <h3 class="font-mono font-bold text-xs tracking-wider uppercase text-[var(--mv-text-primary)] truncate">
+                            ${machineId.replace(/_/g, ' ')}
+                        </h3>
+                        <span class="machine-class-sub text-[9px] font-mono text-[var(--mv-text-muted)] uppercase tracking-wider block truncate">
+                            PACKAGING ASSET
+                        </span>
+                    </div>
                 </div>
                 <span class="status-badge-tech pdm-badge pdm-badge-normal">NOMINAL</span>
             </div>
@@ -514,9 +519,9 @@ function createMachineCard(machineId) {
             <div class="p-3.5 flex-grow flex flex-col space-y-3">
                 <!-- Signature Element: Linear Multi-Zone RUL Instrumentation Gauge -->
                 <div class="pdm-rul-container space-y-1">
-                    <div class="flex items-center justify-between text-[10px] font-mono text-[var(--pdm-text-muted)]">
+                    <div class="flex items-center justify-between text-[10px] font-mono text-[var(--mv-text-muted)]">
                         <span class="tracking-wider">REMAINING USEFUL LIFE:</span>
-                        <span class="machine-rul-value font-mono font-bold text-xs text-[var(--pdm-text-primary)]" style="font-variant-numeric: tabular-nums;">--</span>
+                        <span class="machine-rul-value font-mono font-bold text-xs text-[var(--mv-text-primary)]" style="font-variant-numeric: tabular-nums;">--</span>
                     </div>
                     <div class="pdm-rul-gauge" title="RUL Gauge: Critical (0-30m) | Warning (30-120m) | Normal (>120m)">
                         <div class="pdm-rul-track">
@@ -525,7 +530,7 @@ function createMachineCard(machineId) {
                             <div class="pdm-rul-fill normal" style="width: 100%;"></div>
                         </div>
                     </div>
-                    <div class="flex items-center justify-between text-[9px] font-mono text-[var(--pdm-text-muted)] opacity-60">
+                    <div class="flex items-center justify-between text-[9px] font-mono text-[var(--mv-text-muted)] opacity-70">
                         <span>0m (TRIP)</span>
                         <span>30m</span>
                         <span>120m</span>
@@ -533,37 +538,37 @@ function createMachineCard(machineId) {
                     </div>
                 </div>
 
-                <!-- High-Density Telemetry Readings -->
-                <div class="sensor-readings space-y-1 my-1"></div>
+                <!-- High-Density Telemetry Readings (2x2 Matrix) -->
+                <div class="sensor-readings my-1"></div>
 
                 <div class="no-data-indicator hidden text-center py-6">
-                    <div class="text-xs font-mono font-bold tracking-wider text-[var(--pdm-text-muted)] uppercase mb-1">NO TELEMETRY SIGNAL</div>
-                    <p class="text-[10px] text-[var(--pdm-text-muted)] font-mono uppercase">Data Stream Inactive</p>
+                    <div class="text-xs font-mono font-bold tracking-wider text-[var(--mv-text-muted)] uppercase mb-1">NO TELEMETRY SIGNAL</div>
+                    <p class="text-[10px] text-[var(--mv-text-muted)] font-mono uppercase">Awaiting Edge Packet Burst</p>
                 </div>
 
                 <!-- Integrated Hairline Ribbon Telemetry Sparkline -->
-                <div class="chart-container mt-auto h-28 relative bg-[var(--pdm-surface-sunken)] rounded-[var(--pdm-radius-sm)] border border-[var(--pdm-border-hairline)] p-1">
+                <div class="chart-container mt-auto h-28 relative bg-[var(--mv-surface-sunken)] rounded-[var(--mv-radius-sm)] border border-[var(--mv-border-hairline)] p-1">
                     <canvas id="chart-${machineId}"></canvas>
                 </div>
 
                 <!-- Card Footer Control Strip -->
-                <div class="card-footer pt-2.5 border-t border-[var(--pdm-border-hairline)] flex items-center justify-between">
-                    <div class="flex items-center gap-2 text-[11px] font-mono text-[var(--pdm-text-muted)]">
+                <div class="card-footer pt-2.5 border-t border-[var(--mv-border-hairline)] flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-[11px] font-mono text-[var(--mv-text-muted)]">
                         <span class="machine-health-val" style="font-variant-numeric: tabular-nums;">H: --%</span>
                         <span>|</span>
                         <span class="machine-rul-footer" style="font-variant-numeric: tabular-nums;">RUL: --</span>
                     </div>
                     <div class="flex items-center gap-1.5">
-                        <button data-action="connect" data-machine-id="${machineId}" class="pdm-btn text-[10px] py-1 px-2 h-7 bg-[var(--pdm-surface-raised)] border-[var(--pdm-border-subtle)] text-[var(--pdm-text-secondary)] hover:text-[var(--pdm-text-primary)]" title="Connect Physical Machine Gateway">
+                        <button data-action="connect" data-machine-id="${machineId}" class="pdm-btn text-[10px] py-1 px-2 h-7 bg-[var(--mv-surface-raised)] border-[var(--mv-border-subtle)] text-[var(--mv-text-secondary)] hover:text-[var(--mv-text-primary)] font-mono" title="Connect Physical Machine Gateway">
                             GATEWAY
                         </button>
-                        <button data-action="diagnose" data-machine-id="${machineId}" class="pdm-btn text-[10px] py-1 px-2 h-7 border-[var(--pdm-accent-base)] text-[var(--pdm-accent-base)] hover:bg-[var(--pdm-accent-subtle)]" title="Autonomous AI Diagnostic Advisor">
-                            <span class="inline-block w-1.5 h-1.5 rounded-full bg-[var(--pdm-accent-base)] animate-pulse mr-1"></span>ADVISOR
+                        <button data-action="diagnose" data-machine-id="${machineId}" class="pdm-btn text-[10px] py-1 px-2 h-7 border-[var(--mv-accent-base)] text-[var(--mv-accent-base)] hover:bg-[var(--mv-accent-muted)] font-mono font-bold" title="Autonomous AI Diagnostic Advisor">
+                            <span class="inline-block w-1.5 h-1.5 rounded-full bg-[var(--mv-accent-base)] animate-pulse mr-1"></span>ADVISOR
                         </button>
-                        <button data-action="history" data-machine-id="${machineId}" class="pdm-btn text-[10px] py-1 px-2 h-7 bg-[var(--pdm-surface-raised)] border-[var(--pdm-border-subtle)] text-[var(--pdm-text-secondary)] hover:text-[var(--pdm-text-primary)]" title="Inspect Sensor History">
+                        <button data-action="history" data-machine-id="${machineId}" class="pdm-btn text-[10px] py-1 px-2 h-7 bg-[var(--mv-surface-raised)] border-[var(--mv-border-subtle)] text-[var(--mv-text-secondary)] hover:text-[var(--mv-text-primary)] font-mono" title="Inspect Sensor History">
                             HISTORY
                         </button>
-                        <button data-action="service" data-machine-id="${machineId}" class="pdm-btn pdm-btn-primary text-[10px] py-1 px-2 h-7" title="Request Mechanical Service">
+                        <button data-action="service" data-machine-id="${machineId}" class="pdm-btn pdm-btn-primary text-[10px] py-1 px-2 h-7 font-mono" title="Request Mechanical Service">
                             SERVICE
                         </button>
                     </div>
@@ -847,25 +852,44 @@ function updateDashboard(data) {
                 statusBadge.className = `status-badge-tech pdm-badge ${statusInfo.badgeClass}`;
             }
 
+            // Update machine class and location sub-badge
+            const classSubEl = cardContainer.querySelector('.machine-class-sub');
+            if (classSubEl) {
+                const assetClass = machineData.machine_type ? machineData.machine_type.toUpperCase() : 'INDUSTRIAL ASSET';
+                const loc = machineData.location ? machineData.location.toUpperCase() : 'MAIN FLOOR';
+                classSubEl.textContent = `${assetClass} // ${loc}`;
+            }
+
             // Update physical RUL gauge
             updateRulGauge(cardContainer, machineData.rul_prediction, is_operational);
 
             if (is_operational) {
-                // High-density sensor readings table
+                // High-density calibrated sensor readings matrix (2x2 grid)
                 if (sensorReadingsEl && machineData.sensor_readings) {
-                    const sensorsHtml = Object.entries(machineData.sensor_readings).map(([sensorId, value]) => {
+                    const entries = Object.entries(machineData.sensor_readings);
+                    const isDegraded = machineData.state === 'Critical Failure Imminent' || machineData.state === 'Degrading' || machineData.state === 'Warning';
+                    
+                    const cellsHtml = entries.map(([sensorId, value]) => {
                         let sensorName = sensorId.replace(/_/g, ' ');
                         let unit = getSensorUnit(sensorId, machineData);
                         const displayValue = typeof value === 'number' ? value.toFixed(2) : 'N/A';
+                        const isAnomalous = isDegraded && (sensorName.toLowerCase().includes('vib') || sensorName.toLowerCase().includes('temp'));
 
                         return `
-                            <div class="flex justify-between items-center py-1 border-b border-[var(--pdm-border-hairline)] text-xs font-mono">
-                                <span class="text-[var(--pdm-text-secondary)] text-[11px] uppercase">${sensorName}</span>
-                                <span class="font-bold text-[var(--pdm-text-primary)]" style="font-variant-numeric: tabular-nums;">${displayValue} <span class="text-[10px] font-normal text-[var(--pdm-text-muted)]">${unit}</span></span>
+                            <div class="p-2 bg-[var(--mv-surface-sunken)] border border-[var(--mv-border-hairline)] rounded-[2px] flex flex-col justify-between">
+                                <div class="flex items-center justify-between text-[9px] font-mono text-[var(--mv-text-muted)] uppercase tracking-wider">
+                                    <span class="truncate">${sensorName}</span>
+                                    <span class="w-1.5 h-1.5 rounded-full ${isAnomalous ? 'bg-[var(--mv-status-warning)]' : 'bg-[var(--mv-status-normal)]'} flex-shrink-0"></span>
+                                </div>
+                                <div class="mt-1 flex items-baseline justify-between font-mono">
+                                    <span class="text-xs font-bold text-[var(--mv-text-primary)]" style="font-variant-numeric: tabular-nums;">${displayValue}</span>
+                                    <span class="text-[9px] text-[var(--mv-text-muted)]">${unit}</span>
+                                </div>
                             </div>
                         `;
                     }).join('');
-                    sensorReadingsEl.innerHTML = sensorsHtml || '<div class="text-[var(--pdm-text-muted)] text-xs font-mono py-2">NO SENSOR TELEMETRY</div>';
+
+                    sensorReadingsEl.innerHTML = `<div class="grid grid-cols-2 gap-1.5">${cellsHtml}</div>` || '<div class="text-[var(--mv-text-muted)] text-xs font-mono py-2">NO SENSOR TELEMETRY</div>';
                 }
 
                 // Update Health Metric in Footer

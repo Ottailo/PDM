@@ -4,13 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>{% block title %}PDM — Industrial Predictive Maintenance{% endblock %}</title>
+    <title>{% block title %}Machivital — Autonomous Machinery Vitality & Telemetry{% endblock %}</title>
+
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/machivital-icon.svg') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#0d1015">
 
     <!-- DIN-Caliber Instrumentation Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
         rel="stylesheet">
 
     <!-- Tailwind CSS with OKLCH Theme Architecture -->
@@ -23,32 +27,46 @@
             theme: {
                 extend: {
                     colors: {
-                        'pdm-canvas': 'var(--pdm-canvas)',
-                        'pdm-surface-base': 'var(--pdm-surface-base)',
-                        'pdm-surface-raised': 'var(--pdm-surface-raised)',
-                        'pdm-surface-overlay': 'var(--pdm-surface-overlay)',
-                        'pdm-surface-sunken': 'var(--pdm-surface-sunken)',
-                        'pdm-border-hairline': 'var(--pdm-border-hairline)',
-                        'pdm-border-subtle': 'var(--pdm-border-subtle)',
-                        'pdm-border-strong': 'var(--pdm-border-strong)',
-                        'pdm-accent': 'var(--pdm-accent-base)',
-                        'pdm-accent-muted': 'var(--pdm-accent-muted)',
-                        'pdm-normal': 'var(--pdm-status-normal)',
-                        'pdm-warning': 'var(--pdm-status-warning)',
-                        'pdm-critical': 'var(--pdm-status-critical)',
-                        'pdm-offline': 'var(--pdm-status-offline)',
-                        'pdm-text-primary': 'var(--pdm-text-primary)',
-                        'pdm-text-secondary': 'var(--pdm-text-secondary)',
-                        'pdm-text-muted': 'var(--pdm-text-muted)',
-                        /* Backward compatibility aliases */
-                        'electric-blue': 'var(--pdm-accent-base)',
-                        'silver': 'var(--pdm-text-secondary)',
-                        'warning-amber': 'var(--pdm-status-warning)',
-                        'success-green': 'var(--pdm-status-normal)',
-                        'critical-red': 'var(--pdm-status-critical)',
+                        /* Machivital Primary Design Tokens (Archetype E: Signal Density) */
+                        'mv-canvas': 'var(--mv-canvas)',
+                        'mv-surface-base': 'var(--mv-surface-base)',
+                        'mv-surface-raised': 'var(--mv-surface-raised)',
+                        'mv-surface-overlay': 'var(--mv-surface-overlay)',
+                        'mv-surface-sunken': 'var(--mv-surface-sunken)',
+                        'mv-border-hairline': 'var(--mv-border-hairline)',
+                        'mv-border-subtle': 'var(--mv-border-subtle)',
+                        'mv-border-strong': 'var(--mv-border-strong)',
+                        'mv-accent': 'var(--mv-accent-base)',
+                        'mv-accent-muted': 'var(--mv-accent-muted)',
+                        'mv-normal': 'var(--mv-status-normal)',
+                        'mv-warning': 'var(--mv-status-warning)',
+                        'mv-critical': 'var(--mv-status-critical)',
+                        'mv-offline': 'var(--mv-status-offline)',
+                        'mv-text-primary': 'var(--mv-text-primary)',
+                        'mv-text-secondary': 'var(--mv-text-secondary)',
+                        'mv-text-muted': 'var(--mv-text-muted)',
+
+                        /* PDM Backward-Compatibility Mapping */
+                        'pdm-canvas': 'var(--mv-canvas)',
+                        'pdm-surface-base': 'var(--mv-surface-base)',
+                        'pdm-surface-raised': 'var(--mv-surface-raised)',
+                        'pdm-surface-overlay': 'var(--mv-surface-overlay)',
+                        'pdm-surface-sunken': 'var(--mv-surface-sunken)',
+                        'pdm-border-hairline': 'var(--mv-border-hairline)',
+                        'pdm-border-subtle': 'var(--mv-border-subtle)',
+                        'pdm-border-strong': 'var(--mv-border-strong)',
+                        'pdm-accent': 'var(--mv-accent-base)',
+                        'pdm-accent-muted': 'var(--mv-accent-muted)',
+                        'pdm-normal': 'var(--mv-status-normal)',
+                        'pdm-warning': 'var(--mv-status-warning)',
+                        'pdm-critical': 'var(--mv-status-critical)',
+                        'pdm-offline': 'var(--mv-status-offline)',
+                        'pdm-text-primary': 'var(--mv-text-primary)',
+                        'pdm-text-secondary': 'var(--mv-text-secondary)',
+                        'pdm-text-muted': 'var(--mv-text-muted)',
                     },
                     fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        sans: ['"Plus Jakarta Sans"', '-apple-system', 'sans-serif'],
                         display: ['"Chakra Petch"', 'sans-serif'],
                         space: ['"Chakra Petch"', 'sans-serif'],
                         jetbrains: ['"JetBrains Mono"', 'monospace'],
@@ -60,23 +78,23 @@
     </script>
 
     <!-- Industrial Design System CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=3.5">
 </head>
 
 <body
-    class="bg-[var(--pdm-canvas)] text-[var(--pdm-text-primary)] font-sans antialiased selection:bg-[var(--pdm-accent-base)] selection:text-black overflow-hidden h-screen h-[100dvh]">
+    class="bg-[var(--mv-canvas)] text-[var(--mv-text-primary)] font-sans antialiased selection:bg-[var(--mv-accent-base)] selection:text-black overflow-hidden h-screen h-[100dvh]">
 
     {% block content %}{% endblock %}
 
-    <!-- Common Scripts -->
+    <!-- Chart.js and Telemetry Engines -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script
         src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script
         src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
-    <script src="{{ url_for('static', filename='js/dashboard.js') }}?v=3.0"></script>
-    <script src="{{ url_for('static', filename='js/machine_management.js') }}?v=3.0"></script>
-    <script src="{{ url_for('static', filename='js/device_connection.js') }}?v=3.0"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}?v=3.5"></script>
+    <script src="{{ url_for('static', filename='js/machine_management.js') }}?v=3.5"></script>
+    <script src="{{ url_for('static', filename='js/device_connection.js') }}?v=3.5"></script>
 </body>
 
 </html>

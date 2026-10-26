@@ -1,74 +1,92 @@
-<!-- High-Density Industrial Control Header Strip -->
-<header class="h-12 border-b border-[var(--pdm-border-hairline)] bg-[var(--pdm-surface-base)] px-4 flex items-center justify-between flex-shrink-0 z-20">
-    <!-- Brand & System Telemetry Status -->
+<!-- High-Density Industrial Control Header Strip (Machivital Archetype E) -->
+<header class="h-13 border-b border-[var(--mv-border-hairline)] bg-[var(--mv-surface-base)] px-4 sm:px-5 flex items-center justify-between flex-shrink-0 z-30 select-none">
+    <!-- Brand & Industrial Telemetry Stream Status -->
     <div class="flex items-center gap-4">
-        <div class="flex items-center gap-2">
-            <span class="font-display font-bold text-sm tracking-wide text-[var(--pdm-accent-base)] uppercase">PDM</span>
-            <span class="text-xs text-[var(--pdm-border-strong)]">|</span>
-            <span class="font-display font-medium text-xs tracking-wider text-[var(--pdm-text-secondary)] uppercase hidden sm:inline">CONTROL CONSOLE</span>
-        </div>
+        <a href="/" class="flex items-center gap-2.5 group">
+            <!-- Machivital Precision Vitality Glyphs -->
+            <div class="w-7 h-7 rounded-[3px] bg-[var(--mv-surface-sunken)] border border-[var(--mv-border-subtle)] flex items-center justify-center group-hover:border-[var(--mv-accent-base)] transition-colors">
+                <svg class="w-4 h-4 text-[var(--mv-accent-base)]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h3.5l2.5-6 4 12 3-8 2.5 4h5.5" />
+                </svg>
+            </div>
+            <div class="flex flex-col">
+                <div class="flex items-center gap-1.5 leading-none">
+                    <span class="font-display font-bold text-sm tracking-wider text-[var(--mv-text-primary)]">MACHIVITAL</span>
+                    <span class="font-mono text-[9px] px-1 py-0.2 rounded-[2px] bg-[var(--mv-accent-muted)] text-[var(--mv-accent-base)] border border-[var(--mv-accent-base)]/30 font-semibold tracking-wider">v3.5</span>
+                </div>
+                <span class="font-mono text-[9px] text-[var(--mv-text-muted)] uppercase tracking-widest mt-0.5 hidden sm:inline">AUTONOMOUS MACHINERY VITALITY</span>
+            </div>
+        </a>
 
-        <div class="h-4 w-px bg-[var(--pdm-border-hairline)]"></div>
+        <div class="h-5 w-px bg-[var(--mv-border-hairline)] hidden md:block"></div>
 
-        <!-- Telemetry Heartbeat Ticker -->
-        <div class="flex items-center gap-2">
-            <span id="heartbeat-dot" class="pdm-ticker-dot" title="Telemetry Heartbeat"></span>
-            <span id="last-updated" class="font-mono text-[11px] text-[var(--pdm-text-muted)] uppercase tracking-wider">
-                STREAM CONNECTING...
-            </span>
-        </div>
-    </div>
-
-    <!-- Central Fleet KPI Readouts -->
-    <div class="flex items-center gap-3">
-        <!-- Online Fleet Counter -->
-        <div class="flex items-center gap-1.5 px-2.5 py-1 bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] rounded-[var(--pdm-radius-sm)]">
-            <span class="pdm-label text-[10px] text-[var(--pdm-text-muted)]">ONLINE</span>
-            <span id="kpi-online" class="font-mono text-xs font-bold text-[var(--pdm-status-normal)]">-</span>
-        </div>
-
-        <!-- Active Alerts Counter -->
-        <div class="flex items-center gap-1.5 px-2.5 py-1 bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] rounded-[var(--pdm-radius-sm)]">
-            <span class="pdm-label text-[10px] text-[var(--pdm-text-muted)]">ALERTS</span>
-            <span id="kpi-alerts" class="font-mono text-xs font-bold text-[var(--pdm-status-critical)]">-</span>
+        <!-- Real-Time Telemetry Stream Watchdog -->
+        <div class="hidden md:flex items-center gap-2 px-2.5 py-1 rounded-[2px] bg-[var(--mv-surface-sunken)] border border-[var(--mv-border-hairline)]">
+            <span id="heartbeat-dot" class="pdm-ticker-dot" title="Telemetry Ingestion Heartbeat"></span>
+            <div class="flex items-center gap-1.5 font-mono text-[10px]">
+                <span class="text-[var(--mv-text-secondary)] font-semibold tracking-wider">EDGE STREAM:</span>
+                <span id="last-updated" class="text-[var(--mv-text-primary)] uppercase tracking-wider">SYNCING...</span>
+            </div>
         </div>
     </div>
 
-    <!-- Actions & User Session Strip -->
+    <!-- Central Fleet Vitality KPI Instrumentation -->
+    <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Monitored Fleet Counter -->
+        <div class="flex items-center gap-2 px-2.5 py-1 bg-[var(--mv-surface-sunken)] border border-[var(--mv-border-hairline)] rounded-[2px]" title="Active Monitored Machinery">
+            <span class="text-[9px] font-mono uppercase tracking-wider text-[var(--mv-text-muted)]">FLEET</span>
+            <span id="kpi-online" class="font-mono text-xs font-bold text-[var(--mv-status-normal)] tabular-nums">-</span>
+        </div>
+
+        <!-- Active Degradation / Critical Alarms -->
+        <div class="flex items-center gap-2 px-2.5 py-1 bg-[var(--mv-surface-sunken)] border border-[var(--mv-border-hairline)] rounded-[2px]" title="Machines in Warning or Critical Status">
+            <span class="text-[9px] font-mono uppercase tracking-wider text-[var(--mv-text-muted)]">ALERTS</span>
+            <span id="kpi-alerts" class="font-mono text-xs font-bold text-[var(--mv-status-critical)] tabular-nums">-</span>
+        </div>
+
+        <!-- Telemetry Frequency Tag -->
+        <div class="hidden xl:flex items-center gap-1.5 px-2.5 py-1 bg-[var(--mv-surface-sunken)] border border-[var(--mv-border-hairline)] rounded-[2px]" title="Edge Ingest Sampling Frequency">
+            <span class="text-[9px] font-mono uppercase tracking-wider text-[var(--mv-text-muted)]">INGEST</span>
+            <span class="font-mono text-xs font-medium text-[var(--mv-text-secondary)] tabular-nums">0.5 Hz / 2.0s</span>
+        </div>
+    </div>
+
+    <!-- Actions & Operational Controls Strip -->
     <div class="flex items-center gap-2">
-        <!-- Mobile Remote View Trigger -->
+        <!-- Field Remote Surveillance Handoff Trigger -->
         <button onclick="openMobileRemoteModal()"
-            class="pdm-btn text-xs py-1 px-2.5 h-7 bg-[var(--pdm-surface-raised)] border-[var(--pdm-border-subtle)] hover:border-[var(--pdm-accent-base)] text-[var(--pdm-text-primary)]"
-            title="Launch Mobile Remote Surveillance for Field Engineers">
-            <svg class="w-3.5 h-3.5 text-[var(--pdm-accent-base)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            class="pdm-btn text-xs py-1.5 px-3 h-8 bg-[var(--mv-surface-raised)] border-[var(--mv-border-subtle)] hover:border-[var(--mv-accent-base)] text-[var(--mv-text-primary)] group"
+            title="Launch Field Technician Remote Surveillance (Mobile QR & Web App)">
+            <svg class="w-3.5 h-3.5 text-[var(--mv-accent-base)] group-hover:scale-105 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"/>
             </svg>
-            <span class="hidden sm:inline">MOBILE REMOTE</span>
+            <span class="hidden sm:inline font-mono tracking-wider">FIELD REMOTE</span>
         </button>
 
         {% if current_user.role == 'admin' %}
+        <!-- Asset & ML Engineering Console -->
         <button onclick="showMachineManagement()"
-            class="pdm-btn text-xs py-1 px-2.5 h-7 bg-[var(--pdm-surface-raised)] border-[var(--pdm-border-subtle)] hover:border-[var(--pdm-accent-base)] text-[var(--pdm-text-primary)]"
-            title="Machinery & Data Management">
-            <svg class="w-3.5 h-3.5 text-[var(--pdm-accent-base)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            class="pdm-btn text-xs py-1.5 px-3 h-8 bg-[var(--mv-surface-raised)] border-[var(--mv-border-subtle)] hover:border-[var(--mv-accent-base)] text-[var(--mv-text-primary)]"
+            title="Configure Asset Profiles, Register Sensors, and Calibrate Predictive ML Models">
+            <svg class="w-3.5 h-3.5 text-[var(--mv-accent-base)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
             </svg>
-            <span class="hidden sm:inline">ENGINEERING</span>
+            <span class="hidden md:inline font-mono tracking-wider">ENGINEERING</span>
         </button>
         {% endif %}
 
-        <!-- User Role Badge -->
-        <span class="font-mono text-[10px] uppercase px-2 py-0.5 rounded-[var(--pdm-radius-sm)] bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] text-[var(--pdm-text-secondary)] hidden md:inline">
+        <!-- User Role Pill -->
+        <span class="font-mono text-[10px] uppercase px-2 py-1 rounded-[2px] bg-[var(--mv-surface-sunken)] border border-[var(--mv-border-hairline)] text-[var(--mv-text-secondary)] hidden lg:inline">
             {{ current_user.username }} [{{ current_user.role }}]
         </span>
 
         <!-- Logout Trigger -->
         <a href="{{ url_for('auth.logout') }}"
-            class="pdm-btn text-xs py-1 px-2 h-7 bg-transparent border-transparent hover:border-[var(--pdm-border-subtle)] text-[var(--pdm-text-muted)] hover:text-[var(--pdm-status-critical)]"
-            title="Terminate Session">
+            class="pdm-btn text-xs py-1.5 px-2.5 h-8 bg-transparent border-transparent hover:border-[var(--mv-border-subtle)] text-[var(--mv-text-muted)] hover:text-[var(--mv-status-critical)]"
+            title="Terminate Operational Session">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
             </svg>
         </a>
     </div>
