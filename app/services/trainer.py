@@ -9,7 +9,7 @@ import json
 import logging
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler
+# Optional ML imports: scikit-learn and tensorflow are loaded lazily when training is invoked
 import joblib
 
 logger = logging.getLogger(__name__)
@@ -34,6 +34,7 @@ def train_model_for_template(template_name, epochs=5, num_samples=5000, csv_path
         if num_sensors == 0:
             return False, {}, f"No sensors configured for template '{template_name}'."
 
+        from sklearn.preprocessing import MinMaxScaler
         import tensorflow as tf
         import keras
         from keras import layers
