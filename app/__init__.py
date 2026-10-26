@@ -133,6 +133,10 @@ def create_app(config=None):
     @application.route('/dashboard')
     def dashboard():
         return render_template('dashboard.html')
+
+    @application.route('/api/index')
+    def api_index_handler():
+        return render_template('dashboard.html')
     
     @application.route('/mobile')
     def mobile_surveillance():

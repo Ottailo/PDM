@@ -28,6 +28,15 @@ def app(environ, start_response):
         start_response(status, response_headers)
         return [f"PDM Vercel Boot Exception:\n\n{boot_error}".encode('utf-8')]
     
+    # Path correction for Vercel rewrites:
+    # When rewritten to /api/index, restore original user path from Vercel headers
+    matched_path = environ.get('HTTP_X_MATCHED_PATH') or environ.get('HTTP_X_FORWARDED_URI') or environ.get('RAW_URI')
+    if matched_path:
+        clean_path = matched_path.split('?')[0]
+        # Only rewrite if current path is pointing to the function handler itself
+        if environ.get('PATH_INFO') in ['/api/index', '/api/index.py']:
+            environ['PATH_INFO'] = clean_path
+    
     try:
         return flask_app.wsgi_app(environ, start_response)
     except Exception:
