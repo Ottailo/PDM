@@ -9,6 +9,9 @@ root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if root_dir not in sys.path:
     sys.path.insert(0, root_dir)
 
+# Explicitly flag Vercel serverless environment before importing app modules
+os.environ['VERCEL'] = '1'
+
 try:
     from app import create_app
     app = create_app()

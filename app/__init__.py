@@ -149,10 +149,12 @@ def create_app(config=None):
         # Import models to ensure they are registered with SQLAlchemy
         import app.models
         
-        # Enable WAL mode for SQLite concurrency
+        # Enable WAL mode for SQLite concurrency (local/VPS only; skip on serverless Lambda/Vercel)
         from sqlalchemy import event
         @event.listens_for(db.engine, "connect")
         def set_sqlite_pragma(dbapi_connection, connection_record):
+            if os.environ.get('VERCEL') or os.environ.get('AWS_LAMBDA_FUNCTION_NAME'):
+                return
             try:
                 cursor = dbapi_connection.cursor()
                 cursor.execute("PRAGMA journal_mode=WAL")

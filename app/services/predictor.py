@@ -16,41 +16,49 @@ import contextlib
 # CRITICAL: Import standalone Keras FIRST before any TensorFlow imports
 # This ensures standalone Keras 3.x is used for model loading
 _standalone_keras = None
-try:
-    import keras
-    # Verify it's standalone keras (version 3.x)
-    if hasattr(keras, '__version__') and keras.__version__.startswith('3.'):
-        _standalone_keras = keras
-        # Store reference to prevent TensorFlow from overriding it
-        _standalone_keras_load_model = keras.models.load_model
-except (ImportError, AttributeError):
-    pass
+if not os.environ.get('VERCEL') and not os.environ.get('AWS_LAMBDA_FUNCTION_NAME'):
+    try:
+        import keras
+        # Verify it's standalone keras (version 3.x)
+        if hasattr(keras, '__version__') and keras.__version__.startswith('3.'):
+            _standalone_keras = keras
+            # Store reference to prevent TensorFlow from overriding it
+            _standalone_keras_load_model = keras.models.load_model
+    except (ImportError, AttributeError):
+        pass
 
 @contextlib.contextmanager
 def suppress_output():
-    # Flush Python-level buffers before redirecting low-level FDs
-    sys.stdout.flush()
-    sys.stderr.flush()
-    
-    # Open a pair of null files
-    null_fds = [os.open(os.devnull, os.O_RDWR) for x in range(2)]
-    # Save the actual stdout (1) and stderr (2) file descriptors.
-    save_fds = [os.dup(1), os.dup(2)]
-    try:
-        # Assign the null pointers to stdout and stderr.
-        os.dup2(null_fds[0], 1)
-        os.dup2(null_fds[1], 2)
+    # If in serverless (e.g. Vercel/Lambda), never touch OS file descriptors
+    if os.environ.get('VERCEL') or os.environ.get('AWS_LAMBDA_FUNCTION_NAME'):
         yield
-    finally:
-        # Re-assign the real stdout/stderr back to (1) and (2)
-        os.dup2(save_fds[0], 1)
-        os.dup2(save_fds[1], 2)
-        # Close the null files
-        for fd in null_fds:
-            os.close(fd)
-        # Close the saved fds
-        for fd in save_fds:
-            os.close(fd)
+        return
+    try:
+        # Flush Python-level buffers before redirecting low-level FDs
+        sys.stdout.flush()
+        sys.stderr.flush()
+        
+        # Open a pair of null files
+        null_fds = [os.open(os.devnull, os.O_RDWR) for x in range(2)]
+        # Save the actual stdout (1) and stderr (2) file descriptors.
+        save_fds = [os.dup(1), os.dup(2)]
+        try:
+            # Assign the null pointers to stdout and stderr.
+            os.dup2(null_fds[0], 1)
+            os.dup2(null_fds[1], 2)
+            yield
+        finally:
+            # Re-assign the real stdout/stderr back to (1) and (2)
+            os.dup2(save_fds[0], 1)
+            os.dup2(save_fds[1], 2)
+            # Close the null files
+            for fd in null_fds:
+                os.close(fd)
+            # Close the saved fds
+            for fd in save_fds:
+                os.close(fd)
+    except Exception:
+        yield
 
 from app import db
 from app.models.sensor_data import SensorData, MachineState
@@ -89,6 +97,9 @@ class PredictiveService:
 
     def _try_import_tf(self):
         """Try to import Keras/TensorFlow, return (load_model_func, backend_name)."""
+        if os.environ.get('VERCEL') or os.environ.get('AWS_LAMBDA_FUNCTION_NAME'):
+            logger.info("Serverless environment detected (Vercel/Lambda) - running predictive engine in heuristic mode")
+            return None, None
         try:
             # Try standalone keras first (Keras 3)
             with suppress_output():
