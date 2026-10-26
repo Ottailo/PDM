@@ -3,6 +3,7 @@ Vercel Serverless WSGI Entrypoint for PDM (Predictive Maintenance Telemetry Cons
 """
 import os
 import sys
+import traceback
 
 # Ensure project root directory is on sys.path
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -12,20 +13,29 @@ if root_dir not in sys.path:
 # Explicitly flag Vercel serverless environment before importing app modules
 os.environ['VERCEL'] = '1'
 
+boot_error = None
+flask_app = None
 try:
     from app import create_app
-    app = create_app()
-except Exception as boot_exc:
-    import traceback
-    boot_traceback = traceback.format_exc()
-    from flask import Flask, Response
-    app = Flask('pdm_fallback')
+    flask_app = create_app()
+except Exception:
+    boot_error = traceback.format_exc()
+
+def app(environ, start_response):
+    if boot_error or flask_app is None:
+        status = '500 Internal Server Error'
+        response_headers = [('Content-Type', 'text/plain; charset=utf-8')]
+        start_response(status, response_headers)
+        return [f"PDM Vercel Boot Exception:\n\n{boot_error}".encode('utf-8')]
     
-    @app.route('/', defaults={'path': ''})
-    @app.route('/<path:path>')
-    def catch_all(path):
-        return Response(
-            f"PDM Serverless Boot Exception:\n\n{boot_traceback}",
-            mimetype='text/plain; charset=utf-8',
-            status=500
-        )
+    try:
+        return flask_app.wsgi_app(environ, start_response)
+    except Exception:
+        req_error = traceback.format_exc()
+        status = '500 Internal Server Error'
+        response_headers = [('Content-Type', 'text/plain; charset=utf-8')]
+        start_response(status, response_headers)
+        return [f"PDM Vercel Request Exception:\n\n{req_error}".encode('utf-8')]
+
+# WSGI aliases
+application = app

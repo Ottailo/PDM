@@ -74,10 +74,11 @@ def create_app(config=None):
         migrate.init_app(application, db)
     except Exception:
         pass
-    try:
-        socketio.init_app(application, cors_allowed_origins="*")
-    except Exception:
-        pass
+    if not os.environ.get('VERCEL') and not os.environ.get('AWS_LAMBDA_FUNCTION_NAME'):
+        try:
+            socketio.init_app(application, cors_allowed_origins="*")
+        except Exception:
+            pass
     
     # Initialize LoginManager
     login_manager = LoginManager()
