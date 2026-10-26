@@ -4,7 +4,10 @@ from app.models.user import User
 from app import db
 from functools import wraps
 import time
-import psutil
+try:
+    import psutil
+except ImportError:
+    psutil = None
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -79,8 +82,14 @@ def delete_user(user_id):
 @admin_required
 def system_stats():
     # Basic system stats using psutil
-    cpu_percent = psutil.cpu_percent()
-    memory = psutil.virtual_memory()
+    try:
+        cpu_percent = psutil.cpu_percent() if psutil else 0.0
+    except Exception:
+        cpu_percent = 0.0
+    try:
+        memory_percent = psutil.virtual_memory().percent if psutil else 0.0
+    except Exception:
+        memory_percent = 0.0
     
     # Database stats (simple check)
     try:
@@ -91,7 +100,7 @@ def system_stats():
         
     return jsonify({
         'cpu_usage': cpu_percent,
-        'memory_usage': memory.percent,
+        'memory_usage': memory_percent,
         'db_status': db_status,
         'active_sessions': 1 # Placeholder for now
     })

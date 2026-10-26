@@ -9,7 +9,20 @@ root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if root_dir not in sys.path:
     sys.path.insert(0, root_dir)
 
-from app import create_app
-
-# Vercel's Python runtime directly discovers 'app' as a Flask WSGI application
-app = create_app()
+try:
+    from app import create_app
+    app = create_app()
+except Exception as boot_exc:
+    import traceback
+    boot_traceback = traceback.format_exc()
+    from flask import Flask, Response
+    app = Flask('pdm_fallback')
+    
+    @app.route('/', defaults={'path': ''})
+    @app.route('/<path:path>')
+    def catch_all(path):
+        return Response(
+            f"PDM Serverless Boot Exception:\n\n{boot_traceback}",
+            mimetype='text/plain; charset=utf-8',
+            status=500
+        )
