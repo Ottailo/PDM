@@ -39,12 +39,12 @@ Chart.defaults.font.size = 10;
 // MAINTENANCE & SERVICING PROTOCOL
 // ============================================================================
 
-async function performMaintenance(machineId) {
-    console.log('[MAINTENANCE] Initiating service protocol for:', machineId);
-    showPartSelectionDialog(machineId);
+async function performMaintenance(machineId, preSelectedParts = []) {
+    console.log('[MAINTENANCE] Initiating service protocol for:', machineId, preSelectedParts);
+    showPartSelectionDialog(machineId, preSelectedParts);
 }
 
-function showPartSelectionDialog(machineId) {
+function showPartSelectionDialog(machineId, preSelectedParts = []) {
     const machineType = machineId.split('_')[0];
 
     const serviceableParts = {
@@ -136,10 +136,10 @@ function showPartSelectionDialog(machineId) {
     `;
 
     document.body.insertAdjacentHTML('beforeend', modalHTML);
-    setupPartSelectionEvents(machineId);
+    setupPartSelectionEvents(machineId, preSelectedParts);
 }
 
-function setupPartSelectionEvents(machineId) {
+function setupPartSelectionEvents(machineId, preSelectedParts = []) {
     const modal = document.getElementById('part-selection-modal');
     const closeBtn = document.getElementById('part-selection-close');
     const cancelBtn = document.getElementById('cancel-service');
@@ -185,6 +185,30 @@ function setupPartSelectionEvents(machineId) {
             updateSelection();
         });
     });
+
+    // Auto-select parts recommended by AI Diagnostic Advisor if provided
+    if (Array.isArray(preSelectedParts) && preSelectedParts.length > 0) {
+        document.querySelectorAll('.part-option').forEach(option => {
+            const partName = option.dataset.part;
+            const partTime = parseInt(option.dataset.time, 10);
+            const checkbox = option.querySelector('input[type="checkbox"]');
+
+            const isMatch = preSelectedParts.some(p => 
+                typeof p === 'string' && (
+                    p.toLowerCase().includes(partName.toLowerCase()) || 
+                    partName.toLowerCase().includes(p.toLowerCase()) ||
+                    (partName.includes(' ') && p.toLowerCase().includes(partName.split(' ')[0].toLowerCase()))
+                )
+            );
+
+            if (isMatch) {
+                checkbox.checked = true;
+                selectedParts.push({ name: partName, time: partTime });
+                option.classList.add('border-[var(--pdm-accent-base)]');
+            }
+        });
+        updateSelection();
+    }
 
     closeBtn.addEventListener('click', closeModal);
     cancelBtn.addEventListener('click', closeModal);
@@ -389,6 +413,10 @@ function getStatusInfo(state) {
         'degrading': { text: 'DEGRADING', badgeClass: 'pdm-badge-warning', statusKey: 'WARNING' },
         'critical_failure_imminent': { text: 'CRITICAL', badgeClass: 'pdm-badge-critical', statusKey: 'CRITICAL' },
         'critical': { text: 'CRITICAL', badgeClass: 'pdm-badge-critical', statusKey: 'CRITICAL' },
+        'signal_dropped': { text: 'SIGNAL DROPPED', badgeClass: 'pdm-badge-critical', statusKey: 'SIGNAL_DROPPED' },
+        'communication_lost': { text: 'COMM LOST', badgeClass: 'pdm-badge-critical', statusKey: 'SIGNAL_DROPPED' },
+        'awaiting_telemetry': { text: 'AWAITING EDGE', badgeClass: 'pdm-badge-offline', statusKey: 'AWAITING_TELEMETRY' },
+        'calibrating': { text: 'CALIBRATING', badgeClass: 'pdm-badge-accent', statusKey: 'CALIBRATING' },
         'maintenance': { text: 'SERVICING', badgeClass: 'pdm-badge-offline', statusKey: 'UNDER_MAINTENANCE' },
         'scheduled_maintenance': { text: 'MAINTENANCE', badgeClass: 'pdm-badge-offline', statusKey: 'UNDER_MAINTENANCE' },
         'off': { text: 'OFFLINE', badgeClass: 'pdm-badge-offline', statusKey: 'OFFLINE' }
@@ -526,6 +554,12 @@ function createMachineCard(machineId) {
                         <span class="machine-rul-footer" style="font-variant-numeric: tabular-nums;">RUL: --</span>
                     </div>
                     <div class="flex items-center gap-1.5">
+                        <button data-action="connect" data-machine-id="${machineId}" class="pdm-btn text-[10px] py-1 px-2 h-7 bg-[var(--pdm-surface-raised)] border-[var(--pdm-border-subtle)] text-[var(--pdm-text-secondary)] hover:text-[var(--pdm-text-primary)]" title="Connect Physical Machine Gateway">
+                            GATEWAY
+                        </button>
+                        <button data-action="diagnose" data-machine-id="${machineId}" class="pdm-btn text-[10px] py-1 px-2 h-7 border-[var(--pdm-accent-base)] text-[var(--pdm-accent-base)] hover:bg-[var(--pdm-accent-subtle)]" title="Autonomous AI Diagnostic Advisor">
+                            <span class="inline-block w-1.5 h-1.5 rounded-full bg-[var(--pdm-accent-base)] animate-pulse mr-1"></span>ADVISOR
+                        </button>
                         <button data-action="history" data-machine-id="${machineId}" class="pdm-btn text-[10px] py-1 px-2 h-7 bg-[var(--pdm-surface-raised)] border-[var(--pdm-border-subtle)] text-[var(--pdm-text-secondary)] hover:text-[var(--pdm-text-primary)]" title="Inspect Sensor History">
                             HISTORY
                         </button>
@@ -711,6 +745,16 @@ function updateSidebar(data) {
                 ` : ''}
 
                 ${rcaHtml}
+
+                <div class="mt-2.5 pt-2 border-t border-[var(--pdm-border-hairline)] flex items-center justify-between">
+                    <button data-action="diagnose" data-machine-id="${item.id}" class="text-[10px] font-mono text-[var(--pdm-accent-base)] hover:underline flex items-center gap-1 cursor-pointer">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[var(--pdm-accent-base)] animate-pulse"></span>
+                        <span>[AI DIAGNOSTICS]</span>
+                    </button>
+                    <button data-action="service" data-machine-id="${item.id}" class="text-[10px] font-mono text-[var(--pdm-text-secondary)] hover:text-[var(--pdm-text-primary)] cursor-pointer">
+                        [DISPATCH]
+                    </button>
+                </div>
             </li>
         `;
     }).join('');
@@ -1084,6 +1128,20 @@ function updateHistoryChart(data) {
 // Event delegation on machine grid
 if (machineGrid) {
     machineGrid.addEventListener('click', (e) => {
+        const connectBtn = e.target.closest('[data-action="connect"]');
+        if (connectBtn) {
+            if (typeof showDeviceConnectionModal === 'function') {
+                showDeviceConnectionModal(connectBtn.dataset.machineId);
+            }
+            return;
+        }
+
+        const diagnoseBtn = e.target.closest('[data-action="diagnose"]');
+        if (diagnoseBtn) {
+            showAiAdvisorModal(diagnoseBtn.dataset.machineId);
+            return;
+        }
+
         const serviceBtn = e.target.closest('[data-action="service"]');
         if (serviceBtn) {
             performMaintenance(serviceBtn.dataset.machineId);
@@ -1094,6 +1152,174 @@ if (machineGrid) {
         if (historyBtn) {
             showHistoryModal(historyBtn.dataset.machineId);
             return;
+        }
+    });
+}
+
+// Event delegation on sidebar watchlist alerts
+if (ttfListEl) {
+    ttfListEl.addEventListener('click', (e) => {
+        const diagnoseBtn = e.target.closest('[data-action="diagnose"]');
+        if (diagnoseBtn) {
+            showAiAdvisorModal(diagnoseBtn.dataset.machineId);
+            return;
+        }
+
+        const serviceBtn = e.target.closest('[data-action="service"]');
+        if (serviceBtn) {
+            performMaintenance(serviceBtn.dataset.machineId);
+            return;
+        }
+    });
+}
+
+// ============================================================================
+// AI COGNITIVE DIAGNOSTIC ADVISOR MODAL
+// ============================================================================
+
+let currentAdvisorMachineId = null;
+let currentAdvisorParts = [];
+
+function showAiAdvisorModal(machineId) {
+    const modalOverlay = document.getElementById('ai-advisor-modal-overlay');
+    if (!modalOverlay) return;
+
+    currentAdvisorMachineId = machineId;
+    currentAdvisorParts = [];
+
+    const titleEl = document.getElementById('ai-advisor-title');
+    const badgeEl = document.getElementById('ai-advisor-severity-badge');
+    const timestampEl = document.getElementById('ai-advisor-timestamp');
+    const headingEl = document.getElementById('ai-advisor-heading');
+    const durationEl = document.getElementById('ai-advisor-duration');
+    const causeEl = document.getElementById('ai-advisor-cause');
+    const evidenceEl = document.getElementById('ai-advisor-evidence');
+    const actionsEl = document.getElementById('ai-advisor-actions');
+    const partsEl = document.getElementById('ai-advisor-parts');
+    const riskEl = document.getElementById('ai-advisor-risk');
+    const dispatchBtn = document.getElementById('ai-advisor-dispatch-btn');
+
+    if (titleEl) titleEl.textContent = `COGNITIVE ADVISORY: ${machineId.replace(/_/g, ' ')}`;
+    if (headingEl) headingEl.textContent = `CONSULTING OMNIROUTE REASONING ENGINE...`;
+    if (badgeEl) {
+        badgeEl.textContent = `ANALYZING`;
+        badgeEl.className = `pdm-tag pdm-tag-normal text-[10px] uppercase font-mono animate-pulse`;
+    }
+    if (timestampEl) timestampEl.textContent = `SYNTHESIZING TELEMETRY VECTOR`;
+    if (durationEl) durationEl.textContent = `-- MIN`;
+    if (causeEl) causeEl.textContent = `Evaluating multivariate sensor deviation, envelope drift and failure signature...`;
+    if (evidenceEl) evidenceEl.innerHTML = `<li class="text-[var(--pdm-text-muted)] animate-pulse">Running calibrated boundary limit checks...</li>`;
+    if (actionsEl) actionsEl.innerHTML = `<div class="text-[var(--pdm-text-muted)] animate-pulse">Formulating actionable mechatronic mitigation checklist...</div>`;
+    if (partsEl) partsEl.innerHTML = `<span class="pdm-tag text-[10px] font-mono text-[var(--pdm-text-muted)]">IDENTIFYING SUBSYSTEMS...</span>`;
+    if (riskEl) riskEl.textContent = `Evaluating operational failure cascade probability...`;
+    if (dispatchBtn) dispatchBtn.disabled = true;
+
+    modalOverlay.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+
+    fetch('/api/ai-diagnostics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ machine_id: machineId })
+    })
+    .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+    })
+    .then(data => {
+        if (!data) throw new Error("Empty diagnostic payload");
+
+        const severity = data.severity || 'NOMINAL';
+        const badgeClass = severity === 'CRITICAL' ? 'pdm-tag-critical' : (severity === 'WARNING' ? 'pdm-tag-warning' : 'pdm-tag-normal');
+
+        if (badgeEl) {
+            badgeEl.textContent = severity;
+            badgeEl.className = `pdm-tag ${badgeClass} text-[10px] uppercase font-mono`;
+        }
+
+        if (headingEl) headingEl.textContent = data.diagnosis_title || 'Autonomous Telemetry Assessment';
+        if (timestampEl) {
+            const timeStr = data.timestamp ? new Date(data.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString();
+            timestampEl.textContent = `${timeStr} | ${data.advisor_provider || 'OmniRoute'}`;
+        }
+        if (durationEl) durationEl.textContent = `${data.estimated_downtime_minutes || 30} MINUTES`;
+        if (causeEl) causeEl.textContent = data.physical_root_cause || 'All observed telemetry within nominal bounds.';
+
+        // Evidence
+        if (evidenceEl) {
+            const evList = Array.isArray(data.evidence) && data.evidence.length > 0 ? data.evidence : ['Sensor channels operating within nominal calibrated baseline bounds.'];
+            evidenceEl.innerHTML = evList.map(e => `
+                <li class="flex items-start gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[var(--pdm-accent-base)] mt-1.5 flex-shrink-0"></span>
+                    <span>${e}</span>
+                </li>
+            `).join('');
+        }
+
+        // Actions with interactive checkboxes
+        if (actionsEl) {
+            const actList = Array.isArray(data.immediate_actions) && data.immediate_actions.length > 0 ? data.immediate_actions : ['Verify emergency stop circuits', 'Log inspection sign-off'];
+            actionsEl.innerHTML = actList.map((a, idx) => `
+                <label class="flex items-start gap-2.5 p-2 rounded-[var(--pdm-radius-sm)] bg-[var(--pdm-surface-sunken)] hover:bg-[var(--pdm-surface-raised)] cursor-pointer border border-[var(--pdm-border-hairline)] transition-colors">
+                    <input type="checkbox" id="ai-action-${idx}" class="mt-0.5 accent-[var(--pdm-accent-base)] w-3.5 h-3.5 cursor-pointer">
+                    <span class="text-xs text-[var(--pdm-text-secondary)] font-body">${a}</span>
+                </label>
+            `).join('');
+        }
+
+        // Parts
+        currentAdvisorParts = Array.isArray(data.required_spare_parts) ? data.required_spare_parts : [];
+        if (partsEl) {
+            if (currentAdvisorParts.length > 0) {
+                partsEl.innerHTML = currentAdvisorParts.map(p => `
+                    <span class="pdm-tag pdm-tag-normal font-mono text-[11px] text-[var(--pdm-accent-base)] border border-[var(--pdm-border-subtle)]">${p}</span>
+                `).join('');
+            } else {
+                partsEl.innerHTML = `<span class="text-[var(--pdm-text-muted)] text-[11px] font-mono">No replacement subsystems required.</span>`;
+            }
+        }
+
+        if (riskEl) riskEl.textContent = data.operational_risk || 'Zero secondary damage anticipated under current parameters.';
+        if (dispatchBtn) dispatchBtn.disabled = false;
+    })
+    .catch(err => {
+        console.error('AI Advisor error:', err);
+        if (headingEl) headingEl.textContent = `DIAGNOSTIC ADVISORY OFFLINE`;
+        if (badgeEl) {
+            badgeEl.textContent = `ERROR`;
+            badgeEl.className = `pdm-tag pdm-tag-critical text-[10px] uppercase font-mono`;
+        }
+        if (causeEl) causeEl.textContent = `Failed to contact OmniRoute Reasoning Engine (${err.message}). Using manual override protocol.`;
+        if (dispatchBtn) dispatchBtn.disabled = false;
+    });
+}
+
+function closeAiAdvisorModal() {
+    const modalOverlay = document.getElementById('ai-advisor-modal-overlay');
+    if (modalOverlay) modalOverlay.classList.add('hidden');
+    document.body.style.overflow = '';
+}
+
+// Bind AI Advisor modal triggers
+const aiAdvisorClose = document.getElementById('ai-advisor-close');
+const aiAdvisorDismiss = document.getElementById('ai-advisor-dismiss');
+const aiAdvisorOverlay = document.getElementById('ai-advisor-modal-overlay');
+const aiAdvisorDispatch = document.getElementById('ai-advisor-dispatch-btn');
+
+if (aiAdvisorClose) aiAdvisorClose.addEventListener('click', closeAiAdvisorModal);
+if (aiAdvisorDismiss) aiAdvisorDismiss.addEventListener('click', closeAiAdvisorModal);
+if (aiAdvisorOverlay) {
+    aiAdvisorOverlay.addEventListener('click', (e) => {
+        if (e.target === aiAdvisorOverlay) closeAiAdvisorModal();
+    });
+}
+if (aiAdvisorDispatch) {
+    aiAdvisorDispatch.addEventListener('click', () => {
+        const targetId = currentAdvisorMachineId;
+        const targetParts = currentAdvisorParts;
+        closeAiAdvisorModal();
+        if (targetId) {
+            performMaintenance(targetId, targetParts);
         }
     });
 }
@@ -1259,6 +1485,51 @@ function applyFilters() {
     if (lastDashboardData) {
         updateDashboard(lastDashboardData);
     }
+}
+
+// ============================================================================
+// MOBILE REMOTE SURVEILLANCE MODAL
+// ============================================================================
+
+function openMobileRemoteModal() {
+    const modal = document.getElementById('mobile-remote-modal');
+    if (!modal) return;
+    
+    const currentOrigin = window.location.origin;
+    const mobileUrl = `${currentOrigin}/mobile`;
+    
+    const urlDisplay = document.getElementById('mobile-remote-url-text');
+    if (urlDisplay) urlDisplay.textContent = mobileUrl;
+    
+    const qrImg = document.getElementById('mobile-qr-image');
+    if (qrImg) {
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(mobileUrl)}`;
+    }
+    
+    modal.classList.remove('hidden');
+}
+
+function closeMobileRemoteModal() {
+    const modal = document.getElementById('mobile-remote-modal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function copyMobileUrl() {
+    const urlDisplay = document.getElementById('mobile-remote-url-text');
+    const copyBtn = document.getElementById('copy-mob-url-btn');
+    if (!urlDisplay) return;
+    
+    navigator.clipboard.writeText(urlDisplay.textContent.trim()).then(() => {
+        if (copyBtn) {
+            const original = copyBtn.textContent;
+            copyBtn.textContent = 'COPIED!';
+            copyBtn.classList.add('text-emerald-400');
+            setTimeout(() => {
+                copyBtn.textContent = original;
+                copyBtn.classList.remove('text-emerald-400');
+            }, 2000);
+        }
+    });
 }
 
 // ============================================================================

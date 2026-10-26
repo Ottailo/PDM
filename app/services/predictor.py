@@ -439,6 +439,12 @@ class PredictiveService:
 
     def _heuristic_prediction(self, machine_id: str, df_window: pd.DataFrame) -> Dict[str, Any]:
         """Fallback heuristic prediction when ML models unavailable."""
+        # Check if OmniRoute zero-shot prediction is enabled
+        if os.environ.get("USE_OMNIROUTE_PREDICTIONS", "false").lower() == "true":
+            omni_pred = self.predict_with_omniroute(machine_id, df_window)
+            if omni_pred:
+                return omni_pred
+
         # machine_id is the Asset name (e.g. FILLING_001)
         asset = Asset.query.filter_by(name=machine_id).first()
         if not asset:
@@ -478,95 +484,252 @@ class PredictiveService:
     
     def _calculate_realistic_ttf(self, machine_id: str, df_window: pd.DataFrame, anomaly_details: Dict) -> int:
         """Calculate realistic time to failure based on sensor degradation patterns."""
-        # Simplified logic
-        return 48 # Default 48 hours
+        if df_window is None or df_window.empty or len(df_window) < 2:
+            return 48
+
+        # Inspect sensor slopes over the window
+        max_rate = 0.0
+        for col in df_window.columns:
+            series = df_window[col].dropna()
+            if len(series) >= 2:
+                rate = abs(float(series.iloc[-1] - series.iloc[0])) / len(series)
+                if rate > max_rate:
+                    max_rate = rate
+
+        if max_rate > 1.5:
+            return max(4, int(24 / max_rate))
+        elif max_rate > 0.5:
+            return max(12, int(48 / (max_rate + 0.5)))
+        return 48
+
+    def predict_with_omniroute(self, machine_id: str, df_window: pd.DataFrame) -> Optional[Dict[str, Any]]:
+        """Use OmniRoute LLM to analyze multivariate sequence and predict asset state & RUL."""
+        try:
+            from app.services.llm_advisor import LLMDiagnosticAdvisor
+            asset = Asset.query.filter_by(name=machine_id).first()
+            if not asset:
+                return None
+            latest_readings = df_window.iloc[-1].to_dict() if not df_window.empty else {}
+            context = {
+                "machine_type": asset.template.name if asset.template else "FILLING",
+                "state": "Evaluating",
+                "predicted_failure": "Unknown",
+                "health_score": 0.85,
+                "sensor_readings": latest_readings,
+                "thresholds": {}
+            }
+            diagnosis = LLMDiagnosticAdvisor.generate_diagnosis(machine_id, context)
+            if diagnosis:
+                severity = diagnosis.get('severity', 'NOMINAL')
+                state = "Critical Failure Imminent" if severity == "CRITICAL" else ("Degrading" if severity == "WARNING" else "Normal")
+                prob_deg = 0.85 if severity == "CRITICAL" else (0.45 if severity == "WARNING" else 0.05)
+                ttf = 12 if severity == "CRITICAL" else (48 if severity == "WARNING" else 168)
+                return {
+                    "state": state,
+                    "ttf_hours": ttf,
+                    "probability_degrading": prob_deg,
+                    "predicted_failure": diagnosis.get('diagnosis_title', 'Sensor Drift'),
+                    "anomaly_detected": severity in ["CRITICAL", "WARNING"],
+                    "anomaly_details": {"type": "omniroute_cognitive_signature", "reason": diagnosis.get('physical_root_cause')},
+                    "rca_steps": diagnosis.get('immediate_actions', [])
+                }
+        except Exception as e:
+            logger.debug(f"OmniRoute prediction failed for {machine_id}: {e}")
+        return None
 
     def get_predictions(self) -> Dict[str, Any]:
-        """Get predictions for all machines."""
+        """Get predictions for all machines with real-world edge heartbeat watchdog."""
         predictions = {}
         window_size = current_app.config['WINDOW_SIZE']
+        watchdog_timeout = current_app.config.get('TELEMETRY_WATCHDOG_TIMEOUT', 45)
+        now_utc = datetime.utcnow()
         
         assets = Asset.query.all()
         
         for asset in assets:
             machine_id = asset.name
-            machine_type = asset.template.name
+            machine_type = asset.template.name if asset.template else "FILLING"
             
-            # Get latest sensor data
-            # Note: SensorData.sensor_id is channel_id (e.g. FILLING_001_Speed)
+            # Prepare sensor thresholds and sensor info upfront
+            thresholds = {}
+            for asset_sensor in asset.sensors:
+                template_sensor = next((ts for ts in asset.template.sensors if ts.sensor_template_id == asset_sensor.sensor_template_id), None) if asset.template else None
+                min_t = template_sensor.default_threshold_min if template_sensor else 0
+                max_t = template_sensor.default_threshold_max if template_sensor else 100
+                
+                if asset_sensor.config_overrides:
+                    min_t = asset_sensor.config_overrides.get('warn', min_t)
+                    max_t = asset_sensor.config_overrides.get('crit', max_t)
+                    
+                thresholds[asset_sensor.sensor_template.name] = {
+                    "warn": min_t,
+                    "crit": max_t
+                }
+            
+            sensor_info = {
+                s.sensor_template.name: {
+                    "unit": s.sensor_template.unit,
+                    "label": s.sensor_template.name
+                } for s in asset.sensors
+            }
+
+            # Get machine state from DB
+            state = MachineState.query.filter_by(machine_id=machine_id).first()
+            true_status = state.status if state else "Unknown"
+
+            # Query latest sensor data
             sensor_data = (SensorData.query
                             .filter(SensorData.sensor_id.like(f"{machine_id}_%"))
                             .order_by(SensorData.timestamp.desc())
-                            .limit(window_size * len(asset.sensors))
+                            .limit(window_size * max(1, len(asset.sensors)))
                             .all())
                             
+            # CASE 1: Zero telemetry received
             if not sensor_data:
+                display_state = true_status if true_status in ['Maintenance', 'Scheduled Maintenance', 'Off'] else "Awaiting Telemetry"
+                predictions[machine_id] = {
+                    "machine_id": machine_id,
+                    "state": display_state,
+                    "machine_type": machine_type,
+                    "location": asset.location.name if asset.location else "Unknown",
+                    "ttf_hours": None,
+                    "rul_prediction": None,
+                    "probability_degrading": 0.0,
+                    "health_score": 1.0 if display_state == "Normal" else (None if display_state != "Maintenance" else 0.5),
+                    "sensor_data": {},
+                    "sensor_readings": {},
+                    "sensor_info": sensor_info,
+                    "predicted_failure": None,
+                    "anomaly_detected": False,
+                    "anomaly_details": None,
+                    "rca_steps": [],
+                    "thresholds": thresholds,
+                    "is_online": display_state == "Maintenance",
+                    "telemetry_status": "AWAITING_TELEMETRY",
+                    "last_seen_seconds": None,
+                    "watchdog_message": "Awaiting initial edge hardware telemetry stream."
+                }
+                continue
+                
+            # Filter clean valid readings
+            clean_readings = [r for r in sensor_data if r is not None and getattr(r, 'timestamp', None) is not None]
+            if not clean_readings:
+                display_state = true_status if true_status in ['Maintenance', 'Scheduled Maintenance', 'Off'] else "Awaiting Telemetry"
+                predictions[machine_id] = {
+                    "machine_id": machine_id,
+                    "state": display_state,
+                    "machine_type": machine_type,
+                    "location": asset.location.name if asset.location else "Unknown",
+                    "ttf_hours": None,
+                    "rul_prediction": None,
+                    "probability_degrading": 0.0,
+                    "health_score": 1.0 if display_state == "Normal" else (None if display_state != "Maintenance" else 0.5),
+                    "sensor_data": {},
+                    "sensor_readings": {},
+                    "sensor_info": sensor_info,
+                    "predicted_failure": None,
+                    "anomaly_detected": False,
+                    "anomaly_details": None,
+                    "rca_steps": [],
+                    "thresholds": thresholds,
+                    "is_online": display_state == "Maintenance",
+                    "telemetry_status": "AWAITING_TELEMETRY",
+                    "last_seen_seconds": None,
+                    "watchdog_message": "Awaiting initial edge hardware telemetry stream."
+                }
                 continue
                 
             # Convert to DataFrame
             df = pd.DataFrame([{
                 'timestamp': reading.timestamp,
-                'sensor': reading.sensor_id.split('_', 2)[-1], # Extract sensor name
+                'sensor': reading.sensor_id.split('_', 2)[-1],
                 'value': reading.value
-            } for reading in sensor_data])
+            } for reading in clean_readings])
             
             try:
                 df_pivot = df.pivot(index='timestamp', 
                                     columns='sensor', 
                                     values='value').sort_index()
             except ValueError:
-                # Handle duplicate entries
                 df_agg = df.groupby(['timestamp', 'sensor'])['value'].mean().reset_index()
                 df_pivot = df_agg.pivot(index='timestamp', columns='sensor', values='value').sort_index()
-                                
-            if len(df_pivot) < window_size:
+
+            # Heartbeat check
+            latest_reading_time = clean_readings[0].timestamp
+            elapsed_seconds = (now_utc - latest_reading_time).total_seconds()
+            is_stale = elapsed_seconds > watchdog_timeout
+
+            # CASE 2: Telemetry stopped / signal dropped
+            if is_stale and true_status not in ['Maintenance', 'Scheduled Maintenance', 'Off']:
+                predictions[machine_id] = {
+                    "machine_id": machine_id,
+                    "state": "Signal Dropped",
+                    "machine_type": machine_type,
+                    "location": asset.location.name if asset.location else "Unknown",
+                    "ttf_hours": None,
+                    "rul_prediction": None,
+                    "probability_degrading": 0.0,
+                    "health_score": None,
+                    "sensor_data": df_pivot.tail(10).to_dict('list'),
+                    "sensor_readings": df_pivot.iloc[-1].to_dict() if not df_pivot.empty else {},
+                    "sensor_info": sensor_info,
+                    "predicted_failure": "Signal Dropped / Communication Lost",
+                    "anomaly_detected": True,
+                    "anomaly_details": {
+                        "type": "heartbeat_timeout",
+                        "elapsed_seconds": round(elapsed_seconds, 1),
+                        "timeout_threshold": watchdog_timeout
+                    },
+                    "rca_steps": [
+                        "Verify physical Ethernet / RS-485 Modbus cabling",
+                        "Confirm edge agent service status (pdm_edge_agent.service)",
+                        "Check factory Wi-Fi / gateway IP reachability"
+                    ],
+                    "thresholds": thresholds,
+                    "is_online": False,
+                    "telemetry_status": "SIGNAL_DROPPED",
+                    "last_seen_seconds": round(elapsed_seconds, 1),
+                    "watchdog_message": f"Edge signal dropped {int(elapsed_seconds)}s ago. Check sensor gateway."
+                }
                 continue
-                
-            # Get machine state
-            state = MachineState.query.filter_by(machine_id=machine_id).first()
-            true_status = state.status if state else "Unknown"
-            
-            # Make predictions
-            if self.models_loaded and machine_type in self.models:
+
+            # CASE 3: Active telemetry stream (nominal or degrading)
+            predicted_state = "Normal"
+            prob_degrading = 0.0
+            ttf = None
+
+            if len(df_pivot) < window_size:
+                # Still accumulating initial window, use heuristic prediction
+                heuristic_result = self._heuristic_prediction(machine_id, df_pivot)
+                predicted_state = heuristic_result["state"]
+                prob_degrading = heuristic_result["probability_degrading"]
+                ttf = heuristic_result["ttf_hours"]
+            elif self.models_loaded and machine_type in self.models:
                 try:
                     input_window = self.preprocess_input(df_pivot.tail(window_size), machine_type)
                     model_output = self.models[machine_type].predict(input_window, verbose=0)
                     
-                    # Handle different model output structures
                     if isinstance(model_output, list) and len(model_output) == 2:
-                        # Model has both classification and regression outputs
                         class_pred, reg_pred = model_output
-                        
-                        # Handle Multi-Class Output (Improved Models: Normal, Warning, Degrading, Critical)
                         if class_pred.shape[-1] == 4:
-                            # Map class index to state name
-                            # 0=Normal, 1=Warning, 2=Degrading, 3=Critical
                             state_map = {
                                 0: "Normal",
                                 1: "Warning",
                                 2: "Degrading",
-                                3: DEGRADING_STATE_KEYWORD # "Critical Failure Imminent"
+                                3: DEGRADING_STATE_KEYWORD
                             }
-                            
                             pred_idx = np.argmax(class_pred[0])
                             predicted_state = state_map.get(pred_idx, "Unknown")
-                            
-                            # Prob degrading is probability of NOT being Normal
                             prob_degrading = 1.0 - float(class_pred[0][0])
-                            
-                            # Get TTF only if not Normal
                             if pred_idx > 0:
                                 normalized_ttf = reg_pred[0][0]
                                 ttf = float(self.rul_scalers[machine_type].inverse_transform([[normalized_ttf]])[0][0])
                                 ttf = max(0.0, round(ttf, 1))
                             else:
                                 ttf = None
-                                
-                        # Handle Binary Output (Old Models: Degrading Probability)
                         else:
                             prob_degrading = float(class_pred[0][0])
                             predicted_state = DEGRADING_STATE_KEYWORD if prob_degrading > 0.5 else "Normal"
-                            
                             if predicted_state == DEGRADING_STATE_KEYWORD:
                                 normalized_ttf = reg_pred[0][0]
                                 ttf = float(self.rul_scalers[machine_type].inverse_transform([[normalized_ttf]])[0][0])
@@ -574,22 +737,17 @@ class PredictiveService:
                             else:
                                 ttf = None
                     else:
-                        # Model only has one output, use heuristic (this is expected for some models)
-                        logger.debug(f"Model for {machine_type} has unexpected output structure, using heuristic")
                         heuristic_result = self._heuristic_prediction(machine_id, df_pivot)
                         predicted_state = heuristic_result["state"]
                         prob_degrading = heuristic_result["probability_degrading"]
                         ttf = heuristic_result["ttf_hours"]
-                        
                 except Exception as e:
                     logger.error(f"ML prediction failed for {machine_id}: {e}")
-                    # Fall back to heuristic
                     heuristic_result = self._heuristic_prediction(machine_id, df_pivot)
                     predicted_state = heuristic_result["state"]
                     prob_degrading = heuristic_result["probability_degrading"]
                     ttf = heuristic_result["ttf_hours"]
             else:
-                # Use heuristic prediction
                 heuristic_result = self._heuristic_prediction(machine_id, df_pivot)
                 predicted_state = heuristic_result["state"]
                 prob_degrading = heuristic_result["probability_degrading"]
@@ -605,38 +763,16 @@ class PredictiveService:
                 predicted_failure = self.predict_failure_type(machine_type, df_pivot)
                 # rca_steps = ... (fetch from DB or mock)
             
-            # Prepare sensor thresholds
-            thresholds = {}
-            for asset_sensor in asset.sensors:
-                # Get defaults from template sensor
-                template_sensor = next((ts for ts in asset.template.sensors if ts.sensor_template_id == asset_sensor.sensor_template_id), None)
-                min_t = template_sensor.default_threshold_min if template_sensor else 0
-                max_t = template_sensor.default_threshold_max if template_sensor else 100
-                
-                # Apply overrides if any
-                if asset_sensor.config_overrides:
-                    min_t = asset_sensor.config_overrides.get('warn', min_t)
-                    max_t = asset_sensor.config_overrides.get('crit', max_t)
-                    
-                thresholds[asset_sensor.sensor_template.name] = {
-                    "warn": min_t,
-                    "crit": max_t
-                }
-            
-            # Sensor info for frontend
-            sensor_info = {
-                s.sensor_template.name: {
-                    "unit": s.sensor_template.unit,
-                    "label": s.sensor_template.name
-                } for s in asset.sensors
-            }
-            
             # Log raw probabilities for debugging
             if 'class_pred' in locals() and class_pred is not None:
                 logger.debug(f"[{machine_id}] Prediction raw output: {class_pred[0]}")
                 
+            # Resolved final operational state (maintenance/off status takes precedence, otherwise predicted_state)
+            resolved_state = true_status if true_status in ['Maintenance', 'Scheduled Maintenance', 'Off'] else predicted_state
+
             predictions[machine_id] = {
-                "state": true_status if true_status != "Normal" else predicted_state,
+                "machine_id": machine_id,
+                "state": resolved_state,
                 "machine_type": machine_type, # Ensure machine_type is passed
                 "location": asset.location.name if asset.location else "Unknown",
                 "ttf_hours": ttf,
@@ -650,7 +786,11 @@ class PredictiveService:
                 "anomaly_detected": anomaly_detected,
                 "anomaly_details": anomaly_details,
                 "rca_steps": rca_steps,
-                "thresholds": thresholds
+                "thresholds": thresholds,
+                "is_online": True,
+                "telemetry_status": "LIVE",
+                "last_seen_seconds": round(elapsed_seconds, 1),
+                "watchdog_message": "Live edge telemetry stream active."
             }
                 
         return predictions
@@ -692,7 +832,7 @@ class PredictiveService:
         }
 
     def calculate_kpis(self) -> Dict[str, Any]:
-        """Calculate key performance indicators."""
+        """Calculate key performance indicators taking watchdog state into account."""
         assets = Asset.query.all()
         total_machines = len(assets)
         
@@ -703,18 +843,18 @@ class PredictiveService:
                 "active_alerts": 0
             }
             
-        # Join with MachineState
-        # This is inefficient, better to do a join query, but keeping it simple for now
+        predictions = self.get_predictions_for_machines([a.name for a in assets])
         online_machines = 0
         active_alerts = 0
         
         for asset in assets:
-            state = MachineState.query.filter_by(machine_id=asset.name).first()
-            if state:
-                if state.status not in ['Off', 'Maintenance', 'Scheduled Maintenance']:
-                    online_machines += 1
-                if state.status == DEGRADING_STATE_KEYWORD:
-                    active_alerts += 1
+            pred = predictions.get(asset.name, {})
+            state_val = pred.get("state", "Unknown")
+            is_online = pred.get("is_online", False)
+            if is_online:
+                online_machines += 1
+            if state_val in [DEGRADING_STATE_KEYWORD, "Critical", "Warning", "Signal Dropped"]:
+                active_alerts += 1
                           
         return {
             "machines_online": online_machines,
@@ -723,7 +863,7 @@ class PredictiveService:
         }
 
     def calculate_kpis_for_company(self, company_id: str) -> Dict[str, Any]:
-        """Calculate KPIs for a specific company."""
+        """Calculate KPIs for a specific company taking watchdog state into account."""
         assets = Asset.query.filter_by(company_id=company_id).all()
         total_machines = len(assets)
         
@@ -734,16 +874,18 @@ class PredictiveService:
                 "active_alerts": 0
             }
             
+        predictions = self.get_predictions_for_machines([a.name for a in assets])
         online_machines = 0
         active_alerts = 0
         
         for asset in assets:
-            state = MachineState.query.filter_by(machine_id=asset.name).first()
-            if state:
-                if state.status not in ['Off', 'Maintenance', 'Scheduled Maintenance']:
-                    online_machines += 1
-                if state.status == DEGRADING_STATE_KEYWORD:
-                    active_alerts += 1
+            pred = predictions.get(asset.name, {})
+            state_val = pred.get("state", "Unknown")
+            is_online = pred.get("is_online", False)
+            if is_online:
+                online_machines += 1
+            if state_val in [DEGRADING_STATE_KEYWORD, "Critical", "Warning", "Signal Dropped"]:
+                active_alerts += 1
                           
         return {
             "machines_online": online_machines,

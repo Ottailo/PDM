@@ -1,0 +1,18 @@
+{
+  "name": "PDM Industrial Remote Surveillance",
+  "short_name": "PDM Remote",
+  "start_url": "/mobile",
+  "display": "standalone",
+  "background_color": "#0e121b",
+  "theme_color": "#0e121b",
+  "orientation": "portrait-primary",
+  "description": "Continuous mobile plant surveillance, watchdog heartbeat telemetry, mechatronic diagnostics, and work orders for industrial factory operations.",
+  "icons": [
+    {
+      "src": "/static/img/pdm-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

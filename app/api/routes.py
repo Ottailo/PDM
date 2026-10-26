@@ -105,27 +105,41 @@ def get_history():
 
 
 @api_bp.route('/perform-maintenance', methods=['POST'])
+@api_bp.route('/request-maintenance', methods=['POST'])
 # @login_required - Public dashboard access
 def perform_maintenance():
     """Request maintenance for a specific machine."""
     try:
-        data = request.get_json()
+        data = request.get_json() or {}
         machine_id = data.get('machine_id')
+        parts = data.get('parts', [])
+        duration = data.get('estimated_duration', data.get('duration_minutes', 30))
         
         if not machine_id:
             return jsonify({"error": "machine_id is required"}), 400
         
         simulator = DataSimulator()
-        success = simulator.request_maintenance(machine_id)
+        success = simulator.request_maintenance(machine_id, parts=parts, duration_minutes=duration)
         
         if success:
-            return jsonify({"status": "success", "message": f"Maintenance requested for {machine_id}"}), 200
+            return jsonify({
+                "status": "success",
+                "message": f"Maintenance scheduled for {machine_id}",
+                "parts": parts,
+                "duration_minutes": duration
+            }), 200
         else:
             return jsonify({"error": "Failed to request maintenance"}), 500
             
     except Exception as e:
         current_app.logger.error(f"Maintenance API Error: {e}", exc_info=True)
         return jsonify({"error": "Internal server error"}), 500
+
+@api_bp.route('/ai-diagnostics', methods=['POST'])
+def run_ai_diagnostics():
+    """Proxy route to AI Diagnostic Advisor."""
+    from app.api.machine_management import run_ai_diagnostics as mgmt_ai_diagnostics
+    return mgmt_ai_diagnostics()
 
 @api_bp.route('/health')
 def health_check():

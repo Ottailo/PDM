@@ -36,19 +36,32 @@ def create_app(config=None):
     """
     application = Flask(__name__)
     
+    # Compute absolute project-anchored database path for rock-solid SQLite resolution
+    if os.environ.get('VERCEL'):
+        default_db_path = '/tmp/maintenance.db'
+        source_db = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'instance', 'maintenance.db'))
+        if os.path.exists(source_db) and not os.path.exists(default_db_path):
+            import shutil
+            try:
+                shutil.copyfile(source_db, default_db_path)
+            except Exception:
+                pass
+    else:
+        default_db_path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'instance', 'maintenance.db')).replace('\\', '/')
+
     # Default configuration
     application.config.update(
         SECRET_KEY=os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production'),
-        # Use PostgreSQL if available, else SQLite
-        SQLALCHEMY_DATABASE_URI=os.environ.get('DATABASE_URL', 'sqlite:///maintenance.db').replace('postgres://', 'postgresql://'),
+        # Use PostgreSQL if available, else SQLite with absolute path
+        SQLALCHEMY_DATABASE_URI=os.environ.get('DATABASE_URL', f'sqlite:///{default_db_path}').replace('postgres://', 'postgresql://'),
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
-        MODEL_BASE_DIR=os.environ.get('MODEL_BASE_DIR', os.path.join(os.getcwd(), 'models')),
+        MODEL_BASE_DIR=os.environ.get('MODEL_BASE_DIR', os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'models'))),
         SIMULATOR_UPDATE_INTERVAL=int(os.environ.get('SIMULATOR_UPDATE_INTERVAL', 1)),
         WINDOW_SIZE=int(os.environ.get('WINDOW_SIZE', 10)),
         ANOMALY_Z_SCORE_THRESHOLD=float(os.environ.get('ANOMALY_Z_SCORE_THRESHOLD', 4.0)),
         # New Configs
         API_KEY=os.environ.get('API_KEY', 'dev-api-key'),
-        ENABLE_SIMULATOR=os.environ.get('ENABLE_SIMULATOR', 'True').lower() == 'true'
+        ENABLE_SIMULATOR=os.environ.get('ENABLE_SIMULATOR', 'False').lower() == 'true'
     )
     
     # Override with provided config if any
@@ -107,6 +120,16 @@ def create_app(config=None):
     def dashboard():
         return render_template('dashboard.html')
     
+    @application.route('/mobile')
+    def mobile_surveillance():
+        """Dedicated mobile remote surveillance view for plant engineers and floor technicians."""
+        return render_template('mobile_dashboard.html')
+
+    @application.route('/manifest.json')
+    def manifest():
+        """Web App Manifest for mobile PWA installation."""
+        return application.send_static_file('manifest.json')
+    
     
     # Create database tables
     with application.app_context():
@@ -117,10 +140,16 @@ def create_app(config=None):
         from sqlalchemy import event
         @event.listens_for(db.engine, "connect")
         def set_sqlite_pragma(dbapi_connection, connection_record):
-            cursor = dbapi_connection.cursor()
-            cursor.execute("PRAGMA journal_mode=WAL")
-            cursor.close()
+            try:
+                cursor = dbapi_connection.cursor()
+                cursor.execute("PRAGMA journal_mode=WAL")
+                cursor.close()
+            except Exception:
+                pass
 
-        db.create_all()
+        try:
+            db.create_all()
+        except Exception:
+            pass
     
     return application

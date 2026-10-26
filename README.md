@@ -13,8 +13,8 @@
 | **Status** | 🟢 Active |
 | **Primary Language(s)** | Python 3.10+, JavaScript (ES6+), HTML5/Jinja2, CSS3 |
 | **Tech Stack** | Flask 3.0, TensorFlow 2.15 (Keras), Scikit-learn, SQLAlchemy 2.0, Alembic, Tailwind CSS, Chart.js 4.4, SQLite/Postgres |
-| **Last Major Update** | 2026-10-24 (Auto-synced) |
-| **Estimated LOC** | ~10,358 LOC |
+| **Last Major Update** | 2026-10-26 (Auto-synced) |
+| **Estimated LOC** | ~11,330 LOC |
 | **Test Coverage** | Unit & API integration tests in `scripts/test_api.py` |
 
 ---
@@ -555,5 +555,5 @@ python scripts/check_data_generation.py
 
 ## 📝 Document Meta
 - **Generated:** 2026-09-13
-- **Last Verified Current:** 2026-10-24
+- **Last Verified Current:** 2026-10-26
 - **Verification Frequency:** Bi-annually or upon model retraining.

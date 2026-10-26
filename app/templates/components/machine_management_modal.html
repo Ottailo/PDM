@@ -240,6 +240,43 @@
                             <p class="text-xs font-mono text-[var(--pdm-text-muted)] text-center py-4">No historical datasets uploaded yet.</p>
                         </div>
                     </div>
+
+                    <!-- Direct Model Training Pipeline Control -->
+                    <div class="mt-6 pt-4 border-t border-[var(--pdm-border-hairline)] space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="font-display text-xs uppercase text-[var(--pdm-text-primary)] tracking-wider">NEURAL MODEL TRAINING &amp; INFERENCE ENGINE</h4>
+                                <p class="text-[11px] text-[var(--pdm-text-muted)] font-mono">Fit Dual-Head Recurrent Sequence Weights or Benchmark OmniRoute</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span id="training-indicator" class="w-2.5 h-2.5 rounded-full bg-[var(--pdm-status-normal)]"></span>
+                                <span id="training-text" class="text-xs font-mono text-[var(--pdm-text-secondary)]">TRAINER IDLE</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                            <div class="sm:col-span-4">
+                                <label class="block pdm-label mb-1">Architecture / Engine</label>
+                                <select id="training-type" class="w-full pdm-input font-mono">
+                                    <option value="dual_head_gru">Dual-Head GRU (Neural Network)</option>
+                                    <option value="omniroute_reasoner">OmniRoute LLM (Cognitive Reasoner)</option>
+                                </select>
+                            </div>
+                            <div class="sm:col-span-3">
+                                <label class="block pdm-label mb-1">Training Epochs</label>
+                                <input type="number" id="training-epochs" class="w-full pdm-input font-mono" value="5" min="1" max="50">
+                            </div>
+                            <div class="sm:col-span-5 flex items-end">
+                                <button type="button" id="start-training-btn" class="w-full pdm-btn pdm-btn-primary h-9 flex items-center justify-center gap-2">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <span>START MODEL TRAINING</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

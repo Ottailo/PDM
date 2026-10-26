@@ -67,6 +67,7 @@ class DataSimulator:
     
     def __init__(self):
         self.noise_level = 0.02 # 2% base noise
+        self._step_count = 0
 
     def ensure_initialized(self):
         """Ensure machine states are initialized."""
@@ -131,6 +132,11 @@ class DataSimulator:
             current_time = datetime.utcnow()
             
             for asset in assets:
+                # Check if asset is running on real-world Live Hardware Ingestion
+                if asset.status in ['Live', 'Hardware', 'LIVE_HARDWARE']:
+                    # Do not overwrite live hardware telemetry with synthetic simulation!
+                    continue
+
                 state = MachineState.query.filter_by(machine_id=asset.name).first()
                 if not state:
                     state = self._create_new_state(asset)
@@ -153,14 +159,43 @@ class DataSimulator:
             
             db.session.commit()
             
+            # Periodic retention maintenance every 600 simulation cycles (~10 min)
+            self._step_count += 1
+            if self._step_count % 600 == 0:
+                try:
+                    from app.services.maintenance_db import prune_older_than
+                    prune_older_than(hours=48)
+                except Exception as prune_err:
+                    logger.warning(f"Periodic sensor data prune error: {prune_err}")
+            
         except Exception as e:
             logger.error(f"Error acting simulator step: {str(e)}", exc_info=True)
             db.session.rollback()
 
     def _update_machine_physics(self, state, asset):
-        """Evolve the machine state: degrade components, trigger failures."""
+        """Evolve the machine state: degrade components, trigger failures, count down maintenance."""
         
         old_status = state.status
+
+        # If machine is currently under maintenance, handle countdown
+        if state.status in ["Maintenance", "Scheduled Maintenance", "UNDER_MAINTENANCE"]:
+            if state.event_steps_left and state.event_steps_left > 1:
+                state.event_steps_left -= 1
+                return
+            else:
+                # Maintenance cycle complete: return to normal
+                state.status = "Normal"
+                state.health_factor = 1.0
+                state.active_failure = {}
+                state.event_steps_left = 0
+                event = EventLog(
+                    timestamp=datetime.utcnow(),
+                    machine_id=asset.name,
+                    event_type="Info",
+                    details=f"Maintenance intervention completed on {asset.name}. System returned to nominal service."
+                )
+                db.session.add(event)
+                return
 
         # Ensure active_failure is a dict
         active_failures = state.active_failure or {}
@@ -252,6 +287,12 @@ class DataSimulator:
         base_mean = (base_min + base_max) / 2
         base_range = (base_max - base_min)
         
+        # If under maintenance or off, produce nominal resting baseline
+        if state.status in ["Maintenance", "Scheduled Maintenance", "UNDER_MAINTENANCE"]:
+            return float(base_min)
+        if state.status == "Off":
+            return 0.0
+
         # 2. Apply Physics Effects from Active Failures
         total_offset = 0.0
         total_noise_mult = 1.0
@@ -291,27 +332,37 @@ class DataSimulator:
         
         return val
 
-    def request_maintenance(self, machine_id):
-        """Repair the machine."""
+    def request_maintenance(self, machine_id, parts=None, duration_minutes=30):
+        """Put machine into maintenance state with repair countdown steps."""
         try:
             state = MachineState.query.filter_by(machine_id=machine_id).first()
-            if state:
-                state.status = "Normal"
-                state.health_factor = 1.0
-                state.active_failure = {} # Clear all failures
-                state.active_failure = {} 
-                # Need to explicitly set it to empty dict for JSON
-                
-                # Log
-                event = EventLog(
-                    timestamp=datetime.utcnow(),
+            if not state:
+                state = MachineState(
                     machine_id=machine_id,
-                    event_type="Maintenance",
-                    details="Full maintenance performed. All components repaired."
+                    status="Maintenance",
+                    health_factor=1.0,
+                    active_failure={}
                 )
-                db.session.add(event)
-                db.session.commit()
-                return True
-        except Exception:
+                db.session.add(state)
+            
+            state.status = "Maintenance"
+            state.health_factor = 1.0
+            state.active_failure = {}
+            # In simulation time, 1 tick is ~1s. We set steps to min(60, duration_minutes) for responsive UX
+            steps = max(15, min(120, int(duration_minutes)))
+            state.event_steps_left = steps
+            
+            parts_str = ", ".join(parts) if parts else "General Mechanical Overhaul"
+            event = EventLog(
+                timestamp=datetime.utcnow(),
+                machine_id=machine_id,
+                event_type="Maintenance",
+                details=f"Work order dispatched for {parts_str} (Estimated duration: {duration_minutes}m)."
+            )
+            db.session.add(event)
+            db.session.commit()
+            return True
+        except Exception as e:
+            logger.error(f"Error requesting maintenance: {e}")
             db.session.rollback()
         return False

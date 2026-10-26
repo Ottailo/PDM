@@ -43,8 +43,8 @@ from app import create_app, socketio
 app = create_app()
 
 if __name__ == '__main__':
-    # Start simulator in background thread if enabled
-    if app.config.get('ENABLE_SIMULATOR', True):
+    # Start simulator in background thread only if explicitly enabled
+    if app.config.get('ENABLE_SIMULATOR', False):
         simulator_thread = threading.Thread(target=run_simulator, args=(app,), daemon=True)
         simulator_thread.start()
         app.logger.info("Simulator started")

@@ -1,0 +1,12 @@
+.git
+.gitignore
+.ua
+tests/
+scripts/
+docs/
+*.log
+*.tmp
+*.pyc
+__pycache__
+instance/edge_buffer.db
+instance/test_edge_buffer.db

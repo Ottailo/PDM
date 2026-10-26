@@ -57,3 +57,349 @@
         </div>
     </div>
 </div>
+
+<!-- OmniRoute AI Diagnostic Advisor Modal Dialog -->
+<div id="ai-advisor-modal-overlay"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden pdm-modal-backdrop bg-black/80">
+    <div id="ai-advisor-modal-content"
+        class="w-full max-w-4xl max-h-[90vh] bg-[var(--pdm-surface-overlay)] rounded-[var(--pdm-radius-lg)] shadow-[var(--pdm-shadow-overlay)] border border-[var(--pdm-border-subtle)] flex flex-col overflow-hidden pdm-modal-dialog">
+
+        <!-- Header Strip -->
+        <div class="px-5 py-3.5 border-b border-[var(--pdm-border-hairline)] flex justify-between items-center bg-[var(--pdm-surface-raised)]">
+            <div class="flex items-center gap-3">
+                <span class="w-2 h-2 rounded-full bg-[var(--pdm-accent-base)] animate-pulse"></span>
+                <h2 id="ai-advisor-title" class="font-display font-semibold text-sm tracking-wider uppercase text-[var(--pdm-text-primary)]">
+                    COGNITIVE RELIABILITY ADVISOR: <span id="ai-advisor-machine-name" class="text-[var(--pdm-accent-base)]">FILLING_001</span>
+                </h2>
+            </div>
+            <div class="flex items-center gap-3">
+                <span id="ai-advisor-provider-badge" class="font-mono text-[10px] px-2 py-0.5 bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] text-[var(--pdm-text-muted)] rounded-[var(--pdm-radius-sm)]">
+                    OMNIROUTE LLM
+                </span>
+                <button id="ai-advisor-close"
+                    class="pdm-btn py-1 px-2 h-7 bg-transparent border-transparent hover:border-[var(--pdm-border-subtle)] text-[var(--pdm-text-muted)] hover:text-[var(--pdm-text-primary)]"
+                    title="Close Dialog">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Body Area -->
+        <div class="p-5 overflow-y-auto space-y-4 bg-[var(--pdm-surface-base)] text-xs">
+            <!-- Diagnosis Summary Strip -->
+            <div class="pdm-panel p-4 bg-[var(--pdm-surface-raised)] border border-[var(--pdm-border-subtle)] flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span id="ai-advisor-severity-badge" class="pdm-tag pdm-tag-critical text-[10px] uppercase font-mono">CRITICAL</span>
+                        <span class="font-mono text-[11px] text-[var(--pdm-text-muted)]" id="ai-advisor-timestamp">TICK 12:45:00 UTC</span>
+                    </div>
+                    <h3 id="ai-advisor-heading" class="font-display font-semibold text-sm tracking-wide uppercase text-[var(--pdm-text-primary)]">
+                        Nozzle Restriction &amp; Hydraulic Pressure Surge
+                    </h3>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="text-right font-mono text-[11px]">
+                        <span class="text-[var(--pdm-text-muted)] block">EST. REPAIR WINDOW</span>
+                        <span id="ai-advisor-duration" class="text-[var(--pdm-accent-base)] font-bold">35 MINUTES</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Root Cause Analysis -->
+            <div class="pdm-panel p-4 bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] space-y-1.5">
+                <span class="pdm-label text-[10px] text-[var(--pdm-text-muted)]">PHYSICAL ROOT CAUSE ANALYSIS</span>
+                <p id="ai-advisor-cause" class="text-[var(--pdm-text-secondary)] font-body leading-relaxed text-xs">
+                    Progressive particulate accumulation in fluid nozzles causing constriction and pressure escalation.
+                </p>
+            </div>
+
+            <!-- Evidence Breakdown -->
+            <div class="pdm-panel p-4 bg-[var(--pdm-surface-raised)] border border-[var(--pdm-border-subtle)] space-y-2">
+                <span class="pdm-label text-[10px] text-[var(--pdm-text-muted)]">TELEMETRY ANOMALY EVIDENCE</span>
+                <ul id="ai-advisor-evidence" class="space-y-1 text-xs font-mono text-[var(--pdm-status-warning)]">
+                    <!-- Populated dynamically -->
+                </ul>
+            </div>
+
+            <!-- Immediate Action Plan -->
+            <div class="pdm-panel p-4 bg-[var(--pdm-surface-raised)] border border-[var(--pdm-border-subtle)] space-y-2.5">
+                <span class="pdm-label text-[10px] text-[var(--pdm-text-muted)]">IMMEDIATE OPERATOR ACTION CHECKLIST</span>
+                <div id="ai-advisor-actions" class="space-y-2 font-mono text-xs">
+                    <!-- Populated dynamically with checkboxes -->
+                </div>
+            </div>
+
+            <!-- Required Parts & Operational Risk Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="pdm-panel p-3.5 bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] space-y-2">
+                    <span class="pdm-label text-[10px] text-[var(--pdm-text-muted)]">REQUIRED REPLACEMENT SUBSYSTEMS &amp; TOOLING</span>
+                    <div id="ai-advisor-parts" class="flex flex-wrap gap-1.5">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+                <div class="pdm-panel p-3.5 bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] space-y-1.5">
+                    <span class="pdm-label text-[10px] text-[var(--pdm-status-critical)]">OPERATIONAL IMPACT IF UNRESOLVED</span>
+                    <p id="ai-advisor-risk" class="text-[var(--pdm-text-secondary)] font-body text-xs">
+                        Continued run will trip overpressure interlock, causing product loss and pump seal blow-by.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Action Strip -->
+        <div class="px-5 py-3 border-t border-[var(--pdm-border-hairline)] bg-[var(--pdm-surface-sunken)] flex justify-between items-center">
+            <span class="text-xs font-mono text-[var(--pdm-text-muted)]">CONFIDENTIAL MECHATRONIC ADVISORY</span>
+            <div class="flex items-center gap-2">
+                <button id="ai-advisor-dismiss" class="pdm-btn text-xs py-1.5 px-3 h-8 bg-transparent border-[var(--pdm-border-subtle)] text-[var(--pdm-text-secondary)]">DISMISS</button>
+                <button id="ai-advisor-dispatch-btn" class="pdm-btn pdm-btn-primary text-xs py-1.5 px-3 h-8">DISPATCH WORK ORDER</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Physical Asset Live Ingestion & Pilot Gateway Modal -->
+<div id="device-connection-modal"
+    class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 hidden pdm-modal-backdrop bg-black/80 select-none">
+    <div class="w-full max-w-4xl max-h-[90vh] bg-[var(--pdm-surface-overlay)] rounded-[var(--pdm-radius-lg)] shadow-[var(--pdm-shadow-overlay)] border border-[var(--pdm-border-subtle)] flex flex-col overflow-hidden pdm-modal-dialog">
+
+        <!-- Header Strip -->
+        <div class="px-5 py-3.5 border-b border-[var(--pdm-border-hairline)] bg-[var(--pdm-surface-raised)] flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <span class="w-2 h-2 rounded-full bg-[var(--pdm-accent-base)] animate-pulse"></span>
+                <div>
+                    <h2 id="device-conn-title" class="font-display font-semibold text-sm tracking-wider uppercase text-[var(--pdm-text-primary)]">
+                        CONNECT PHYSICAL MACHINE GATEWAY
+                    </h2>
+                    <p class="text-[11px] text-[var(--pdm-text-muted)] font-mono" id="device-conn-subtitle">
+                        Edge Ingestion Credentials &amp; Industrial Protocol Bridges
+                    </p>
+                </div>
+            </div>
+            <button id="device-conn-close"
+                class="pdm-btn py-1 px-2 h-7 bg-transparent border-transparent hover:border-[var(--pdm-border-subtle)] text-[var(--pdm-text-muted)] hover:text-[var(--pdm-text-primary)]"
+                title="Close Dialog">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mode Toggle & Live Connection Status Banner -->
+        <div class="px-5 py-2.5 bg-[var(--pdm-surface-sunken)] border-b border-[var(--pdm-border-hairline)] flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+            <div class="flex items-center gap-3">
+                <span class="text-[var(--pdm-text-muted)]">INGESTION MODE:</span>
+                <span id="device-conn-mode-badge" class="pdm-tag pdm-tag-normal text-[10px] uppercase font-mono">SIMULATED FEED</span>
+                <button id="device-conn-toggle-mode-btn" class="pdm-btn text-[10px] py-1 px-2.5 h-6 bg-[var(--pdm-surface-raised)] border-[var(--pdm-border-subtle)] text-[var(--pdm-text-primary)]">
+                    SWITCH TO LIVE HARDWARE FEED
+                </button>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-[var(--pdm-status-offline)]" id="device-conn-ping-dot"></span>
+                <span id="device-conn-ping-text" class="text-[var(--pdm-text-secondary)]">GATEWAY STANDBY</span>
+                <button id="device-conn-ping-btn" class="pdm-btn text-[10px] py-0.5 px-2 h-6 bg-[var(--pdm-surface-raised)] border-[var(--pdm-border-hairline)] text-[var(--pdm-accent-base)] hover:bg-[var(--pdm-accent-subtle)]">
+                    TEST HANDSHAKE
+                </button>
+            </div>
+        </div>
+
+        <!-- Protocol Selector Tab Bar -->
+        <div class="px-5 py-2 bg-[var(--pdm-surface-base)] border-b border-[var(--pdm-border-hairline)] flex gap-2">
+            <button class="device-tab-btn pdm-btn text-[10px] py-1 px-3 active border-[var(--pdm-accent-base)] text-[var(--pdm-accent-base)]" data-tab="edge-agent">
+                PYTHON EDGE AGENT
+            </button>
+            <button class="device-tab-btn pdm-btn text-[10px] py-1 px-3 border-transparent text-[var(--pdm-text-secondary)] hover:text-[var(--pdm-text-primary)]" data-tab="curl-rest">
+                REST API &amp; CURL
+            </button>
+            <button class="device-tab-btn pdm-btn text-[10px] py-1 px-3 border-transparent text-[var(--pdm-text-secondary)] hover:text-[var(--pdm-text-primary)]" data-tab="modbus-tcp">
+                MODBUS TCP (PLC)
+            </button>
+            <button class="device-tab-btn pdm-btn text-[10px] py-1 px-3 border-transparent text-[var(--pdm-text-secondary)] hover:text-[var(--pdm-text-primary)]" data-tab="mqtt-broker">
+                MQTT BROKER
+            </button>
+        </div>
+
+        <!-- Body Content -->
+        <div class="p-5 overflow-y-auto space-y-4 bg-[var(--pdm-surface-base)] text-xs flex-grow">
+
+            <!-- Panel 1: Python Edge Daemon -->
+            <div id="device-tab-panel-edge-agent" class="space-y-3">
+                <div class="pdm-panel p-3.5 bg-[var(--pdm-surface-raised)] border border-[var(--pdm-border-subtle)] space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-display font-semibold text-xs tracking-wider uppercase text-[var(--pdm-text-primary)]">
+                            Option 1: Deploy Universal Edge Daemon (Recommended for Pilots)
+                        </span>
+                        <span class="font-mono text-[10px] text-[var(--pdm-accent-base)]">STORE-AND-FORWARD RESILIENT</span>
+                    </div>
+                    <p class="text-[11px] text-[var(--pdm-text-secondary)] font-body leading-relaxed">
+                        Runs on any Linux/Windows industrial PC or Raspberry Pi connected to your machinery. Automatically buffers up to 50,000 readings in a local SQLite queue during network dropouts and auto-drains upon reconnection.
+                    </p>
+                </div>
+
+                <div class="pdm-panel p-3 bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] space-y-1.5">
+                    <div class="flex justify-between items-center">
+                        <span class="pdm-label text-[10px] text-[var(--pdm-text-muted)]">COMMAND (RUN ON EDGE GATEWAY)</span>
+                        <button class="copy-code-btn pdm-btn text-[10px] py-0.5 px-2 h-6 border-[var(--pdm-border-subtle)] text-[var(--pdm-text-secondary)] hover:text-[var(--pdm-text-primary)]" data-target="code-edge-cmd">
+                            COPY COMMAND
+                        </button>
+                    </div>
+                    <pre class="bg-black/60 p-3 rounded font-mono text-[11px] text-[var(--pdm-accent-base)] overflow-x-auto select-text"><code id="code-edge-cmd">python scripts/edge/pdm_edge_agent.py --host http://localhost:5000 --machine-id FILLING_001 --key dev-api-key</code></pre>
+                </div>
+            </div>
+
+            <!-- Panel 2: REST API & cURL -->
+            <div id="device-tab-panel-curl-rest" class="space-y-3 hidden">
+                <div class="pdm-panel p-3 bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] space-y-1.5">
+                    <div class="flex justify-between items-center">
+                        <span class="pdm-label text-[10px] text-[var(--pdm-text-muted)]">CURL COMMAND (DIRECT HTTP INGESTION)</span>
+                        <button class="copy-code-btn pdm-btn text-[10px] py-0.5 px-2 h-6 border-[var(--pdm-border-subtle)] text-[var(--pdm-text-secondary)] hover:text-[var(--pdm-text-primary)]" data-target="code-curl-cmd">
+                            COPY CURL
+                        </button>
+                    </div>
+                    <pre class="bg-black/60 p-3 rounded font-mono text-[11px] text-[var(--pdm-text-primary)] overflow-x-auto select-text"><code id="code-curl-cmd">curl -X POST ...</code></pre>
+                </div>
+            </div>
+
+            <!-- Panel 3: Modbus TCP (PLC) -->
+            <div id="device-tab-panel-modbus-tcp" class="space-y-3 hidden">
+                <div class="pdm-panel p-3 bg-[var(--pdm-surface-raised)] border border-[var(--pdm-border-subtle)] space-y-2">
+                    <span class="font-display font-semibold text-xs tracking-wider uppercase text-[var(--pdm-text-primary)]">
+                        Option 3: Connect Directly to PLC (Modbus TCP Port 502)
+                    </span>
+                    <p class="text-[11px] text-[var(--pdm-text-secondary)] font-body">
+                        Direct connection to Siemens S7, Schneider Modicon, Allen-Bradley, or Beckhoff industrial controllers.
+                    </p>
+                </div>
+                <div class="pdm-panel p-3 bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] space-y-1.5">
+                    <div class="flex justify-between items-center">
+                        <span class="pdm-label text-[10px] text-[var(--pdm-text-muted)]">MODBUS BRIDGE COMMAND</span>
+                        <button class="copy-code-btn pdm-btn text-[10px] py-0.5 px-2 h-6 border-[var(--pdm-border-subtle)] text-[var(--pdm-text-secondary)] hover:text-[var(--pdm-text-primary)]" data-target="code-modbus-cmd">
+                            COPY COMMAND
+                        </button>
+                    </div>
+                    <pre class="bg-black/60 p-3 rounded font-mono text-[11px] text-[var(--pdm-accent-base)] overflow-x-auto select-text"><code id="code-modbus-cmd">python scripts/edge/pdm_modbus_bridge.py --plc-host 192.168.1.100 --plc-port 502 --machine-id FILLING_001</code></pre>
+                </div>
+            </div>
+
+            <!-- Panel 4: MQTT Broker -->
+            <div id="device-tab-panel-mqtt-broker" class="space-y-3 hidden">
+                <div class="pdm-panel p-3 bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] space-y-1.5">
+                    <div class="flex justify-between items-center">
+                        <span class="pdm-label text-[10px] text-[var(--pdm-text-muted)]">MQTT BRIDGE COMMAND</span>
+                        <button class="copy-code-btn pdm-btn text-[10px] py-0.5 px-2 h-6 border-[var(--pdm-border-subtle)] text-[var(--pdm-text-secondary)] hover:text-[var(--pdm-text-primary)]" data-target="code-mqtt-cmd">
+                            COPY COMMAND
+                        </button>
+                    </div>
+                    <pre class="bg-black/60 p-3 rounded font-mono text-[11px] text-[var(--pdm-accent-base)] overflow-x-auto select-text"><code id="code-mqtt-cmd">python scripts/edge/pdm_mqtt_subscriber.py --broker 192.168.1.50 --topic pdm/+/telemetry --machine-id FILLING_001</code></pre>
+                </div>
+            </div>
+
+            <!-- Configured Channels & Auto-Calibration Card -->
+            <div class="pdm-panel p-4 bg-[var(--pdm-surface-raised)] border border-[var(--pdm-border-subtle)] space-y-3">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="pdm-label text-[10px] text-[var(--pdm-text-muted)]">CHANNEL SCHEMA &amp; EMPIRICAL ENVELOPES</span>
+                        <h4 class="font-display text-xs uppercase text-[var(--pdm-text-primary)]">Calibrated Telemetry Bounds</h4>
+                    </div>
+                    <button id="device-conn-calibrate-btn" class="pdm-btn text-xs py-1 px-3 h-7 bg-[var(--pdm-surface-sunken)] border-[var(--pdm-border-subtle)] text-[var(--pdm-accent-base)] hover:border-[var(--pdm-accent-base)]">
+                        AUTO-CALIBRATE BASELINE
+                    </button>
+                </div>
+                <div id="device-conn-channels-table" class="space-y-1 font-mono text-[11px]">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer Strip -->
+        <div class="px-5 py-3 border-t border-[var(--pdm-border-hairline)] bg-[var(--pdm-surface-sunken)] flex justify-between items-center text-xs font-mono">
+            <span class="text-[var(--pdm-text-muted)]">PILOT PROTOCOL: TLS 1.3 / TOKEN AUTH / EDGE STORE-AND-FORWARD</span>
+            <button id="device-conn-dismiss-btn" class="pdm-btn text-xs py-1.5 px-3 h-8 bg-transparent border-[var(--pdm-border-subtle)] text-[var(--pdm-text-secondary)]">
+                CLOSE GATEWAY DIALOG
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Remote Surveillance Modal -->
+<div id="mobile-remote-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="pdm-panel bg-[var(--pdm-surface-base)] border border-[var(--pdm-border-subtle)] rounded-lg max-w-md w-full shadow-2xl overflow-hidden font-mono">
+        <!-- Header -->
+        <div class="px-5 py-4 border-b border-[var(--pdm-border-hairline)] flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-[var(--pdm-accent-base)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"/>
+                </svg>
+                <h3 class="font-display font-bold text-sm uppercase tracking-wide text-[var(--pdm-text-primary)]">
+                    MOBILE REMOTE SURVEILLANCE
+                </h3>
+            </div>
+            <button onclick="closeMobileRemoteModal()" class="text-[var(--pdm-text-muted)] hover:text-white">✕</button>
+        </div>
+
+        <!-- Content -->
+        <div class="p-5 space-y-4 text-xs">
+            <p class="text-[var(--pdm-text-secondary)] font-sans leading-relaxed">
+                Factory plant engineers and technicians can continuously monitor machinery health on their phones while walking the line.
+            </p>
+
+            <!-- QR Code Card -->
+            <div class="p-4 bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] rounded-lg flex flex-col items-center justify-center text-center space-y-3">
+                <div class="p-2 bg-white rounded-lg shadow-inner inline-block" id="mobile-qr-container">
+                    <!-- Dynamic QR or clean SVG render -->
+                    <img id="mobile-qr-image" src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=http://localhost:5000/mobile" alt="Mobile Remote QR" class="w-36 h-36">
+                </div>
+                <div class="text-[11px] text-[var(--pdm-text-muted)]">
+                    SCAN WITH SMARTPHONE CAMERA TO LAUNCH
+                </div>
+            </div>
+
+            <!-- Copyable URL Well -->
+            <div class="space-y-1">
+                <div class="flex items-center justify-between text-[10px] text-[var(--pdm-text-muted)]">
+                    <span>REMOTE ACCESS URL:</span>
+                    <button onclick="copyMobileUrl()" id="copy-mob-url-btn" class="text-[var(--pdm-accent-base)] hover:underline font-bold">
+                        COPY URL
+                    </button>
+                </div>
+                <div class="p-2.5 bg-black/60 rounded border border-[var(--pdm-border-hairline)] text-[11px] text-[var(--pdm-accent-base)] select-all truncate" id="mobile-remote-url-text">
+                    http://localhost:5000/mobile
+                </div>
+            </div>
+
+            <!-- Feature Checklist -->
+            <div class="space-y-1.5 text-[11px] text-[var(--pdm-text-secondary)] pt-1 border-t border-[var(--pdm-border-hairline)]">
+                <div class="flex items-center gap-2">
+                    <span class="text-[var(--pdm-status-normal)]">✓</span>
+                    <span>Continuous 2-second edge telemetry polling</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-[var(--pdm-status-normal)]">✓</span>
+                    <span>Haptic vibration & audio alerts on warning / critical states</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-[var(--pdm-status-normal)]">✓</span>
+                    <span>On-floor mechatronic root-cause diagnostics & checklists</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-[var(--pdm-status-normal)]">✓</span>
+                    <span>1-Tap work order creation and technician sign-offs</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="px-5 py-3 border-t border-[var(--pdm-border-hairline)] bg-[var(--pdm-surface-sunken)] flex items-center justify-between">
+            <a href="/mobile" target="_blank"
+                class="pdm-btn text-xs py-1.5 px-3 bg-[var(--pdm-accent-base)] text-black font-bold rounded hover:opacity-90">
+                OPEN MOBILE APP NOW →
+            </a>
+            <button onclick="closeMobileRemoteModal()"
+                class="pdm-btn text-xs py-1.5 px-3 bg-transparent border border-[var(--pdm-border-subtle)] text-[var(--pdm-text-secondary)] rounded">
+                CLOSE
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0e121b">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/svg+xml" href="/static/img/pdm-icon.svg">
+
+    <title>PDM Remote — Field Plant Surveillance</title>
+
+    <!-- DIN-Caliber Instrumentation Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS with OKLCH Theme Architecture -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'pdm-canvas': 'var(--pdm-canvas)',
+                        'pdm-surface-base': 'var(--pdm-surface-base)',
+                        'pdm-surface-raised': 'var(--pdm-surface-raised)',
+                        'pdm-surface-overlay': 'var(--pdm-surface-overlay)',
+                        'pdm-surface-sunken': 'var(--pdm-surface-sunken)',
+                        'pdm-border-hairline': 'var(--pdm-border-hairline)',
+                        'pdm-border-subtle': 'var(--pdm-border-subtle)',
+                        'pdm-border-strong': 'var(--pdm-border-strong)',
+                        'pdm-accent': 'var(--pdm-accent-base)',
+                        'pdm-normal': 'var(--pdm-status-normal)',
+                        'pdm-warning': 'var(--pdm-status-warning)',
+                        'pdm-critical': 'var(--pdm-status-critical)',
+                        'pdm-offline': 'var(--pdm-status-offline)',
+                        'pdm-text-primary': 'var(--pdm-text-primary)',
+                        'pdm-text-secondary': 'var(--pdm-text-secondary)',
+                        'pdm-text-muted': 'var(--pdm-text-muted)',
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        display: ['"Chakra Petch"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Industrial Design System CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        /* Mobile-first ergonomic touch adjustments */
+        body {
+            background-color: var(--pdm-canvas);
+            color: var(--pdm-text-primary);
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: contain;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .safe-pb {
+            padding-bottom: calc(env(safe-area-inset-bottom, 16px) + 64px);
+        }
+
+        .safe-pt {
+            padding-top: max(env(safe-area-inset-top, 0px), 8px);
+        }
+
+        /* Pulse animation for live edge telemetry */
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.6; }
+        }
+        .pulse-live {
+            animation: pulse-dot 1.5s infinite ease-in-out;
+        }
+
+        /* Slide-up drawer transition */
+        .drawer-sheet {
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+        }
+        .drawer-closed {
+            transform: translateY(105%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .drawer-open {
+            transform: translateY(0%);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Horizontal hide scrollbar */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body class="h-[100dvh] flex flex-col overflow-hidden select-none">
+
+    <!-- TOP COMPACT SURVEILLANCE BAR -->
+    <header class="safe-pt bg-[var(--pdm-surface-base)] border-b border-[var(--pdm-border-hairline)] px-4 py-2.5 flex-shrink-0 z-30">
+        <div class="flex items-center justify-between">
+            <!-- Brand & Pulse Indicator -->
+            <div class="flex items-center gap-2.5">
+                <div class="w-2.5 h-2.5 rounded-full bg-[var(--pdm-status-normal)] pulse-live" id="mobile-heartbeat-led"></div>
+                <div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="font-display font-bold text-xs tracking-wider text-[var(--pdm-accent-base)] uppercase">PDM</span>
+                        <span class="text-[10px] text-[var(--pdm-border-strong)]">/</span>
+                        <span class="font-display font-semibold text-[11px] text-[var(--pdm-text-primary)] uppercase tracking-wide">REMOTE SURVEILLANCE</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 text-[9px] font-mono text-[var(--pdm-text-muted)] tracking-wider">
+                        <span id="mobile-conn-status">LIVE EDGE FEED</span>
+                        <span>•</span>
+                        <span id="mobile-last-sync">SYNCING...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls: Haptic & Audio Toggle + Desktop Switch -->
+            <div class="flex items-center gap-1.5">
+                <button id="toggle-haptic-btn" onclick="toggleHaptics()"
+                    class="px-2 py-1 bg-[var(--pdm-surface-raised)] border border-[var(--pdm-border-subtle)] rounded text-[10px] font-mono text-[var(--pdm-text-secondary)] active:scale-95 transition-transform"
+                    title="Toggle Haptic Alarm Vibration">
+                    <span id="haptic-label">HAPTIC: ON</span>
+                </button>
+                <a href="/" class="p-1.5 bg-[var(--pdm-surface-raised)] border border-[var(--pdm-border-subtle)] rounded text-[var(--pdm-text-muted)] hover:text-[var(--pdm-text-primary)] active:scale-95"
+                    title="Switch to Desktop Control Room">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+
+        <!-- QUICK FLEET KPI STRIP (Swipeable horizontal chips) -->
+        <div class="flex items-center gap-2 mt-2.5 overflow-x-auto no-scrollbar pb-0.5">
+            <div class="flex-shrink-0 px-2.5 py-1 bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] rounded flex items-center gap-2">
+                <span class="text-[9px] font-mono text-[var(--pdm-text-muted)] tracking-wider">ONLINE FLEET</span>
+                <span id="mob-kpi-online" class="text-xs font-mono font-bold text-[var(--pdm-status-normal)]">- / -</span>
+            </div>
+            <div class="flex-shrink-0 px-2.5 py-1 bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] rounded flex items-center gap-2">
+                <span class="text-[9px] font-mono text-[var(--pdm-text-muted)] tracking-wider">ACTIVE ALERTS</span>
+                <span id="mob-kpi-alerts" class="text-xs font-mono font-bold text-[var(--pdm-status-critical)]">0</span>
+            </div>
+            <div class="flex-shrink-0 px-2.5 py-1 bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] rounded flex items-center gap-2">
+                <span class="text-[9px] font-mono text-[var(--pdm-text-muted)] tracking-wider">WATCHDOG</span>
+                <span id="mob-kpi-watchdog" class="text-xs font-mono font-bold text-[var(--pdm-accent-base)]">ACTIVE</span>
+            </div>
+            <div class="flex-shrink-0 px-2.5 py-1 bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] rounded flex items-center gap-2">
+                <span class="text-[9px] font-mono text-[var(--pdm-text-muted)] tracking-wider">LATENCY</span>
+                <span id="mob-kpi-latency" class="text-xs font-mono font-bold text-[var(--pdm-text-primary)]">-- ms</span>
+            </div>
+        </div>
+
+        <!-- LINE & ATTENTION FILTER CHIPS -->
+        <div class="flex items-center gap-1.5 mt-2 overflow-x-auto no-scrollbar">
+            <button onclick="setFilter('ALL')" id="filter-ALL"
+                class="filter-pill px-2.5 py-0.5 rounded-full text-[10px] font-mono tracking-wider bg-[var(--pdm-accent-base)] text-black font-semibold">
+                ALL ASSETS
+            </button>
+            <button onclick="setFilter('ATTENTION')" id="filter-ATTENTION"
+                class="filter-pill px-2.5 py-0.5 rounded-full text-[10px] font-mono tracking-wider bg-[var(--pdm-surface-sunken)] text-[var(--pdm-text-muted)] border border-[var(--pdm-border-hairline)]">
+                ATTENTION NEEDED (<span id="count-attention">0</span>)
+            </button>
+            <button onclick="setFilter('LIVE')" id="filter-LIVE"
+                class="filter-pill px-2.5 py-0.5 rounded-full text-[10px] font-mono tracking-wider bg-[var(--pdm-surface-sunken)] text-[var(--pdm-text-muted)] border border-[var(--pdm-border-hairline)]">
+                STREAMING LIVE
+            </button>
+            <button onclick="setFilter('DROPPED')" id="filter-DROPPED"
+                class="filter-pill px-2.5 py-0.5 rounded-full text-[10px] font-mono tracking-wider bg-[var(--pdm-surface-sunken)] text-[var(--pdm-text-muted)] border border-[var(--pdm-border-hairline)]">
+                DROPPED SIGNAL (<span id="count-dropped">0</span>)
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN SCROLLABLE SURVEILLANCE FEED -->
+    <main id="mobile-feed-container" class="flex-1 overflow-y-auto px-3.5 py-3 space-y-3 safe-pb">
+        <!-- Machinery Cards Injected Here via JS -->
+        <div class="text-center py-12 text-[var(--pdm-text-muted)] font-mono text-xs">
+            CONNECTING TO FACTORY TELEMETRY STREAM...
+        </div>
+    </main>
+
+    <!-- INCIDENTS TAB CONTENT (HIDDEN BY DEFAULT) -->
+    <div id="incidents-container" class="flex-1 overflow-y-auto px-3.5 py-3 space-y-2.5 safe-pb hidden">
+        <div class="flex items-center justify-between border-b border-[var(--pdm-border-hairline)] pb-2">
+            <span class="font-display font-bold text-xs uppercase tracking-wider text-[var(--pdm-text-primary)]">ACTIVE FACTORY INCIDENTS</span>
+            <span id="incident-counter-badge" class="font-mono text-[10px] px-2 py-0.5 bg-[var(--pdm-status-critical-bg)] text-[var(--pdm-status-critical)] border border-[var(--pdm-status-critical-border)] rounded">0 ACTIVE</span>
+        </div>
+        <div id="incidents-list" class="space-y-2">
+            <!-- Incidents injected via JS -->
+        </div>
+    </div>
+
+    <!-- WORK ORDERS TAB CONTENT (HIDDEN BY DEFAULT) -->
+    <div id="workorders-container" class="flex-1 overflow-y-auto px-3.5 py-3 space-y-2.5 safe-pb hidden">
+        <div class="flex items-center justify-between border-b border-[var(--pdm-border-hairline)] pb-2">
+            <span class="font-display font-bold text-xs uppercase tracking-wider text-[var(--pdm-text-primary)]">MAINTENANCE WORK ORDERS</span>
+            <button onclick="openManualWorkOrderModal()" class="px-2 py-1 bg-[var(--pdm-accent-base)] text-black font-mono text-[10px] font-bold rounded">
+                + NEW ORDER
+            </button>
+        </div>
+        <div id="workorders-list" class="space-y-2">
+            <!-- Work orders injected via JS -->
+        </div>
+    </div>
+
+    <!-- EDGE GATEWAY CONNECT TAB (HIDDEN BY DEFAULT) -->
+    <div id="gateway-tab-container" class="flex-1 overflow-y-auto px-3.5 py-3 space-y-3 safe-pb hidden">
+        <div class="border-b border-[var(--pdm-border-hairline)] pb-2">
+            <span class="font-display font-bold text-xs uppercase tracking-wider text-[var(--pdm-text-primary)]">EDGE GATEWAY CONNECTION PROFILES</span>
+            <p class="text-[11px] text-[var(--pdm-text-muted)] font-mono mt-0.5">Plug physical PLCs and Modbus transducers into the telemetry bus.</p>
+        </div>
+
+        <div class="bg-[var(--pdm-surface-base)] border border-[var(--pdm-border-subtle)] rounded p-3 space-y-2.5">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-mono font-bold text-[var(--pdm-accent-base)]">STEP 1: INGEST PROFILE</span>
+                <span class="text-[10px] font-mono text-[var(--pdm-status-normal)]">ACTIVE</span>
+            </div>
+            <div class="bg-[var(--pdm-surface-sunken)] p-2 rounded border border-[var(--pdm-border-hairline)] font-mono text-[10px] text-[var(--pdm-text-secondary)]">
+                <div>URL: <span class="text-[var(--pdm-text-primary)]" id="gw-url-display">http://localhost:5000/api/ingest</span></div>
+                <div class="mt-1">TOKEN: <span class="text-[var(--pdm-accent-base)]" id="gw-token-display">pdm_live_secret</span></div>
+            </div>
+            <div class="space-y-1">
+                <span class="text-[10px] font-mono text-[var(--pdm-text-muted)]">QUICK TEST CURL:</span>
+                <pre class="bg-[var(--pdm-surface-sunken)] p-2 rounded text-[9px] font-mono text-[var(--pdm-text-secondary)] overflow-x-auto whitespace-pre select-all" id="gw-curl-snippet">curl -X POST http://localhost:5000/api/ingest -H "Content-Type: application/json" -H "X-API-Key: pdm_live_secret" -d '{"machine_id":"FILLING_001","readings":{"Speed":1420,"Temperature":64.5,"Pressure":4.2,"Vibration":0.35}}'</pre>
+            </div>
+            <button onclick="sendMobileIngestTest()" id="mobile-test-burst-btn"
+                class="w-full py-1.5 bg-[var(--pdm-surface-raised)] border border-[var(--pdm-border-subtle)] text-[11px] font-mono font-bold text-[var(--pdm-text-primary)] rounded active:scale-98">
+                TRANSMIT TEST EDGE PACKET (FILLING_001)
+            </button>
+            <div id="mobile-burst-result" class="text-[10px] font-mono text-[var(--pdm-text-muted)]"></div>
+        </div>
+
+        <div class="bg-[var(--pdm-surface-base)] border border-[var(--pdm-border-subtle)] rounded p-3 space-y-2 font-mono text-[11px]">
+            <span class="text-xs font-bold text-[var(--pdm-text-primary)]">SUPPORTED PROTOCOLS</span>
+            <div class="space-y-1 text-[10px] text-[var(--pdm-text-secondary)]">
+                <div>• <span class="text-[var(--pdm-accent-base)]">REST Ingest</span>: Port 5000 (HTTPS/HTTP JSON)</div>
+                <div>• <span class="text-[var(--pdm-accent-base)]">Modbus TCP</span>: Port 502 (Holding Registers via bridge)</div>
+                <div>• <span class="text-[var(--pdm-accent-base)]">MQTT Transducer</span>: Port 1883 (`pdm/telemetry/+`)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MECHATRONIC DIAGNOSTIC SLIDE-UP DRAWER -->
+    <div id="mobile-diagnostic-backdrop" onclick="closeDiagnosticDrawer()"
+        class="fixed inset-0 bg-black/75 z-40 opacity-0 pointer-events-none transition-opacity duration-200"></div>
+
+    <div id="mobile-diagnostic-drawer"
+        class="drawer-sheet drawer-closed fixed inset-x-0 bottom-0 max-h-[85dvh] bg-[var(--pdm-surface-base)] border-t border-[var(--pdm-border-subtle)] rounded-t-xl z-50 flex flex-col shadow-2xl">
+        <!-- Drawer Drag Handle & Header -->
+        <div class="px-4 pt-3 pb-2 border-b border-[var(--pdm-border-hairline)] flex-shrink-0">
+            <div class="w-10 h-1 bg-[var(--pdm-border-strong)] rounded-full mx-auto mb-2.5"></div>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span id="drawer-machine-id" class="font-display font-bold text-sm tracking-wide text-[var(--pdm-text-primary)]">MACHINE_ID</span>
+                    <span id="drawer-status-badge" class="font-mono text-[9px] font-bold px-2 py-0.5 rounded">STATUS</span>
+                </div>
+                <button onclick="closeDiagnosticDrawer()" class="p-1 text-[var(--pdm-text-muted)] hover:text-white">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="text-[10px] font-mono text-[var(--pdm-text-muted)] mt-0.5">
+                OMNIRoute Mechatronic Root-Cause & Floor Action Sheet
+            </div>
+        </div>
+
+        <!-- Drawer Scrollable Body -->
+        <div class="flex-1 overflow-y-auto px-4 py-3 space-y-3 font-mono text-xs">
+            <!-- Root Cause Card -->
+            <div class="bg-[var(--pdm-surface-sunken)] p-3 rounded border border-[var(--pdm-border-hairline)] space-y-1.5">
+                <div class="flex items-center justify-between text-[10px] text-[var(--pdm-text-muted)]">
+                    <span>PHYSICAL ROOT-CAUSE HYPOTHESIS</span>
+                    <span id="drawer-severity" class="font-bold">--</span>
+                </div>
+                <div id="drawer-root-cause" class="text-[var(--pdm-text-primary)] font-sans text-xs leading-relaxed">
+                    Analyzing mechatronic telemetry signature...
+                </div>
+            </div>
+
+            <!-- Technician Floor Checklist -->
+            <div class="space-y-1.5">
+                <div class="text-[10px] text-[var(--pdm-text-muted)] uppercase tracking-wider font-bold">
+                    FIELD TECHNICIAN ACTION CHECKLIST:
+                </div>
+                <div id="drawer-checklist" class="space-y-1.5">
+                    <!-- Checkboxes injected via JS -->
+                </div>
+            </div>
+
+            <!-- Recommended Parts -->
+            <div class="bg-[var(--pdm-surface-sunken)] p-2.5 rounded border border-[var(--pdm-border-hairline)] space-y-1">
+                <div class="text-[10px] text-[var(--pdm-text-muted)] uppercase tracking-wider font-bold">
+                    RECOMMENDED REPLACEMENT HARDWARE:
+                </div>
+                <div id="drawer-parts-list" class="text-xs text-[var(--pdm-text-primary)] flex flex-wrap gap-1">
+                    <!-- Parts pills injected via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Drawer Action Footer -->
+        <div class="p-3 border-t border-[var(--pdm-border-hairline)] bg-[var(--pdm-surface-raised)] flex items-center gap-2 flex-shrink-0">
+            <button onclick="openWorkOrderFromDrawer()"
+                class="flex-1 py-2 bg-[var(--pdm-status-critical)] text-white font-mono font-bold text-xs rounded active:scale-98 transition-transform">
+                DISPATCH SERVICE WORK ORDER
+            </button>
+            <button onclick="closeDiagnosticDrawer()"
+                class="px-3 py-2 bg-[var(--pdm-surface-base)] border border-[var(--pdm-border-subtle)] text-[var(--pdm-text-secondary)] font-mono text-xs rounded">
+                CLOSE
+            </button>
+        </div>
+    </div>
+
+    <!-- WORK ORDER DISPATCH MODAL -->
+    <div id="mobile-workorder-modal" class="fixed inset-0 bg-black/80 z-50 flex items-end sm:items-center justify-center p-3 hidden">
+        <div class="w-full max-w-sm bg-[var(--pdm-surface-base)] border border-[var(--pdm-border-subtle)] rounded-t-xl sm:rounded-xl p-4 space-y-3 font-mono">
+            <div class="flex items-center justify-between border-b border-[var(--pdm-border-hairline)] pb-2">
+                <span class="font-display font-bold text-xs uppercase text-[var(--pdm-text-primary)]" id="wo-modal-title">DISPATCH WORK ORDER</span>
+                <button onclick="closeWorkOrderModal()" class="text-[var(--pdm-text-muted)] text-sm">✕</button>
+            </div>
+            <div class="space-y-2 text-xs">
+                <div>
+                    <label class="text-[10px] text-[var(--pdm-text-muted)] block">TARGET ASSET:</label>
+                    <input type="text" id="wo-target-machine" readonly
+                        class="w-full bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] rounded px-2 py-1 text-[var(--pdm-text-primary)] text-xs">
+                </div>
+                <div>
+                    <label class="text-[10px] text-[var(--pdm-text-muted)] block">SELECT REPLACEMENT PARTS:</label>
+                    <div id="wo-parts-selector" class="space-y-1 text-[11px] pt-1">
+                        <label class="flex items-center gap-2"><input type="checkbox" value="High-Speed Deep Groove Bearings" checked class="rounded"> Bearings</label>
+                        <label class="flex items-center gap-2"><input type="checkbox" value="High-Temp PTFE Mechanical Seals" checked class="rounded"> Mechanical Seals</label>
+                        <label class="flex items-center gap-2"><input type="checkbox" value="Reinforced Timing Belt" class="rounded"> Drive Belt</label>
+                        <label class="flex items-center gap-2"><input type="checkbox" value="Vibration Sensor Calibration" class="rounded"> Sensor Calibration</label>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[10px] text-[var(--pdm-text-muted)] block">ESTIMATED DURATION (MIN):</label>
+                    <input type="number" id="wo-duration" value="30" min="5" max="180"
+                        class="w-full bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] rounded px-2 py-1 text-[var(--pdm-text-primary)] text-xs">
+                </div>
+            </div>
+            <div class="flex items-center gap-2 pt-2">
+                <button onclick="submitWorkOrder()" id="wo-submit-btn"
+                    class="flex-1 py-2 bg-[var(--pdm-status-warning)] text-black font-bold text-xs rounded active:scale-98">
+                    CONFIRM & SCHEDULE SERVICE
+                </button>
+                <button onclick="closeWorkOrderModal()"
+                    class="px-3 py-2 bg-[var(--pdm-surface-sunken)] border border-[var(--pdm-border-hairline)] text-[var(--pdm-text-muted)] text-xs rounded">
+                    CANCEL
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM MOBILE NAVIGATION BAR -->
+    <nav class="fixed inset-x-0 bottom-0 bg-[var(--pdm-surface-base)] border-t border-[var(--pdm-border-hairline)] px-2 py-1.5 z-30 flex items-center justify-around font-mono text-[10px]">
+        <button onclick="switchTab('SURVEILLANCE')" id="tab-SURVEILLANCE"
+            class="flex flex-col items-center gap-0.5 text-[var(--pdm-accent-base)] py-1 px-3 rounded">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25"/>
+            </svg>
+            <span class="tracking-wider">FLEET</span>
+        </button>
+
+        <button onclick="switchTab('INCIDENTS')" id="tab-INCIDENTS"
+            class="flex flex-col items-center gap-0.5 text-[var(--pdm-text-muted)] py-1 px-3 rounded relative">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+            </svg>
+            <span class="tracking-wider">INCIDENTS</span>
+            <span id="bottom-alert-dot" class="w-1.5 h-1.5 rounded-full bg-[var(--pdm-status-critical)] absolute top-1 right-3 hidden"></span>
+        </button>
+
+        <button onclick="switchTab('WORKORDERS')" id="tab-WORKORDERS"
+            class="flex flex-col items-center gap-0.5 text-[var(--pdm-text-muted)] py-1 px-3 rounded">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 3.097l-.102.102m0 0l-1.921 1.921"/>
+            </svg>
+            <span class="tracking-wider">ORDERS</span>
+        </button>
+
+        <button onclick="switchTab('GATEWAY')" id="tab-GATEWAY"
+            class="flex flex-col items-center gap-0.5 text-[var(--pdm-text-muted)] py-1 px-3 rounded">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"/>
+            </svg>
+            <span class="tracking-wider">CONNECT</span>
+        </button>
+    </nav>
+
+    <!-- Mobile Surveillance Logic Script -->
+    <script src="{{ url_for('static', filename='js/mobile_dashboard.js') }}?v=1.0"></script>
+</body>
+
+</html>

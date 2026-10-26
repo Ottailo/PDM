@@ -1,21 +1,8 @@
 {
-  "version": "1.0.0",
-  "project": {
-    "name": "Predictive Maintenance Platform",
-    "languages": [
-      "Python"
-    ],
-    "frameworks": [
-      "PyTorch",
-      "SciPy FFT",
-      "TimescaleDB",
-      "FastAPI",
-      "Kafka/MQTT"
-    ],
-    "description": "Industrial IoT machine degradation monitoring, FFT spectral kurtosis extraction, Deep Autoencoder anomaly scoring, and Weibull RUL estimation.",
-    "analyzedAt": "2026-10-24T12:00:00.000Z",
-    "gitCommitHash": "main"
-  },
+  "$schema": "https://understand-anything.dev/schemas/knowledge-graph.v1.json",
+  "name": "Predictive Maintenance Platform",
+  "version": "2.4.0",
+  "description": "Industrial IoT sensor streaming telemetry, FFT frequency-domain spectrum analysis, Autoencoder anomaly detector, and RUL estimation.",
   "nodes": [
     {
       "id": "sensor-stream-ingress",
@@ -23,15 +10,9 @@
       "type": "interface",
       "layer": "ingress",
       "complexity": "moderate",
-      "tech": "MQTT Broker \u00b7 Kafka / HTTP Stream",
+      "tech": "MQTT Broker · Kafka / HTTP Stream",
       "sla": "< 10ms stream ingestion",
       "summary": "Ingests continuous 1000Hz vibration, temperature, pressure, and acoustic sensor telemetry from plant manufacturing equipment.",
-      "tags": [
-        "iot",
-        "sensors",
-        "mqtt",
-        "telemetry"
-      ],
       "inputs": [
         "Raw Sensor Analog-to-Digital Stream"
       ],
@@ -40,20 +21,30 @@
       ]
     },
     {
+      "id": "edge-mcu-buffer",
+      "name": "Edge MCU Buffer & INT8 Quantizer",
+      "type": "interface",
+      "layer": "ingress",
+      "complexity": "moderate",
+      "tech": "STM32 / ESP32 · FreeRTOS Ring Buffer",
+      "sla": "< 0.2ms edge sampling",
+      "summary": "High-frequency edge buffer sampling piezoelectric accelerometer voltage at 1000Hz, quantizing INT8 frames before streaming.",
+      "inputs": [
+        "Piezoelectric Accelerometer Voltage"
+      ],
+      "outputs": [
+        "Quantized Telemetry Frame Batch"
+      ]
+    },
+    {
       "id": "pdm-telemetry-gateway",
       "name": "FastAPI Ingestion Gateway",
       "type": "endpoint",
       "layer": "ingress",
       "complexity": "simple",
-      "tech": "FastAPI \u00b7 Redis Buffer Ingestion",
+      "tech": "FastAPI · Redis Buffer Ingestion",
       "sla": "< 3ms gateway latency",
       "summary": "Validates device authentication certificates, performs schema normalization, and buffers readings into high-throughput queue.",
-      "tags": [
-        "fastapi",
-        "gateway",
-        "queue",
-        "ingress"
-      ],
       "inputs": [
         "POST /api/v1/telemetry",
         "Device Token"
@@ -68,15 +59,9 @@
       "type": "pipeline",
       "layer": "engine",
       "complexity": "critical",
-      "tech": "SciPy FFT \u00b7 Fast Fourier Transform \u00b7 Kurtosis",
+      "tech": "SciPy FFT · Fast Fourier Transform · Kurtosis",
       "sla": "< 18ms spectrum calculation",
       "summary": "Converts raw time-series vibration waveforms into frequency-domain power spectrums, extracting peak harmonics, skewness, and crest factors.",
-      "tags": [
-        "dsp",
-        "fft",
-        "signal-processing",
-        "spectral"
-      ],
       "inputs": [
         "1024-Sample Waveform Buffer"
       ],
@@ -86,22 +71,33 @@
       ]
     },
     {
+      "id": "time-domain-features",
+      "name": "Time-Domain Statistical Engine",
+      "type": "pipeline",
+      "layer": "engine",
+      "complexity": "simple",
+      "tech": "NumPy · Statistical Moments",
+      "sla": "< 2ms computation",
+      "summary": "Calculates statistical descriptors including RMS vibration, peak-to-peak amplitude, crest factor, and shape factor.",
+      "inputs": [
+        "Raw Sensor Voltage Stream"
+      ],
+      "outputs": [
+        "Time-Domain Feature Matrix"
+      ]
+    },
+    {
       "id": "autoencoder-anomaly-detector",
       "name": "Deep Autoencoder Anomaly Scorer",
       "type": "service",
       "layer": "engine",
       "complexity": "critical",
-      "tech": "PyTorch Deep Autoencoder \u00b7 Reconstruction Error",
+      "tech": "PyTorch Deep Autoencoder · Reconstruction Error",
       "sla": "< 12ms inference",
       "summary": "Trained on nominal healthy machine baselines; flags early mechanical degradation by measuring reconstruction error spikes.",
-      "tags": [
-        "deep-learning",
-        "autoencoder",
-        "anomaly",
-        "pytorch"
-      ],
       "inputs": [
-        "Normalized Spectral Feature Vector"
+        "Normalized Spectral Feature Vector",
+        "Time-Domain Matrix"
       ],
       "outputs": [
         "Anomaly Reconstruction Loss",
@@ -114,15 +110,9 @@
       "type": "pipeline",
       "layer": "engine",
       "complexity": "moderate",
-      "tech": "Weibull Proportional Hazards \u00b7 LSTM Predictor",
+      "tech": "Weibull Proportional Hazards · LSTM Predictor",
       "sla": "< 25ms forecast",
       "summary": "Projects bearing and motor wear curves to estimate Remaining Useful Life (RUL) in operational hours before catastrophic failure.",
-      "tags": [
-        "rul",
-        "weibull",
-        "prognostics",
-        "wear-curve"
-      ],
       "inputs": [
         "Cumulative Degradation Index",
         "Operating Temperature"
@@ -133,20 +123,31 @@
       ]
     },
     {
+      "id": "iso-10816-classifier",
+      "name": "ISO 10816 Vibration Severity Matrix",
+      "type": "service",
+      "layer": "engine",
+      "complexity": "simple",
+      "tech": "ISO 10816-3 Velocity Boundaries",
+      "sla": "< 1ms classification",
+      "summary": "Evaluates vibration velocity RMS against ISO danger thresholds (Zone A: Good, Zone B: Acceptable, Zone C: Alert, Zone D: Danger).",
+      "inputs": [
+        "Peak Vibration Velocity (mm/s RMS)"
+      ],
+      "outputs": [
+        "ISO Severity Zone (A/B/C/D)",
+        "Severity Multiplier"
+      ]
+    },
+    {
       "id": "timeseries-telemetry-db",
       "name": "TimescaleDB Time-Series Archive",
       "type": "table",
       "layer": "persistence",
       "complexity": "moderate",
-      "tech": "TimescaleDB (PostgreSQL) \u00b7 Hypertables",
+      "tech": "TimescaleDB (PostgreSQL) · Hypertables",
       "sla": "< 4ms partition write",
       "summary": "High-density partitioned time-series storage preserving billions of historical sensor readings with automated downsampling chunks.",
-      "tags": [
-        "timeseries",
-        "timescaledb",
-        "hypertables",
-        "history"
-      ],
       "inputs": [
         "Telemetry Metric Tuple"
       ],
@@ -160,15 +161,9 @@
       "type": "service",
       "layer": "persistence",
       "complexity": "simple",
-      "tech": "Telegram Bot API \u00b7 ERP Webhook",
+      "tech": "Telegram Bot API · ERP Webhook",
       "sla": "< 50ms dispatch",
       "summary": "Automatically synthesizes and routes emergency work orders, replacement parts lists, and technician alerts upon failure detection.",
-      "tags": [
-        "dispatch",
-        "webhook",
-        "telegram",
-        "maintenance"
-      ],
       "inputs": [
         "Critical Anomaly Alert",
         "Asset ID"
@@ -187,18 +182,28 @@
       "tech": "Hardware PLC Relay & Interlock Trigger",
       "sla": "< 2ms hardware trip",
       "summary": "Trips instantly when vibration velocity exceeds ISO 10816 Class IV critical danger limit (11.2 mm/s RMS), cutting motor power to prevent plant explosion.",
-      "tags": [
-        "safety",
-        "relay",
-        "iso-10816",
-        "emergency-stop"
-      ],
       "inputs": [
         "RMS Vibration Velocity (mm/s)"
       ],
       "outputs": [
         "Emergency Power Cut Relay Trigger",
         "Audible Alarm"
+      ]
+    },
+    {
+      "id": "thermal-runaway-breaker",
+      "name": "Thermal Runaway Interlock",
+      "type": "circuit-breaker",
+      "layer": "safety",
+      "complexity": "critical",
+      "tech": "Thermal Threshold Sensor (> 95°C)",
+      "sla": "< 1ms trigger",
+      "summary": "Emergency shutdown interlock triggering immediate motor cut when bearing or motor stator temperature exceeds 95°C ceiling.",
+      "inputs": [
+        "Bearing Temperature (°C)"
+      ],
+      "outputs": [
+        "Thermal Power Cut Signal"
       ]
     },
     {
@@ -210,17 +215,29 @@
       "tech": "Zero-Variance & Out-of-Bounds Watchdog",
       "sla": "< 1ms validation",
       "summary": "Filters out false alarms caused by detached probes or ADC wiring faults (e.g. static flatline 0.00V readings or impossible physical jumps).",
-      "tags": [
-        "safety",
-        "drift",
-        "filtering",
-        "adc-fault"
-      ],
       "inputs": [
         "Raw Sensor Voltage"
       ],
       "outputs": [
         "Valid Telemetry Flag / Probe Fault Warning"
+      ]
+    },
+    {
+      "id": "multichannel-alert-pager",
+      "name": "Multi-Channel Alert & PagerDuty Hub",
+      "type": "circuit-breaker",
+      "layer": "safety",
+      "complexity": "moderate",
+      "tech": "PagerDuty API · Webhook Pipeline",
+      "sla": "< 120ms alert dispatch",
+      "summary": "Immediate emergency notification pipeline alerting maintenance field engineers via SMS, Telegram, and plant alarms upon ISO Zone D trip.",
+      "inputs": [
+        "ISO Zone D Trigger",
+        "Asset Identifier"
+      ],
+      "outputs": [
+        "Dispatched Pager Notification",
+        "Escalation Acknowledged"
       ]
     }
   ],
@@ -232,15 +249,39 @@
       "type": "stream"
     },
     {
+      "source": "edge-mcu-buffer",
+      "target": "pdm-telemetry-gateway",
+      "label": "INT8 Packets",
+      "type": "stream"
+    },
+    {
       "source": "pdm-telemetry-gateway",
       "target": "fft-spectral-extractor",
-      "label": "Normalized Readings",
+      "label": "Waveform Batch",
+      "type": "data"
+    },
+    {
+      "source": "pdm-telemetry-gateway",
+      "target": "time-domain-features",
+      "label": "Voltage Stream",
       "type": "data"
     },
     {
       "source": "fft-spectral-extractor",
       "target": "autoencoder-anomaly-detector",
       "label": "Spectral Kurtosis",
+      "type": "data"
+    },
+    {
+      "source": "time-domain-features",
+      "target": "autoencoder-anomaly-detector",
+      "label": "RMS / Crest",
+      "type": "data"
+    },
+    {
+      "source": "time-domain-features",
+      "target": "iso-10816-classifier",
+      "label": "RMS Velocity",
       "type": "data"
     },
     {
@@ -268,6 +309,18 @@
       "type": "safety"
     },
     {
+      "source": "sensor-stream-ingress",
+      "target": "thermal-runaway-breaker",
+      "label": "Bearing Temp",
+      "type": "safety"
+    },
+    {
+      "source": "iso-10816-classifier",
+      "target": "multichannel-alert-pager",
+      "label": "Zone D Danger",
+      "type": "safety"
+    },
+    {
       "source": "pdm-telemetry-gateway",
       "target": "sensor-drift-guard",
       "label": "Probe Voltage Check",
@@ -278,26 +331,29 @@
     {
       "id": "layer:ingress",
       "name": "Ingress & Gateway Layer",
-      "description": "External client HUDs, edge authentication, and API endpoints.",
+      "description": "Client HUDs, gateways, and auth filters.",
       "nodeIds": [
         "sensor-stream-ingress",
+        "edge-mcu-buffer",
         "pdm-telemetry-gateway"
       ]
     },
     {
       "id": "layer:engine",
       "name": "Core Engine & Orchestration Layer",
-      "description": "Autonomous loops, deterministic classifiers, and execution pipelines.",
+      "description": "Domain logic, state machines, and autonomous pipelines.",
       "nodeIds": [
         "fft-spectral-extractor",
+        "time-domain-features",
         "autoencoder-anomaly-detector",
-        "rul-forecaster"
+        "rul-forecaster",
+        "iso-10816-classifier"
       ]
     },
     {
       "id": "layer:persistence",
       "name": "State & Data Persistence Layer",
-      "description": "Relational tables, vector embeddings, caches, and time-series archives.",
+      "description": "Relational tables, vector embeddings, and memory caches.",
       "nodeIds": [
         "timeseries-telemetry-db",
         "maintenance-dispatch-hub"
@@ -305,35 +361,13 @@
     },
     {
       "id": "layer:safety",
-      "name": "Circuit Breakers & Defensive Guardrails Layer",
-      "description": "Defensive circuit breakers, kill switches, and anti-cheat traps.",
+      "name": "Circuit Breakers & Guards Layer",
+      "description": "Defensive interlocks, kill switches, and anti-cheat traps.",
       "nodeIds": [
         "vibration-kill-breaker",
-        "sensor-drift-guard"
-      ]
-    }
-  ],
-  "tours": [
-    {
-      "title": "Autonomous Execution Walkthrough",
-      "description": "Step-by-step telemetry through the Predictive Maintenance Platform architecture pipeline.",
-      "steps": [
-        {
-          "nodeId": "sensor-stream-ingress",
-          "explanation": "Ingests continuous 1000Hz vibration, temperature, pressure, and acoustic sensor telemetry from plant manufacturing equipment."
-        },
-        {
-          "nodeId": "pdm-telemetry-gateway",
-          "explanation": "Validates device authentication certificates, performs schema normalization, and buffers readings into high-throughput queue."
-        },
-        {
-          "nodeId": "fft-spectral-extractor",
-          "explanation": "Converts raw time-series vibration waveforms into frequency-domain power spectrums, extracting peak harmonics, skewness, and crest factors."
-        },
-        {
-          "nodeId": "autoencoder-anomaly-detector",
-          "explanation": "Trained on nominal healthy machine baselines; flags early mechanical degradation by measuring reconstruction error spikes."
-        }
+        "thermal-runaway-breaker",
+        "sensor-drift-guard",
+        "multichannel-alert-pager"
       ]
     }
   ]
