@@ -1,21 +1,21 @@
 {
-  "name": "Machivital — Industrial Machinery Vitality",
-  "short_name": "Machivital",
+  "name": "Mechavital — Industrial Machinery Vitality & Telemetry",
+  "short_name": "Mechavital",
   "start_url": "/mobile",
   "display": "standalone",
-  "background_color": "#0d1015",
-  "theme_color": "#0d1015",
+  "background_color": "#0c0e12",
+  "theme_color": "#0c0e12",
   "orientation": "portrait-primary",
-  "description": "Continuous plant machinery vitality monitoring, remaining useful life forecasting, and mechatronic diagnostics.",
+  "description": "Continuous industrial machinery vitality monitoring, remaining useful life (RUL) forecasting, and mechatronic failure diagnostics.",
   "icons": [
     {
-      "src": "/static/img/machivital-icon.svg",
+      "src": "/static/img/mechavital-icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "/static/img/pdm-icon.svg",
+      "src": "/static/img/machivital-icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"

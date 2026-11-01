@@ -29,8 +29,8 @@ if not os.environ.get('VERCEL') and not os.environ.get('AWS_LAMBDA_FUNCTION_NAME
 
 @contextlib.contextmanager
 def suppress_output():
-    # If in serverless (e.g. Vercel/Lambda), never touch OS file descriptors
-    if os.environ.get('VERCEL') or os.environ.get('AWS_LAMBDA_FUNCTION_NAME'):
+    # If in serverless (e.g. Vercel/Lambda) or on Windows, never touch OS file descriptors
+    if os.environ.get('VERCEL') or os.environ.get('AWS_LAMBDA_FUNCTION_NAME') or os.name == 'nt':
         yield
         return
     try:

@@ -1,18 +1,18 @@
-<!-- High-Density Industrial Control Header Strip (Machivital Archetype E) -->
-<header class="h-13 border-b border-[var(--mv-border-hairline)] bg-[var(--mv-surface-base)] px-4 sm:px-5 flex items-center justify-between flex-shrink-0 z-30 select-none">
+<!-- High-Density Industrial Control Header Strip (Mechavital Archetype E: Signal Density) -->
+<header class="h-13 border-b border-[var(--mv-border-hairline)] bg-[var(--mv-surface-base)] px-3.5 sm:px-5 flex items-center justify-between flex-shrink-0 z-30 select-none shadow-[inset_0_-1px_0_0_rgba(255,255,255,0.03)]">
     <!-- Brand & Industrial Telemetry Stream Status -->
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-3.5">
         <a href="/" class="flex items-center gap-2.5 group">
-            <!-- Machivital Precision Vitality Glyphs -->
-            <div class="w-7 h-7 rounded-[3px] bg-[var(--mv-surface-sunken)] border border-[var(--mv-border-subtle)] flex items-center justify-center group-hover:border-[var(--mv-accent-base)] transition-colors">
-                <svg class="w-4 h-4 text-[var(--mv-accent-base)]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <!-- Mechavital Precision Vitality Glyphs -->
+            <div class="w-7.5 h-7.5 rounded-[3px] bg-[var(--mv-surface-sunken)] border border-[var(--mv-border-subtle)] flex items-center justify-center group-hover:border-[var(--mv-accent-base)] transition-colors shadow-[inset_0_1px_2px_rgba(0,0,0,0.5)]">
+                <svg class="w-4.5 h-4.5 text-[var(--mv-accent-base)] group-hover:scale-105 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h3.5l2.5-6 4 12 3-8 2.5 4h5.5" />
                 </svg>
             </div>
             <div class="flex flex-col">
                 <div class="flex items-center gap-1.5 leading-none">
-                    <span class="font-display font-bold text-sm tracking-wider text-[var(--mv-text-primary)]">MACHIVITAL</span>
-                    <span class="font-mono text-[9px] px-1 py-0.2 rounded-[2px] bg-[var(--mv-accent-muted)] text-[var(--mv-accent-base)] border border-[var(--mv-accent-base)]/30 font-semibold tracking-wider">v3.5</span>
+                    <span class="font-display font-bold text-sm tracking-wider text-[var(--mv-text-primary)]">MECHAVITAL</span>
+                    <span class="font-mono text-[9px] px-1.5 py-0.5 rounded-[2px] bg-[var(--mv-accent-muted)] text-[var(--mv-accent-base)] border border-[var(--mv-accent-base)]/30 font-semibold tracking-wider">v4.0</span>
                 </div>
                 <span class="font-mono text-[9px] text-[var(--mv-text-muted)] uppercase tracking-widest mt-0.5 hidden sm:inline">AUTONOMOUS MACHINERY VITALITY</span>
             </div>
@@ -22,10 +22,10 @@
 
         <!-- Real-Time Telemetry Stream Watchdog -->
         <div class="hidden md:flex items-center gap-2 px-2.5 py-1 rounded-[2px] bg-[var(--mv-surface-sunken)] border border-[var(--mv-border-hairline)]">
-            <span id="heartbeat-dot" class="pdm-ticker-dot" title="Telemetry Ingestion Heartbeat"></span>
+            <span id="heartbeat-dot" class="pdm-ticker-dot" title="Live Telemetry Ingestion Pulse"></span>
             <div class="flex items-center gap-1.5 font-mono text-[10px]">
-                <span class="text-[var(--mv-text-secondary)] font-semibold tracking-wider">EDGE STREAM:</span>
-                <span id="last-updated" class="text-[var(--mv-text-primary)] uppercase tracking-wider">SYNCING...</span>
+                <span class="text-[var(--mv-text-secondary)] font-semibold tracking-wider">EDGE INGEST:</span>
+                <span id="last-updated" class="text-[var(--mv-text-primary)] uppercase tracking-wider tabular-nums font-bold">SYNCING...</span>
             </div>
         </div>
     </div>
@@ -44,19 +44,26 @@
             <span id="kpi-alerts" class="font-mono text-xs font-bold text-[var(--mv-status-critical)] tabular-nums">-</span>
         </div>
 
-        <!-- Telemetry Frequency Tag -->
-        <div class="hidden xl:flex items-center gap-1.5 px-2.5 py-1 bg-[var(--mv-surface-sunken)] border border-[var(--mv-border-hairline)] rounded-[2px]" title="Edge Ingest Sampling Frequency">
-            <span class="text-[9px] font-mono uppercase tracking-wider text-[var(--mv-text-muted)]">INGEST</span>
+        <!-- Ingestion Sampling Cadence -->
+        <div class="hidden xl:flex items-center gap-1.5 px-2.5 py-1 bg-[var(--mv-surface-sunken)] border border-[var(--mv-border-hairline)] rounded-[2px]" title="Edge Telemetry Sampling Frequency">
+            <span class="text-[9px] font-mono uppercase tracking-wider text-[var(--mv-text-muted)]">CADENCE</span>
             <span class="font-mono text-xs font-medium text-[var(--mv-text-secondary)] tabular-nums">0.5 Hz / 2.0s</span>
         </div>
     </div>
 
     <!-- Actions & Operational Controls Strip -->
     <div class="flex items-center gap-2">
+        <!-- Quick Keyboard Shortcuts Guide -->
+        <button onclick="toggleShortcutsModal()"
+            class="pdm-btn text-xs py-1.5 px-2.5 h-8 bg-[var(--mv-surface-raised)] border-[var(--mv-border-subtle)] text-[var(--mv-text-muted)] hover:text-[var(--mv-text-primary)] hidden lg:inline-flex"
+            title="Keyboard Shortcuts ([1-4] Filter, [/] Search, [R] Refresh)">
+            <span class="font-mono text-[10px]">[?] KEYS</span>
+        </button>
+
         <!-- Field Remote Surveillance Handoff Trigger -->
         <button onclick="openMobileRemoteModal()"
             class="pdm-btn text-xs py-1.5 px-3 h-8 bg-[var(--mv-surface-raised)] border-[var(--mv-border-subtle)] hover:border-[var(--mv-accent-base)] text-[var(--mv-text-primary)] group"
-            title="Launch Field Technician Remote Surveillance (Mobile QR & Web App)">
+            title="Launch Field Technician Remote Surveillance (Mobile QR &amp; Web App)">
             <svg class="w-3.5 h-3.5 text-[var(--mv-accent-base)] group-hover:scale-105 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"/>
             </svg>

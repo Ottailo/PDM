@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Machivital — Autonomous Machinery Vitality & Telemetry{% endblock %}
+{% block title %}Mechavital — Autonomous Machinery Vitality &amp; Telemetry{% endblock %}
 
 {% block content %}
 <div class="flex flex-col h-screen h-[100dvh] overflow-hidden bg-[var(--mv-canvas)]">
@@ -13,45 +13,64 @@
         {% include "components/sidebar.html" %}
 
         <!-- Primary Fleet Surveillance Workstation -->
-        <main class="flex-1 flex flex-col min-w-0 overflow-y-auto p-3.5 sm:p-5 bg-[var(--mv-canvas)] space-y-3.5">
+        <main class="flex-1 flex flex-col min-w-0 overflow-y-auto p-3 sm:p-4.5 bg-[var(--mv-canvas)] space-y-3">
 
             <!-- High-Density Filter & Diagnostics Toolbar -->
-            <div class="pdm-panel p-2.5 sm:p-3 bg-[var(--mv-surface-base)] border border-[var(--mv-border-hairline)] flex flex-wrap items-center justify-between gap-2.5">
-                <div class="flex flex-wrap items-center gap-2 sm:gap-3 flex-grow">
+            <div class="pdm-panel p-2.5 sm:p-3 bg-[var(--mv-surface-base)] border border-[var(--mv-border-hairline)] flex flex-wrap items-center justify-between gap-2.5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.03)]">
+                <div class="flex flex-wrap items-center gap-2 sm:gap-2.5 flex-grow">
                     <span class="pdm-label text-[10px] text-[var(--mv-text-muted)] flex items-center gap-1.5 flex-shrink-0">
                         <span class="w-1.5 h-1.5 rounded-full bg-[var(--mv-accent-base)]"></span>
-                        <span>SURVEILLANCE FILTERS:</span>
+                        <span class="hidden sm:inline">SECTOR FILTERS:</span>
                     </span>
 
                     <!-- Location Selector -->
-                    <div class="min-w-[140px] sm:min-w-[170px]">
+                    <div class="min-w-[130px] sm:min-w-[160px]">
                         <select id="filter-location"
-                            class="w-full pdm-input text-xs py-1.5 px-2 font-mono bg-[var(--mv-surface-sunken)] border-[var(--mv-border-subtle)] text-[var(--mv-text-primary)] rounded-[2px]">
+                            class="w-full pdm-input text-xs py-1.5 px-2 font-mono bg-[var(--mv-surface-sunken)] border-[var(--mv-border-subtle)] text-[var(--mv-text-primary)] rounded-[2px]"
+                            title="Filter by Plant Location">
                             <option value="">ALL PLANT SECTORS</option>
                         </select>
                     </div>
 
                     <!-- Machine Type Selector -->
-                    <div class="min-w-[140px] sm:min-w-[170px]">
+                    <div class="min-w-[130px] sm:min-w-[160px]">
                         <select id="filter-type"
-                            class="w-full pdm-input text-xs py-1.5 px-2 font-mono bg-[var(--mv-surface-sunken)] border-[var(--mv-border-subtle)] text-[var(--mv-text-primary)] rounded-[2px]">
+                            class="w-full pdm-input text-xs py-1.5 px-2 font-mono bg-[var(--mv-surface-sunken)] border-[var(--mv-border-subtle)] text-[var(--mv-text-primary)] rounded-[2px]"
+                            title="Filter by Asset Classification">
                             <option value="">ALL ASSET CLASSES</option>
                         </select>
                     </div>
 
+                    <!-- Quick Triage Status Chips -->
+                    <div class="flex items-center gap-1 bg-[var(--mv-surface-sunken)] p-0.5 rounded-[2px] border border-[var(--mv-border-hairline)]" id="status-triage-chips">
+                        <button class="triage-chip active px-2 py-1 text-[10px] font-mono rounded-[2px] text-[var(--mv-text-primary)] hover:bg-[var(--mv-surface-raised)]" data-status="ALL">ALL</button>
+                        <button class="triage-chip px-2 py-1 text-[10px] font-mono rounded-[2px] text-[var(--mv-status-normal)] hover:bg-[var(--mv-surface-raised)]" data-status="NORMAL">NOMINAL</button>
+                        <button class="triage-chip px-2 py-1 text-[10px] font-mono rounded-[2px] text-[var(--mv-status-warning)] hover:bg-[var(--mv-surface-raised)]" data-status="WARNING">DEGRADING</button>
+                        <button class="triage-chip px-2 py-1 text-[10px] font-mono rounded-[2px] text-[var(--mv-status-critical)] hover:bg-[var(--mv-surface-raised)]" data-status="CRITICAL">TRIP</button>
+                    </div>
+
+                    <!-- Search Input -->
+                    <div class="relative min-w-[120px] max-w-[200px] flex-grow hidden sm:block">
+                        <input type="text" id="filter-search" placeholder="Search asset ID ( / )..."
+                            class="w-full pdm-input text-xs py-1.5 pl-7 pr-2 font-mono bg-[var(--mv-surface-sunken)] border-[var(--mv-border-subtle)] text-[var(--mv-text-primary)] rounded-[2px]">
+                        <svg class="w-3.5 h-3.5 text-[var(--mv-text-muted)] absolute left-2 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+
                     <!-- Reset Filters Button -->
                     <button id="clear-filters"
-                        class="pdm-btn text-xs py-1.5 px-3 h-8 bg-[var(--mv-surface-raised)] border-[var(--mv-border-subtle)] text-[var(--mv-text-secondary)] hover:text-[var(--mv-text-primary)]"
+                        class="pdm-btn text-xs py-1.5 px-2.5 h-8 bg-[var(--mv-surface-raised)] border-[var(--mv-border-subtle)] text-[var(--mv-text-secondary)] hover:text-[var(--mv-text-primary)]"
                         title="Reset Active Filters">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                         </svg>
-                        <span class="font-mono">RESET</span>
+                        <span class="font-mono text-[10px]">RESET</span>
                     </button>
                 </div>
 
                 <!-- Status Legend Matrix -->
-                <div class="hidden xl:flex items-center gap-3 text-[10px] font-mono text-[var(--mv-text-muted)]">
+                <div class="hidden 2xl:flex items-center gap-3 text-[10px] font-mono text-[var(--mv-text-muted)]">
                     <span class="flex items-center gap-1.5">
                         <span class="w-2 h-2 rounded-full bg-[var(--mv-status-normal)]"></span>
                         <span class="text-[var(--mv-text-secondary)] font-semibold">NOMINAL (&gt;120m)</span>
@@ -62,20 +81,37 @@
                     </span>
                     <span class="flex items-center gap-1.5">
                         <span class="w-2 h-2 rounded-full bg-[var(--mv-status-critical)]"></span>
-                        <span class="text-[var(--mv-text-secondary)] font-semibold">CRITICAL TRIP (&le;30m)</span>
+                        <span class="text-[var(--mv-text-secondary)] font-semibold">TRIP (&le;30m)</span>
                     </span>
                     <span class="flex items-center gap-1.5">
                         <span class="w-2 h-2 rounded-full bg-[var(--mv-status-offline)]"></span>
-                        <span class="text-[var(--mv-text-secondary)]">AWAITING STREAM</span>
+                        <span class="text-[var(--mv-text-secondary)]">STANDBY / AWAITING</span>
                     </span>
                 </div>
             </div>
 
+            <!-- Error State Container (Canonical Pattern 5-State View) -->
+            <div id="fleet-error-banner" class="hidden p-4 rounded-[var(--mv-radius-md)] border border-[var(--mv-status-critical-border)] bg-[var(--mv-surface-base)] text-xs">
+                <div class="flex items-start justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="w-3 h-3 rounded-full bg-[var(--mv-status-critical)] flex-shrink-0 animate-ping"></span>
+                        <div>
+                            <h4 class="font-display font-bold text-sm tracking-wide text-[var(--mv-status-critical)] uppercase">Telemetry Stream Interrupted</h4>
+                            <p class="mt-0.5 text-[var(--mv-text-secondary)] font-mono text-[11px]" id="fleet-error-message">Unable to sync with live telemetry stream.</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="manualRefreshData()"
+                        class="pdm-btn pdm-btn-critical text-[10px] py-1 px-3 font-mono">
+                        RECONNECT STREAM
+                    </button>
+                </div>
+            </div>
+
             <!-- Machine Grid Container (Populated / Loading / Empty / Error States) -->
-            <div id="machine-grid" class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4 pb-8">
+            <div id="machine-grid" class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-3.5 pb-8">
 
                 <!-- Initial Loading Skeleton (Zero Layout Shift) -->
-                <div class="col-span-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4" id="fleet-loading-skeleton">
+                <div class="col-span-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-3.5" id="fleet-loading-skeleton">
                     {% for i in range(3) %}
                     <div class="pdm-card flex flex-col p-4 space-y-4 bg-[var(--mv-surface-base)] border border-[var(--mv-border-hairline)] rounded-[3px]">
                         <div class="flex items-center justify-between pb-3 border-b border-[var(--mv-border-hairline)]">
@@ -110,8 +146,46 @@
     </div>
 </div>
 
-<!-- Modal Overlays -->
+<!-- Modal Dialogs Layer -->
 {% include "components/modals.html" %}
 {% include "components/machine_management_modal.html" %}
 
+<!-- Keyboard Shortcuts Cheat-Sheet Modal -->
+<div id="shortcuts-modal-overlay" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden pdm-modal-backdrop bg-black/80">
+    <div class="w-full max-w-md bg-[var(--mv-surface-overlay)] rounded-[var(--mv-radius-lg)] border border-[var(--mv-border-subtle)] shadow-2xl p-5 pdm-modal-dialog">
+        <div class="flex items-center justify-between pb-3 border-b border-[var(--mv-border-hairline)]">
+            <h3 class="font-display font-bold text-sm tracking-wider uppercase text-[var(--mv-text-primary)]">OPERATOR KEYBOARD COMMANDS</h3>
+            <button onclick="toggleShortcutsModal()" class="pdm-btn text-xs py-1 px-2 text-[var(--mv-text-muted)] hover:text-white">✕</button>
+        </div>
+        <div class="py-4 space-y-2.5 font-mono text-xs">
+            <div class="flex items-center justify-between p-2 bg-[var(--mv-surface-sunken)] rounded-[2px] border border-[var(--mv-border-hairline)]">
+                <span class="text-[var(--mv-text-secondary)]">Show All Machines</span>
+                <kbd class="px-2 py-0.5 bg-[var(--mv-surface-raised)] border border-[var(--mv-border-subtle)] text-[var(--mv-accent-base)] rounded">1</kbd>
+            </div>
+            <div class="flex items-center justify-between p-2 bg-[var(--mv-surface-sunken)] rounded-[2px] border border-[var(--mv-border-hairline)]">
+                <span class="text-[var(--mv-text-secondary)]">Triage Degrading Alerts</span>
+                <kbd class="px-2 py-0.5 bg-[var(--mv-surface-raised)] border border-[var(--mv-border-subtle)] text-[var(--mv-status-warning)] rounded">2</kbd>
+            </div>
+            <div class="flex items-center justify-between p-2 bg-[var(--mv-surface-sunken)] rounded-[2px] border border-[var(--mv-border-hairline)]">
+                <span class="text-[var(--mv-text-secondary)]">Triage Critical Trip Alarms</span>
+                <kbd class="px-2 py-0.5 bg-[var(--mv-surface-raised)] border border-[var(--mv-border-subtle)] text-[var(--mv-status-critical)] rounded">3</kbd>
+            </div>
+            <div class="flex items-center justify-between p-2 bg-[var(--mv-surface-sunken)] rounded-[2px] border border-[var(--mv-border-hairline)]">
+                <span class="text-[var(--mv-text-secondary)]">Focus Search Query</span>
+                <kbd class="px-2 py-0.5 bg-[var(--mv-surface-raised)] border border-[var(--mv-border-subtle)] text-[var(--mv-text-primary)] rounded">/</kbd>
+            </div>
+            <div class="flex items-center justify-between p-2 bg-[var(--mv-surface-sunken)] rounded-[2px] border border-[var(--mv-border-hairline)]">
+                <span class="text-[var(--mv-text-secondary)]">Manual Telemetry Polling Pulse</span>
+                <kbd class="px-2 py-0.5 bg-[var(--mv-surface-raised)] border border-[var(--mv-border-subtle)] text-[var(--mv-text-primary)] rounded">R</kbd>
+            </div>
+            <div class="flex items-center justify-between p-2 bg-[var(--mv-surface-sunken)] rounded-[2px] border border-[var(--mv-border-hairline)]">
+                <span class="text-[var(--mv-text-secondary)]">Close Active Modals / Drawers</span>
+                <kbd class="px-2 py-0.5 bg-[var(--mv-surface-raised)] border border-[var(--mv-border-subtle)] text-[var(--mv-text-primary)] rounded">ESC</kbd>
+            </div>
+        </div>
+        <div class="pt-3 border-t border-[var(--mv-border-hairline)] flex justify-end">
+            <button onclick="toggleShortcutsModal()" class="pdm-btn text-xs py-1.5 px-4 font-mono">DISMISS</button>
+        </div>
+    </div>
+</div>
 {% endblock %}

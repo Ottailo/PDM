@@ -1,7 +1,7 @@
 /* ==========================================================================
-   MACHIVITAL — Industrial Machinery Vitality & Autonomous Telemetry
+   MECHAVITAL — Autonomous Machinery Vitality & Telemetry
    Design Archetype E: SIGNAL DENSITY (Serious OPERATE Surface)
-   Surface Mode: OPERATE | Variance: 3/10 | Motion: 1/10 | Density: 9/10
+   Surface Mode: OPERATE | Variance: 3/10 | Motion: 2/10 | Density: 9/10
    Base Neutral Hue: 250 (Graphite Cold Steel)
    ========================================================================== */
 
@@ -505,7 +505,29 @@ pre,
   color: var(--mv-text-primary);
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease, transform 60ms ease;
+}
+
+.pdm-btn:active {
+  transform: translateY(1px);
+}
+
+/* Quick Triage Status Chips */
+.triage-chip {
+  cursor: pointer;
   transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+  border: 1px solid transparent;
+  user-select: none;
+}
+
+.triage-chip:hover {
+  background-color: var(--mv-surface-raised);
+}
+
+.triage-chip.active {
+  background-color: var(--mv-surface-raised);
+  border-color: var(--mv-border-subtle);
+  font-weight: 700;
 }
 
 @media (hover: hover) and (pointer: fine) {

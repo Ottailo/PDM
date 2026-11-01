@@ -807,6 +807,25 @@ function updateDashboard(data) {
             if (currentFilters.location && machineData.location !== currentFilters.location) isVisible = false;
             if (currentFilters.type && machineData.machine_type !== currentFilters.type) isVisible = false;
 
+            if (currentFilters.status && currentFilters.status !== 'ALL') {
+                const s = (machineData.state || '').toLowerCase();
+                if (currentFilters.status === 'NORMAL') {
+                    if (s !== 'normal' && s !== 'live') isVisible = false;
+                } else if (currentFilters.status === 'WARNING') {
+                    if (s !== 'warning' && s !== 'degrading') isVisible = false;
+                } else if (currentFilters.status === 'CRITICAL') {
+                    if (!s.includes('critical') && !s.includes('trip') && !s.includes('dropped')) isVisible = false;
+                }
+            }
+
+            if (currentFilters.search) {
+                const q = currentFilters.search.toLowerCase();
+                const idMatch = machineId.toLowerCase().includes(q);
+                const typeMatch = machineData.machine_type && machineData.machine_type.toLowerCase().includes(q);
+                const locMatch = machineData.location && machineData.location.toLowerCase().includes(q);
+                if (!idMatch && !typeMatch && !locMatch) isVisible = false;
+            }
+
             if (!isVisible) {
                 if (cardContainer) cardContainer.style.display = 'none';
                 continue;
@@ -968,16 +987,27 @@ async function fetchDashboardData() {
         // Remove error panel if present
         const errPanel = document.getElementById('fleet-error-panel');
         if (errPanel) errPanel.remove();
+        const errorBanner = document.getElementById('fleet-error-banner');
+        if (errorBanner) errorBanner.classList.add('hidden');
 
         if (lastUpdatedEl) {
-            lastUpdatedEl.textContent = `SIMULATION ACTIVE | INGESTION: ${new Date(data.last_prediction_run_time_utc).toLocaleTimeString()}`;
+            const timeStr = data.last_prediction_run_time_utc ? new Date(data.last_prediction_run_time_utc).toLocaleTimeString() : new Date().toLocaleTimeString();
+            const modeStr = data.is_operational ? 'LIVE BURST' : 'STANDBY';
+            lastUpdatedEl.textContent = `${modeStr} [${timeStr}]`;
         }
         updateDashboard(data);
     } catch (error) {
         console.error("Dashboard fetch error:", error);
-        if (lastUpdatedEl) lastUpdatedEl.textContent = `CONNECTION TRIP: ${error.message}`;
+        if (lastUpdatedEl) lastUpdatedEl.textContent = `DISCONNECT: ${error.message}`;
         const skeletonEl = document.getElementById('fleet-loading-skeleton');
         if (skeletonEl) skeletonEl.remove();
+
+        const errorBanner = document.getElementById('fleet-error-banner');
+        const errorMsg = document.getElementById('fleet-error-message');
+        if (errorBanner) {
+            errorBanner.classList.remove('hidden');
+            if (errorMsg) errorMsg.textContent = `Telemetry Stream Interrupted: ${error.message}. Edge retry queued.`;
+        }
         if (machineGrid && (!lastDashboardData || Object.keys(lastDashboardData.predictions || {}).length === 0)) {
             let errorPanel = document.getElementById('fleet-error-panel');
             if (!errorPanel) {
@@ -1438,31 +1468,97 @@ function initSidebarResize() {
 
 let currentFilters = {
     location: '',
-    type: ''
+    type: '',
+    status: 'ALL',
+    search: ''
 };
 
 function initFilters() {
     const locationFilter = document.getElementById('filter-location');
     const typeFilter = document.getElementById('filter-type');
     const clearButton = document.getElementById('clear-filters');
+    const searchInput = document.getElementById('filter-search');
 
-    if (!locationFilter || !typeFilter || !clearButton) return;
+    if (locationFilter) {
+        locationFilter.addEventListener('change', (e) => {
+            currentFilters.location = e.target.value;
+            applyFilters();
+        });
+    }
 
-    locationFilter.addEventListener('change', (e) => {
-        currentFilters.location = e.target.value;
-        applyFilters();
+    if (typeFilter) {
+        typeFilter.addEventListener('change', (e) => {
+            currentFilters.type = e.target.value;
+            applyFilters();
+        });
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            currentFilters.search = e.target.value.trim();
+            applyFilters();
+        });
+    }
+
+    const triageChips = document.querySelectorAll('.triage-chip');
+    triageChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            triageChips.forEach(c => c.classList.remove('active', 'bg-[var(--mv-surface-raised)]', 'font-bold'));
+            chip.classList.add('active', 'bg-[var(--mv-surface-raised)]', 'font-bold');
+            currentFilters.status = chip.dataset.status || 'ALL';
+            applyFilters();
+        });
     });
 
-    typeFilter.addEventListener('change', (e) => {
-        currentFilters.type = e.target.value;
-        applyFilters();
-    });
+    if (clearButton) {
+        clearButton.addEventListener('click', () => {
+            currentFilters = { location: '', type: '', status: 'ALL', search: '' };
+            if (locationFilter) locationFilter.value = '';
+            if (typeFilter) typeFilter.value = '';
+            if (searchInput) searchInput.value = '';
+            triageChips.forEach(c => c.classList.remove('active', 'bg-[var(--mv-surface-raised)]', 'font-bold'));
+            const allChip = document.querySelector('.triage-chip[data-status="ALL"]');
+            if (allChip) allChip.classList.add('active', 'bg-[var(--mv-surface-raised)]', 'font-bold');
+            applyFilters();
+        });
+    }
 
-    clearButton.addEventListener('click', () => {
-        currentFilters = { location: '', type: '' };
-        locationFilter.value = '';
-        typeFilter.value = '';
-        applyFilters();
+    // Global tactile keyboard shortcuts for operators
+    document.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') {
+            if (e.key === 'Escape') e.target.blur();
+            return;
+        }
+
+        if (e.key === '1') {
+            const chip = document.querySelector('.triage-chip[data-status="ALL"]');
+            if (chip) chip.click();
+        } else if (e.key === '2') {
+            const chip = document.querySelector('.triage-chip[data-status="WARNING"]');
+            if (chip) chip.click();
+        } else if (e.key === '3') {
+            const chip = document.querySelector('.triage-chip[data-status="CRITICAL"]');
+            if (chip) chip.click();
+        } else if (e.key === '/') {
+            e.preventDefault();
+            const sInput = document.getElementById('filter-search');
+            if (sInput) sInput.focus();
+        } else if (e.key.toLowerCase() === 'r') {
+            e.preventDefault();
+            fetchDashboardData();
+        } else if (e.key === 'Escape') {
+            closeHistoryModal();
+            closeMobileRemoteModal();
+            const advisorModal = document.getElementById('ai-advisor-modal-overlay');
+            if (advisorModal) advisorModal.classList.add('hidden');
+            const maintModal = document.getElementById('maintenance-request-modal-overlay');
+            if (maintModal) maintModal.classList.add('hidden');
+            const connModal = document.getElementById('device-connection-modal-overlay');
+            if (connModal) connModal.classList.add('hidden');
+            const shortcutsModal = document.getElementById('shortcuts-modal-overlay');
+            if (shortcutsModal) shortcutsModal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
     });
 }
 
@@ -1537,6 +1633,15 @@ function closeMobileRemoteModal() {
     const modal = document.getElementById('mobile-remote-modal');
     if (modal) modal.classList.add('hidden');
 }
+
+window.toggleShortcutsModal = function() {
+    const modal = document.getElementById('shortcuts-modal-overlay');
+    if (modal) modal.classList.toggle('hidden');
+};
+
+window.manualRefreshData = function() {
+    fetchDashboardData();
+};
 
 function copyMobileUrl() {
     const urlDisplay = document.getElementById('mobile-remote-url-text');

@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Haptic & Audio Support
 function initHaptics() {
-    const stored = localStorage.getItem('machivital_mobile_haptics') || localStorage.getItem('pdm_mobile_haptics');
+    const stored = localStorage.getItem('mechavital_mobile_haptics') || localStorage.getItem('machivital_mobile_haptics') || localStorage.getItem('pdm_mobile_haptics');
     if (stored !== null) {
         hapticsEnabled = stored === 'true';
     }
@@ -34,7 +34,7 @@ function initHaptics() {
 
 function toggleHaptics() {
     hapticsEnabled = !hapticsEnabled;
-    localStorage.setItem('machivital_mobile_haptics', hapticsEnabled ? 'true' : 'false');
+    localStorage.setItem('mechavital_mobile_haptics', hapticsEnabled ? 'true' : 'false');
     updateHapticButtonLabel();
     if (hapticsEnabled && navigator.vibrate) {
         navigator.vibrate(60);
@@ -576,7 +576,7 @@ async function openDiagnosticDrawer(machineId) {
 
     // Show loading state
     document.getElementById('drawer-severity').textContent = 'CALCULATING...';
-    document.getElementById('drawer-root-cause').textContent = 'Querying Machivital Cognitive Diagnostic Engine...';
+    document.getElementById('drawer-root-cause').textContent = 'Querying Mechavital Cognitive Diagnostic Engine...';
     document.getElementById('drawer-checklist').innerHTML = '<div class="text-[10px] text-[var(--pdm-text-muted)]">Generating physical inspection steps...</div>';
     document.getElementById('drawer-parts-list').innerHTML = '';
 

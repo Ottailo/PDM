@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Machivital — Operator Authentication Console</title>
+    <title>Mechavital — Operator Authentication Console</title>
 
-    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/machivital-icon.svg') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/mechavital-icon.svg') }}">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-    <meta name="theme-color" content="#0d1015">
+    <meta name="theme-color" content="#0c0e12">
 
     <!-- DIN-Caliber Instrumentation Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,7 +36,6 @@
                         'mv-border-subtle': 'var(--mv-border-subtle)',
                         'mv-border-strong': 'var(--mv-border-strong)',
                         'mv-accent': 'var(--mv-accent-base)',
-                        'mv-accent-muted': 'var(--mv-accent-muted)',
                         'mv-normal': 'var(--mv-status-normal)',
                         'mv-warning': 'var(--mv-status-warning)',
                         'mv-critical': 'var(--mv-status-critical)',
@@ -72,27 +71,31 @@
     </script>
 
     <!-- Industrial Design System CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=3.5">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=4.0">
 </head>
 
 <body
-    class="bg-[var(--mv-canvas)] text-[var(--mv-text-primary)] font-sans antialiased h-screen h-[100dvh] flex items-center justify-center p-4">
+    class="bg-[var(--mv-canvas)] text-[var(--mv-text-primary)] font-sans antialiased h-screen h-[100dvh] flex items-center justify-center p-4 selection:bg-[var(--mv-accent-base)] selection:text-black">
 
     <!-- Console Authentication Card -->
-    <div class="w-full max-w-sm bg-[var(--mv-surface-base)] border border-[var(--mv-border-subtle)] rounded-[3px] shadow-2xl overflow-hidden">
+    <div class="w-full max-w-sm bg-[var(--mv-surface-base)] border border-[var(--mv-border-subtle)] rounded-[3px] shadow-2xl overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]">
 
         <!-- Header Bar with System ID -->
         <div class="px-5 py-4 border-b border-[var(--mv-border-hairline)] bg-[var(--mv-surface-sunken)] flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-[var(--mv-status-normal)]"></span>
-                <span class="font-display font-semibold text-xs tracking-wider text-[var(--mv-text-primary)] uppercase">MACHIVITAL // SECURE ACCESS</span>
+            <div class="flex items-center gap-2.5">
+                <div class="w-5 h-5 rounded-[2px] bg-[var(--mv-surface-base)] border border-[var(--mv-border-subtle)] flex items-center justify-center">
+                    <svg class="w-3.5 h-3.5 text-[var(--mv-accent-base)]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h3.5l2.5-6 4 12 3-8 2.5 4h5.5" />
+                    </svg>
+                </div>
+                <span class="font-display font-semibold text-xs tracking-wider text-[var(--mv-text-primary)] uppercase">MECHAVITAL // SECURE ACCESS</span>
             </div>
-            <span class="font-mono text-[10px] text-[var(--mv-accent-base)] uppercase tracking-wider font-bold">v3.5</span>
+            <span class="font-mono text-[10px] text-[var(--mv-accent-base)] uppercase tracking-wider font-bold">v4.0</span>
         </div>
 
         <div class="p-6">
             <!-- Console Identifier -->
-            <div class="mb-6">
+            <div class="mb-5">
                 <h1 class="pdm-display-lg text-[var(--mv-text-primary)]">OPERATOR LOGIN</h1>
                 <p class="text-xs text-[var(--mv-text-muted)] mt-1 font-sans">Autonomous Machinery Vitality &amp; Telemetry</p>
             </div>
@@ -117,7 +120,7 @@
                     <label class="block pdm-label mb-1.5" for="username">Operator ID / Username</label>
                     <input type="text" id="username" name="username" required autocomplete="username"
                         class="w-full pdm-input focus:border-[var(--mv-accent-base)]"
-                        placeholder="e.g. operator_line1">
+                        placeholder="e.g. admin">
                 </div>
 
                 <div>
@@ -143,14 +146,35 @@
                 </button>
             </form>
 
+            <!-- Quick Demo Credential Pills -->
+            <div class="mt-5 pt-3 border-t border-[var(--mv-border-hairline)] space-y-1.5">
+                <span class="text-[9px] font-mono text-[var(--mv-text-muted)] uppercase tracking-wider block">QUICK ACCESS PASSES:</span>
+                <div class="grid grid-cols-2 gap-2">
+                    <button type="button" onclick="fillCreds('admin', 'admin123')"
+                        class="pdm-btn text-[10px] py-1 px-2 font-mono bg-[var(--mv-surface-sunken)] border-[var(--mv-border-hairline)] hover:border-[var(--mv-accent-base)] text-[var(--mv-text-secondary)] hover:text-[var(--mv-text-primary)]">
+                        ADMIN PASS
+                    </button>
+                    <button type="button" onclick="fillCreds('operator', 'operator123')"
+                        class="pdm-btn text-[10px] py-1 px-2 font-mono bg-[var(--mv-surface-sunken)] border-[var(--mv-border-hairline)] hover:border-[var(--mv-accent-base)] text-[var(--mv-text-secondary)] hover:text-[var(--mv-text-primary)]">
+                        OPERATOR PASS
+                    </button>
+                </div>
+            </div>
+
             <!-- Diagnostic Hint -->
-            <div class="mt-6 pt-4 border-t border-[var(--mv-border-hairline)] flex items-center justify-between text-[11px] font-mono text-[var(--mv-text-muted)]">
+            <div class="mt-4 pt-3 border-t border-[var(--mv-border-hairline)] flex items-center justify-between text-[10px] font-mono text-[var(--mv-text-muted)]">
                 <span>SYSTEM: NOMINAL</span>
                 <span>SEC: LEVEL-3 TLS</span>
             </div>
         </div>
     </div>
 
+    <script>
+        function fillCreds(u, p) {
+            document.getElementById('username').value = u;
+            document.getElementById('password').value = p;
+        }
+    </script>
 </body>
 
 </html>

@@ -4,11 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>{% block title %}Machivital — Autonomous Machinery Vitality & Telemetry{% endblock %}</title>
+    <title>{% block title %}Mechavital — Autonomous Machinery Vitality &amp; Telemetry{% endblock %}</title>
 
-    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/machivital-icon.svg') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/mechavital-icon.svg') }}">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-    <meta name="theme-color" content="#0d1015">
+    <meta name="theme-color" content="#0c0e12">
+    <meta name="description" content="Autonomous industrial machinery vitality monitoring, remaining useful life (RUL) forecasting, and predictive mechatronic failure diagnostics.">
 
     <!-- DIN-Caliber Instrumentation Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,7 +28,7 @@
             theme: {
                 extend: {
                     colors: {
-                        /* Machivital Primary Design Tokens (Archetype E: Signal Density) */
+                        /* Mechavital Primary Design Tokens (Archetype E: Signal Density) */
                         'mv-canvas': 'var(--mv-canvas)',
                         'mv-surface-base': 'var(--mv-surface-base)',
                         'mv-surface-raised': 'var(--mv-surface-raised)',
@@ -78,7 +79,7 @@
     </script>
 
     <!-- Industrial Design System CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=3.5">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=4.0">
 </head>
 
 <body
@@ -92,9 +93,9 @@
         src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script
         src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
-    <script src="{{ url_for('static', filename='js/dashboard.js') }}?v=3.5"></script>
-    <script src="{{ url_for('static', filename='js/machine_management.js') }}?v=3.5"></script>
-    <script src="{{ url_for('static', filename='js/device_connection.js') }}?v=3.5"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}?v=4.0"></script>
+    <script src="{{ url_for('static', filename='js/machine_management.js') }}?v=4.0"></script>
+    <script src="{{ url_for('static', filename='js/device_connection.js') }}?v=4.0"></script>
 </body>
 
 </html>
