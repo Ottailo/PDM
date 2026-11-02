@@ -1,4 +1,4 @@
-// Predictive Maintenance Console Master Client Logic
+﻿// Predictive Maintenance Console Master Client Logic
 // Strictly adhering to DESIGN.md (OPERATE surface mode) and PRODUCT.md contracts
 
 console.log("--- PDM TELEMETRY CONSOLE INITIALIZED ---");
@@ -693,7 +693,7 @@ function updateSidebar(data) {
             dotColor = 'bg-[var(--pdm-status-warning)]';
             title = 'ANOMALY DETECTED';
             textColor = 'text-[var(--pdm-status-warning)]';
-            message = item.anomaly_details || 'Multivariate sensor divergence';
+            message = (typeof item.anomaly_details === 'object' && item.anomaly_details ? (item.anomaly_details.type ? item.anomaly_details.type.replace(/_/g, ' ').toUpperCase() : 'TELEMETRY DEVIANCE') : (item.anomaly_details || 'Multivariate sensor divergence'));
         } else if (item.state === 'Warning') {
             borderClass = 'border-[var(--pdm-status-warning-border)]';
             dotColor = 'bg-[var(--pdm-status-warning)]';
