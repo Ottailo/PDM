@@ -2,7 +2,7 @@
 
 ## Production informational-page publication — 2026-11-12
 
-User explicitly approved **Publish to production** after the production alias `machivital.vercel.app` was found still serving the historical console. Approved scope: fast-forward reviewed source to main and deploy the static public pilot information only, no private backend/data/customer release. Fresh public build/4build-boundary checks/source-only rehearsal/64frontend tests14.73s all exit0. Current: publish via existing Vercel Git integration and verify exact production domain.
+User explicitly approved **Publish to production** after the production alias `machivital.vercel.app` was found still serving the historical console. Approved scope: fast-forward reviewed source to main and deploy the static public pilot information only, no private backend/data/customer release. Fresh public build/4build-boundary checks/source-only rehearsal/64frontend tests14.73s all exit0. Production main c0db2f7 deployed, but actual domain checks found root404/APIplain503: builder mounted files at /frontend/ while routes assumed root. /frontend/index.html200 confirmed. Current: correct mounted destinations, add regression/negative control, push routing fix and verify exact production domain. Private service remains excluded.
 
 ## Public publishing and design polish — 2026-11-12
 
