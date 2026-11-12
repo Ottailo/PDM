@@ -1,5 +1,15 @@
 # Machivital execution proof
 
+## Production informational-page deployment — 2026-11-12
+
+User explicitly approved **Publish to production** to replace the old console at `https://machivital.vercel.app`. Source was fast-forwarded to main; private service and customer release remain held.
+
+Initial production commit `c0db2f7` received Vercel success but actual GET `/` returned404 and API returned plain-text503. Inspection proved the nested static builder mounted files at `/frontend/index.html` (200), `/frontend/mark.svg` (200), and `/frontend/pilot-unavailable.json` (200). Root-only destinations were wrong. Failed production Edge traces are preserved under ignored `.pilot/production-initial-route-failure-20261112`.
+
+Routing fix `e5d3f7a40c9a5ffe8b14153664df669f289e6190` maps root/deep links/assets/logo/unavailable-API to `/frontend/` and adds a mounted-artifact regression/negative control. Five public-build contract tests, lint and public build exit0. Source-only build rehearsal exit0. Vercel deployment status success: https://vercel.com/ottailo-projects/pdm/6w5PGEdFThK7qytAVFassMshWhFd . Actual production HTTP checks now pass: root200 title `Machivital | A clearer maintenance shift`, JS/CSS/logo200 with correct MIME, auth/private/legacy deep links200 informational HTML, missing asset404, API503 application/json/no-store with `private_pilot_unavailable`. Full production Edge: `PDM_PUBLIC_URL=https://machivital.vercel.app npm --prefix frontend run test:public-e2e` — **2 passed in17.8s,exit0**. Real production disclosures, keyboard,390px/320px no-overflow, no private forms/API queries/pageerrors, private/auth/legacy deep links and API GET/POST503JSON/no-store passed. Production screenshots replace the earlier local public captures at `tests/screenshots/public-pilot/{desktop,mobile-320,mobile-390}.png`; screenshots read and text audited.
+
+Fresh pre-production64unit tests14.73s exit0. Original24tables/9protectedfiles/3legacyDBs remain unchanged. No private API/storage/email/worker provisioned, no secrets or customer records deployed. The old console is replaced intentionally, not relabeled as a working private app.
+
 ## Public publishing and visual polish — 2026-11-12
 
 This turn publishes a static public pilot overview only. The real private maintenance service remains a local rehearsal, not a production/customer release.

@@ -1,8 +1,14 @@
 # Machivital Stage 1 verification checklist
 
-Current status: local implementation on `feat/machivital-private-pilot`; not deployed or approved for customer use. The older checklist below is a historical demo record, NOT current release proof. The 2026-11-11 source audit disproved its blanket real-hardware, reliable-prediction, secure-auth and real-work-order claims. Prior screenshots/printed script success do not close these gates.
+Current status: public informational page deployed and verified at `machivital.vercel.app`; private workbench remains local and not approved for customer use. The older checklist below is a historical demo record, NOT current release proof. The 2026-11-11 source audit disproved its blanket real-hardware, reliable-prediction, secure-auth and real-work-order claims. Prior screenshots/printed script success do not close these gates.
 
-## Public publishing and visual polish — 2026-11-12
+## Production informational-page publication — 2026-11-12
+
+- [x] PROD-APPROVAL: user explicitly approved Publish to production; reviewed source fast-forwarded to main, static-only scope/private backend hold preserved.
+- [x] PROD-ROUTING: initialroot404/APIplain503 reproduced; nested/frontend mount confirmed live; e5d3f7a fix maps root/assets/logo/API. Five build-boundary tests/lint/build exit0, private-client negative control/source-only build pass.
+- [x] PROD-LIVE: machivital.vercel.app root200 newpage/JS+CSS+logo200/missingasset404; API503JSON/no-store. Actual Edge2tests17.8s exit0 covers disclosures/keyboard/phone390+320/nooverflow/noforms/noAPIqueries/deeplinks/GET+POST unavailable. Production screenshots saved/read; Vercel success https://vercel.com/ottailo-projects/pdm/6w5PGEdFThK7qytAVFassMshWhFd. Original24tables/9files/3legacyDBs unchanged. Full proof VERIFICATION.md.
+
+## Public publishing and visual polish — 2026-11-12 (earlier preview checkpoint)
 
 Approved scope: public pilot information on the feature-branch preview; private service remains local. No main merge, production alias promotion, private DB migration or provider changes.
 
