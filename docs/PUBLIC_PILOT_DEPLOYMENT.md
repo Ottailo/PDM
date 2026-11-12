@@ -16,7 +16,13 @@ Run `npm --prefix frontend run vercel-build` followed by `npm --prefix frontend 
 
 Ordinary `npm --prefix frontend run build` still builds the real private workbench. Its existing isolated PostgreSQL/SMTP/scanner/worker rehearsal remains separate. Original pilot schema/data are not automatically upgraded or connected to Vercel.
 
-## Git versus production
+## Production publishing authorization — 2026-11-12
+
+After confirming that `machivital.vercel.app` still showed the old console, the user explicitly approved **Publish to production**. The approved change is the static informational page only, replacing the historical telemetry console at the production alias. The reviewed feature source may now be fast-forwarded to `main` for Vercel's Git production deployment. No private API, accounts, files, databases, workers, provider credentials or customer-service release are included. Production behavior must be checked after deployment; earlier preview SSO limits are not production verification.
+
+Fresh pre-production verification: `vercel-build`, four public-build contract tests, source-only build rehearsal and64frontend tests all exit0 (unit suite14.73s). Exact remote checks are recorded in `VERIFICATION.md` when executed.
+
+## Git versus production (earlier preview checkpoint)
 
 Pushing `feat/machivital-private-pilot` requests a branch preview through the existing Vercel Git integration. It does not merge `main` or promote the production alias `https://pdm-chi.vercel.app`. Record the exact commit and Vercel status/URL after the push; do not claim a ready preview solely because Git accepted the push.
 

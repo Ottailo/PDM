@@ -4,6 +4,10 @@
 
 Scope: review only, no production writes, installs, credential changes, commits, pushes or deployment. Existing app/doc changes preserved. Fresh backend baseline rerun passed24 tests in64.88s,exit0. Independent read-only access-security review completed and identified the source-confirmed blockers below. No application fixes were made in this review.
 
+## Production informational-page approval — 2026-11-12
+
+The user subsequently explicitly approved **Publish to production** to replace the old console at `machivital.vercel.app`. This authorizes a fast-forward of the verified feature source to `main` and static informational-page production deployment only. It does not release the private maintenance backend, change original databases or approve customer operations. The customer-service HOLD below remains applicable; earlier no-main-promotion statements describe the superseded preview-only scope.
+
 ## Public publishing approval — 2026-11-12
 
 The user approved polishing the existing workbench and publishing **public pilot information only** from `feat/machivital-private-pilot`. This supersedes earlier no-push instructions only for source checkpointing and the static informational preview. It does not authorize customer/private backend deployment, production main merge, original database migration, paid providers or production alias promotion. New single-static-build Vercel routing excludes Python and private data/flows. See `PUBLIC_PILOT_DEPLOYMENT.md` and fresh `VERIFICATION.md`; historical blockers below concern a working customer service, not this informational page.
