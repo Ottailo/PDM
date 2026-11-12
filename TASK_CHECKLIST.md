@@ -10,7 +10,7 @@ Approved scope: public pilot information on the feature-branch preview; private 
 - [x] PUBLISH-BOUNDARY: standalone `pilot-main.tsx`/HTML/config, single static Vercel target, private modules excluded; 4artifact negative-control tests and source-only build exit0; public Edge2tests8.4s zero forms/API queries, GET/POST unavailable JSON/503.
 - [x] PUBLISH-VERIFY: final type/lint/frontend64tests20.65s/private+publicbuild/4artifact tests exit0; backend/calendar/runtime143tests291.51s exit0; private Edge5journeys2.5m exit0 after all fixes. Original24tables/9files/3legacyDBs unchanged/check exit0. Frozen0001 whitespace exception documented, not modified.
 - [x] PUBLISH-PROOF: reviewed public `tests/screenshots/public-pilot/{desktop,mobile-320,mobile-390}.png`; private synthetic persona captures are ignored/machine-local. Contrast7.30/6.53/7.21:1, public console clean, source credential-pattern scan0hits. Detailed failures preserved in VERIFICATION.md.
-- [ ] PUBLISH-GIT: staged private-path/secret scan, attributed commit, feature push and actual Vercel status recorded.
+- [x] PUBLISH-GIT: staged174files private-path/credential scan0hits; attributed commit `08b62ce55b6ecbe79c455fdde9e98e9e04358235` pushed to `origin/feat/machivital-private-pilot`. Vercel Git status success/Deployment has completed: `https://vercel.com/ottailo-projects/pdm/3P5gZ7neWbfemufQASxcc2KNkhTh`. Preview `https://pdm-git-feat-machivital-private-pilot-ottailo-projects.vercel.app` is SSO-protected; actual CDN/UI behavior remains unverified without accepted Vercel auth. `main` remains6539ad2; no production alias promotion/private backend release.
 
 ## Preventive maintenance milestone — locally verified 2026-11-12
 

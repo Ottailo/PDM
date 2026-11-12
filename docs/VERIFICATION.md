@@ -20,7 +20,13 @@ This turn publishes a static public pilot overview only. The real private mainte
 4. Visual critique caught mid-word phone `Maintenance` wrapping; visible tab changed to `Jobs` with accessible full label and E2E single-line check. Public screenshots refreshed without keyboard-test focus overlay.
 5. Giving every nav link an aria-label made `getByLabel(/^Machine/)` match the Machines link as well as the form field. Explicit label now applies only to the shortened Maintenance/Jobs link. A bounded 900-second worker expired during repeated verification, leaving genuine email jobs queued; rearmed the isolated worker rather than pretending SMTP delivery or weakening tests. Failed runs remain private.
 
-Only informational public screenshots are committed. Private persona screenshots, account evidence, mail, recovery keys, uploads, traces and local memory are excluded from Git/Vercel. Git push and actual CDN verification are recorded separately; local success is not proof of deployment.
+Only informational public screenshots are committed. Private persona screenshots, account evidence, mail, recovery keys, uploads, traces and local memory are excluded from Git/Vercel.
+
+### Git and Vercel outcome
+
+`08b62ce55b6ecbe79c455fdde9e98e9e04358235` committed and pushed to `origin/feat/machivital-private-pilot`. Remote refs confirm `main` remains `6539ad20b3540e86192e33cc2409678b97405794`. Vercel commit status is **success**, description **Deployment has completed**, linked dashboard: https://vercel.com/ottailo-projects/pdm/3P5gZ7neWbfemufQASxcc2KNkhTh . The exact preview URL came from Vercel's check annotation, not a guessed hostname: https://pdm-git-feat-machivital-private-pilot-ottailo-projects.vercel.app . Unauthenticated access redirects302 to Vercel SSO. Local Vercel CLI/link are absent; **actual protected CDN/API/UI behavior remains unverified**, not claimed passing. Deployment Protection untouched. Local frontend preview is not remote evidence.
+
+After whitespace-only security test EOF cleanup, the focused security suite passed **7 tests in40.11s,exit0**. Bounded rehearsal worker and API/web started here stopped; pre-existing infrastructure and original data preserved. This documentation checkpoint records execution, not a production release approval.
 
 ## Historical Stage 1 local execution proof
 
