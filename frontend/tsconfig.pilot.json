@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "types": ["vite/client", "node"] },
+  "include": ["src/pilot-main.tsx", "src/PilotPage.tsx", "src/Brand.tsx", "vite.pilot.config.ts"]
+}

@@ -1,7 +1,7 @@
 """
 Configuration Models for v2 Schema (Templates & Assets)
 """
-from datetime import datetime
+from datetime import datetime, timezone
 from app import db
 from sqlalchemy.dialects.postgresql import JSONB
 
@@ -11,7 +11,13 @@ class Location(db.Model):
     __tablename__ = 'locations'
     
     id = db.Column(db.Integer, primary_key=True)
-    parent_id = db.Column(db.Integer, db.ForeignKey('locations.id'), nullable=True)
+    company_id = db.Column(db.Integer, db.ForeignKey('companies.id'), nullable=False)
+    parent_id = db.Column(db.Integer, nullable=True)
+    __table_args__ = (
+        db.UniqueConstraint('company_id', 'id'),
+        db.ForeignKeyConstraint(['company_id', 'parent_id'], ['locations.company_id', 'locations.id']),
+        db.CheckConstraint("type IN ('Site', 'Area', 'Line')", name='location_type'),
+    )
     name = db.Column(db.String(100), nullable=False)
     type = db.Column(db.String(50), nullable=False) # Site, Area, Line
     path = db.Column(db.String(500), index=True) # Materialized path e.g. "1/5/12"
@@ -115,13 +121,26 @@ class Asset(db.Model):
     __tablename__ = 'assets'
     
     id = db.Column(db.Integer, primary_key=True)
-    asset_template_id = db.Column(db.Integer, db.ForeignKey('asset_templates.id'), nullable=False)
-    location_id = db.Column(db.Integer, db.ForeignKey('locations.id'), nullable=True)
+    asset_template_id = db.Column(db.Integer, db.ForeignKey('asset_templates.id'), nullable=True)
+    location_id = db.Column(db.Integer, nullable=True)
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'), nullable=False)
+    code = db.Column(db.String(64), nullable=False)
+    manufacturer = db.Column(db.String(100))
+    model = db.Column(db.String(100))
+    description = db.Column(db.Text)
+    criticality = db.Column(db.String(20), nullable=False, default='medium')
+    revision = db.Column(db.Integer, nullable=False, default=1)
+    archived_at = db.Column(db.DateTime(timezone=True))
+    __table_args__ = (
+        db.UniqueConstraint('company_id', 'id'),
+        db.UniqueConstraint('company_id', 'code'),
+        db.ForeignKeyConstraint(['company_id', 'location_id'], ['locations.company_id', 'locations.id']),
+        db.CheckConstraint("criticality IN ('low', 'medium', 'high', 'critical')", name='asset_criticality'),
+    )
     
     name = db.Column(db.String(100), nullable=False) # e.g. BOXING_001
     serial_number = db.Column(db.String(100))
-    install_date = db.Column(db.DateTime, default=datetime.utcnow)
+    install_date = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
     status = db.Column(db.String(50), default='Active')
     
     # Relationships
@@ -131,7 +150,7 @@ class Asset(db.Model):
         return {
             'id': self.id,
             'name': self.name,
-            'template_name': self.template.name,
+            'template_name': self.template.name if self.template else None,
             'location_name': self.location.name if self.location else None,
             'status': self.status,
             'install_date': self.install_date.isoformat() if self.install_date else None

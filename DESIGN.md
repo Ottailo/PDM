@@ -1,5 +1,27 @@
-# Mechavital — Autonomous Machinery Vitality & Predictive Telemetry
-## Visual Design Contract & Surface Specification (Archetype E: Signal Density)
+# Machivital — Maintenance workbench
+
+## Active design contract — 2026-11-12
+
+```text
+Product Truth    : Maintenance teams record machines, plan work, and retain reviewed completion records.
+Audience State   : Scattered handovers become a clear next action.
+Emotional Soul   : Practical confidence and legible responsibility, never invented machine health.
+Surface Mode     : OPERATE (private workbench); TRUST-FIRST (public pilot information).
+Chosen Archetype : Warm Authority, grounded in the plant's shift sheet and maintenance ledger.
+Stack & Target   : Existing React/TypeScript/Vite; desktop and 320px+ phone.
+MOTION_INTENSITY : 2/10; short deliberate feedback, reduced-motion respected.
+VISUAL_DENSITY   : 6/10 workbench, 3/10 public page.
+Signature Element: Machine → planned work → reviewed record; explanatory disclosures public, actual records private.
+Typography       : Barlow / Source Sans 3; existing local font assets.
+Palette Dynamic  : Sage surfaces, deep mineral ink, teal action accents, amber only for real attention states.
+Anti-defaults    : No fake telemetry cockpit, inactive demo controls, synthetic customer metrics or status dots.
+```
+
+Shared tokens govern surfaces, borders, contrast, focus and action feedback. Record counts remain API-derived; no public dashboard imitation. Public publishing has its own React entry without private forms or API requests. Existing auth and maintenance actions retain their behavior. Details: [public deployment boundary](docs/PUBLIC_PILOT_DEPLOYMENT.md).
+
+## Historical demo design specification — not active release contract
+
+> 2026-11-12: Autonomous telemetry, physical condition and predictive statements below are not verified product truth. The current local React workbench uses its existing warm maintenance identity; PM phone improvements preserve that identity, not this retired cockpit spec. See [original-vision audit](docs/ORIGINAL_VISION_CROSSCHECK_2026-11-12.md) and [PM PRD](docs/PREVENTIVE_MAINTENANCE_PRD.md).
 
 ---
 

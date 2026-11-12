@@ -1,53 +1,28 @@
-"""
-Vercel Serverless WSGI Entrypoint for Machivital (Industrial Machinery Vitality & Autonomous Telemetry)
-"""
-import os
-import sys
-import traceback
+"""Optional WSGI adapter. No serverless SQLite, seeding or traceback exposure."""
+import logging
 from urllib.parse import parse_qs, urlencode
+from app import create_app
 
-# Ensure project root directory is on sys.path
-root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-if root_dir not in sys.path:
-    sys.path.insert(0, root_dir)
-
-# Explicitly flag Vercel serverless environment before importing app modules
-os.environ['VERCEL'] = '1'
-
-boot_error = None
-flask_app = None
+logger = logging.getLogger(__name__)
 try:
-    from app import create_app
     flask_app = create_app()
-except Exception:
-    boot_error = traceback.format_exc()
+except Exception as error:
+    logger.error('Machivital startup configuration failed (%s)', type(error).__name__)
+    flask_app = None
+
 
 def app(environ, start_response):
-    if boot_error or flask_app is None:
-        status = '500 Internal Server Error'
-        response_headers = [('Content-Type', 'text/plain; charset=utf-8')]
-        start_response(status, response_headers)
-        return [f"PDM Vercel Boot Exception:\n\n{boot_error}".encode('utf-8')]
-    
-    # Path correction for Vercel rewrites:
-    query_string = environ.get('QUERY_STRING', '')
-    if '__pdm_path__' in query_string:
-        params = parse_qs(query_string, keep_blank_values=True)
-        raw_paths = params.pop('__pdm_path__', [''])
-        resolved_path = raw_paths[0] if raw_paths else ''
-        environ['PATH_INFO'] = '/' + resolved_path.lstrip('/')
+    if flask_app is None:
+        start_response('503 Service Unavailable', [('Content-Type', 'application/json'), ('Cache-Control', 'no-store')])
+        return [b'{"error":{"code":"startup_unavailable","message":"The application is not configured for this deployment."}}']
+    params = parse_qs(environ.get('QUERY_STRING', ''), keep_blank_values=True)
+    if '__pdm_path__' in params:
+        path = params.pop('__pdm_path__', [''])[0]
+        environ['PATH_INFO'] = '/' + path.lstrip('/')
         environ['QUERY_STRING'] = urlencode(params, doseq=True)
-    elif environ.get('PATH_INFO') in ['/api/index', '/api/index.py']:
+    elif environ.get('PATH_INFO') in {'/api/index', '/api/index.py'}:
         environ['PATH_INFO'] = '/'
-    
-    try:
-        return flask_app.wsgi_app(environ, start_response)
-    except Exception:
-        req_error = traceback.format_exc()
-        status = '500 Internal Server Error'
-        response_headers = [('Content-Type', 'text/plain; charset=utf-8')]
-        start_response(status, response_headers)
-        return [f"PDM Vercel Request Exception:\n\n{req_error}".encode('utf-8')]
+    return flask_app.wsgi_app(environ, start_response)
 
-# WSGI alias
+
 application = app

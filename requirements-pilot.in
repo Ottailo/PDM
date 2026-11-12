@@ -1,0 +1,15 @@
+# Isolated Stage 1 runtime; compiled to requirements-pilot.lock.
+Flask
+Flask-SQLAlchemy
+Flask-Migrate
+Flask-Login
+Flask-SocketIO
+psycopg[binary]
+pyotp
+cryptography
+pypdf
+boto3
+python-dotenv
+requests
+pytest
+pytest-cov

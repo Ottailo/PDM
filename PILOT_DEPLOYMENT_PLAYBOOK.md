@@ -1,6 +1,8 @@
 # Machivital — Industrial Pilot Deployment & Physical Machine Onboarding Playbook
 
-This document is the operational and engineering blueprint for piloting the **Machivital Autonomous Machinery Vitality & Telemetry Console** in a real-world manufacturing plant, packaging line, CNC workshop, or industrial facility.
+> **Historical prototype playbook, not a commissioning/deployment approval.** Listed 'available/verified' hardware, token, inference and advisor facilities are old demo claims; handcrafted/synthetic scripts did not prove physical factory outcomes. Current local runtime intentionally disables these legacy paths. Do not run this playbook against original or customer data. See [release gates](docs/RELEASE_GATES.md), [original-vision audit](docs/ORIGINAL_VISION_CROSSCHECK_2026-11-12.md) and [PM milestone](docs/PREVENTIVE_MAINTENANCE_PRD.md). Equipment access, prediction claims and deployment require separate authorization/evidence.
+
+The material below is retained historical engineering context for the **Machivital Autonomous Machinery Vitality & Telemetry Console**, not current product acceptance.
 
 ---
 

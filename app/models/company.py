@@ -1,7 +1,7 @@
 """
 Company and Machine Management Models
 """
-from datetime import datetime
+from datetime import datetime, timezone
 from flask_sqlalchemy import SQLAlchemy
 from app import db
 
@@ -15,8 +15,10 @@ class Company(db.Model):
     contact_email = db.Column(db.String(120), nullable=False)
     contact_phone = db.Column(db.String(20))
     address = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
+    timezone = db.Column(db.String(64), nullable=False, default='Africa/Lagos')
+    next_work_order = db.Column(db.Integer, nullable=False, default=1)
     
     # Relationships
     machines = db.relationship('Machine', backref='company', lazy=True, cascade='all, delete-orphan')
@@ -58,8 +60,8 @@ class Machine(db.Model):
     maintenance_schedule = db.Column(db.JSON)  # Maintenance schedule
     
     # Metadata
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None), onupdate=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
     created_by = db.Column(db.String(100))
     
     def to_dict(self):
@@ -101,7 +103,7 @@ class MaintenanceRecord(db.Model):
     # Timestamps
     scheduled_date = db.Column(db.DateTime)
     completed_date = db.Column(db.DateTime)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
     
     # Company relationship
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'), nullable=False)

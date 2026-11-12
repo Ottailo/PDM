@@ -1,0 +1,36 @@
+# Local development only. No public ports or production credentials.
+services:
+  db:
+    image: postgres@sha256:987b242173006d6df08506f10b967a71478a3610664cfefbc49b9c775d3d0eed
+    container_name: machivital-pilot-db
+    environment:
+      POSTGRES_USER: machivital
+      POSTGRES_PASSWORD: local-pilot-only
+      POSTGRES_DB: machivital_pilot
+    ports:
+      - "127.0.0.1:55432:5432"
+    volumes:
+      - machivital_pilot_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U machivital -d machivital_pilot"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+  mail:
+    image: axllent/mailpit@sha256:aef2aacc11f075ec0fb6874275ee4a421e688e11a96ebb296134d1735c7761ce
+    container_name: machivital-pilot-mail
+    ports:
+      - "127.0.0.1:11026:1025"
+      - "127.0.0.1:8026:8025"
+  scanner:
+    image: clamav/clamav@sha256:45fe5149fbee5a46509c9848ef20d0c354b7b2323c9369f285939a37cf33422a
+    container_name: machivital-pilot-scan
+    ports:
+      - "127.0.0.1:13310:3310"
+    volumes:
+      - machivital_pilot_clam:/var/lib/clamav
+volumes:
+  machivital_pilot_pgdata:
+    external: true
+  machivital_pilot_clam:
+    external: true

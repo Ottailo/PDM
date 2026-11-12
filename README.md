@@ -1,6 +1,10 @@
-# Machivital — Industrial Machinery Vitality & Autonomous Telemetry Platform
+# Machivital — Factory maintenance workspace
 
-> Real-time industrial machine telemetry, dual-output GRU failure prediction, and maintenance scheduling platform for manufacturing lines.
+> Current work: private equipment records, assigned maintenance, scanned manuals, team access controls and preventive plans are implemented locally. The public Vercel build is pilot information only, with no accounts, records, monitoring or uploads. Customer backend release and factory commissioning remain held. See [public publishing boundary](docs/PUBLIC_PILOT_DEPLOYMENT.md), [PM state](docs/PREVENTIVE_MAINTENANCE_STATE.md), and [release gates](docs/RELEASE_GATES.md).
+
+**Current release truth (2026-11-11):** the sections below describe the historical prototype, not verified customer capabilities. Source audit found public admin auto-login, generated history, simulated maintenance and unvalidated model claims. No hardware access or representative industrial dataset is available. The new isolated pilot must pass fresh tests before release; exact failure prediction, real-machine monitoring, compliance and downtime savings are not established.
+
+See [Stage 1 PRD](docs/PRD.md), [API contract](docs/STAGE1_API.md), [current checklist](TASK_CHECKLIST.md), and [local pilot](docs/LOCAL_PILOT.md). The pre-existing documentation and diagrams are retained as historical context.
 
 ---
 
@@ -13,8 +17,8 @@
 | **Status** | 🟢 Active |
 | **Primary Language(s)** | Python 3.10+, JavaScript (ES6+), HTML5/Jinja2, CSS3 |
 | **Tech Stack** | Flask 3.0, TensorFlow 2.15 (Keras), Scikit-learn, SQLAlchemy 2.0, Alembic, Tailwind CSS, Chart.js 4.4, SQLite/Postgres |
-| **Last Major Update** | 2026-11-02 (Auto-synced) |
-| **Estimated LOC** | ~16,149 LOC |
+| **Last Major Update** | 2026-11-12 (Auto-synced) |
+| **Estimated LOC** | ~33,079 LOC |
 | **Test Coverage** | Unit & API integration tests in `scripts/test_api.py` |
 
 ---
@@ -555,5 +559,5 @@ python scripts/check_data_generation.py
 
 ## 📝 Document Meta
 - **Generated:** 2026-09-13
-- **Last Verified Current:** 2026-11-02
+- **Last Verified Current:** 2026-11-12
 - **Verification Frequency:** Bi-annually or upon model retraining.

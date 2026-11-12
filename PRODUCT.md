@@ -1,5 +1,7 @@
 # PDM — Industrial Predictive Maintenance System
-## Product Truth, Operational Context & Domain Specification
+## Historical prototype vision — not current product truth
+
+> 2026-11-12: Statements below describe the old demo and future ambition, not validated industrial capabilities. Current active runtime is a local private maintenance workspace. Telemetry/precise RUL/diagnosis/ROI remain uncommissioned and unvalidated; do not sell or transplant prototype claims. Authoritative scope: [original-vision audit](docs/ORIGINAL_VISION_CROSSCHECK_2026-11-12.md), [PM PRD](docs/PREVENTIVE_MAINTENANCE_PRD.md), [release gates](docs/RELEASE_GATES.md).
 
 ---
 

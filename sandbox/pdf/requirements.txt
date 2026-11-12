@@ -1,0 +1,3 @@
+# PyPI release metadata: https://pypi.org/pypi/pypdf/7.0.1/json
+# Only the published universal wheel is accepted (no source builds/dependencies).
+pypdf==7.0.1 --hash=sha256:6131b764b046282357037309e7ef2a1b7679d4a5c53eed3db2bfbf7c673ddc2b

@@ -70,3 +70,21 @@ logs/
 # Temporary files
 *.tmp
 *.temp
+
+# Private pilot runtime
+.env.*
+.pilot/
+.pytest_cache/
+.coverage
+htmlcov/
+node_modules/
+frontend/dist/
+frontend/dist-pilot/
+frontend/test-results/
+frontend/public-test-results/
+frontend/playwright-report/
+
+# Private local verification evidence (public-page screenshots may be committed)
+tests/screenshots/personas/
+tests/screenshots/vision-audit/
+tests/screenshots/pm-workbench-preview-20261112.jpg
